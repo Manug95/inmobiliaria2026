@@ -1,0 +1,67 @@
+@model Propietario;
+
+<div class="container-md mt-3">
+    <h1 class="text-center">Guardar Nuevo Propietario</h1>
+
+    <div class="d-flex justify-content-center align-items-center vh-50 w-100 mt-5">
+        <form asp-action="Guardar" id="form-propietario" class="p-3 w-75 mx-auto border rounded-4 shadow-sm needs-validation mt-3 mb-3 bg-light-subtle">
+            <div class="row mt-3 mb-md-4">
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="Nombre" class="form-label fw-bold">Nombre</label>
+                        <input type="text" asp-for="Nombre" class="form-control" id="nombre">
+                        <div class="invalid-tooltip">Falta el nombre o es incorrecto</div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="Apellido" class="form-label fw-bold">Apellido</label>
+                        <input type="text" asp-for="Apellido" class="form-control" id="apellido">
+                        <div class="invalid-tooltip">Falta el apellido o es incorrecto</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-md-4">
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="Dni" class="form-label fw-bold">DNI</label>
+                        <input type="text" asp-for="Dni" class="form-control" id="dni">
+                        <div class="invalid-tooltip">Falta el DNI o es incorrecto</div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="Telefono" class="form-label fw-bold">Teléfono</label>
+                        <input type="text" asp-for="Telefono" class="form-control" id="telefono">
+                        <div class="invalid-tooltip">Falta el teléfono o es incorrecto</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-md-4">
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="Email" class="form-label fw-bold">Email</label>
+                        <input type="email" asp-for="Email" class="form-control" id="email">
+                        <div class="invalid-tooltip">Falta el email o es incorrecto</div>
+                    </div>
+                </div>
+            </div>
+
+            <input type="hidden" asp-for="Id"/>
+
+            <div class="row mb-2 mt-5 mt-md-4 justify-content-center">
+                <div class="col-2 d-flex justify-content-center">
+                    <input type="submit" value="Guardar" class="btn btn-primary d-block mx-auto">
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div>
+        <a asp-action="Index" class="btn btn-primary">Volver</a>
+    </div>
+</div>
+
+<script type="module" src="~/js/propietarioForm.js" defer></script>

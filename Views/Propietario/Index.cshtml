@@ -1,0 +1,19 @@
+@using inmobiliaria2026.Models.ViewModels
+@model PropietarioViewModel
+@{
+    ViewData["Title"] = "Propietarios";
+}
+
+<link rel="stylesheet" href="~/css/tablas.css">
+
+<h1 id="titulo" data-modelo="@nameof(Propietario)" class="text-center mt-2">Propietarios</h1>
+
+@*aca va la tabla*@
+<partial name="_PropietarioTabla" model="Model.Propietarios"/>
+<partial name="_PropietarioFormModal" model="Model.Propietario"/>
+<partial name="_ModalPregunta"/>
+@if(!string.IsNullOrEmpty(Model.MensajeError)) {
+    <partial name="_MensajeError" model="Model.MensajeError"/>
+}
+
+<script type="module" src="~/js/propietarios.js"></script>

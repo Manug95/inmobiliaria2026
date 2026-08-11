@@ -1,0 +1,18 @@
+@model string
+
+<div id="modal-mensaje" class="modal fade modal-md" tabindex="-1" aria-describedby="titulo-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div id="titulo-modal" class="modal-title fs-5">Mensaje</div>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body justify-content-center align-items-center">
+                <p id="mensaje" class="text-center fw-bold fs-5">@Model</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button class="btn btn-primary" type="button" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
