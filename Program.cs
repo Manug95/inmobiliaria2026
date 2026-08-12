@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IPropietarioRepository, PropietarioRepository>();
-// builder.Services.AddScoped<IInquilinoRepository, InquilinoRepository>();
+builder.Services.AddScoped<IInquilinoRepository, InquilinoRepository>();
 
 var app = builder.Build();
 
