@@ -1,0 +1,51 @@
+@model TipoInmueble;
+
+<div id="modal_formulario_tipoInmueble" class="modal fade modal-lg" tabindex="-1" aria-describedby="titulo-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div id="titulo-modal" class="modal-title fs-5">Formulario Tipo Inmueble</div>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body justify-content-center align-items-center">
+                <div class="container-md">
+                    <div class="d-flex justify-content-center align-items-center vh-50 w-100">
+                        <form asp-action="Guardar" id="form-tipoInmueble" class="p-3 w-75 mx-auto border rounded-4 shadow-sm needs-validation mt-3 mb-3 bg-light-subtle">
+                            <div class="row mb-md-4">
+                                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                                    <div class="position-relative">
+                                        <label asp-for="Tipo" class="form-label fw-bold">Tipo Inmueble</label>
+                                        <input type="text" asp-for="Tipo" class="form-control" id="tipo">
+                                        <div id="tpe_tipo" class="invalid-tooltip"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-md-4">
+                                <div class="col-12 mt-5 mt-md-3 mb-md-0">
+                                    <div class="position-relative">
+                                        <label asp-for="Descripcion" class="form-label fw-bold">Descripción</label>
+                                        <textarea asp-for="Descripcion" id="descripcion" class="form-control" rows="3" placeholder="(opcional) agregue una descripción al tipo de inmueble"></textarea>
+                                        <div id="tpe_descripcion" class="invalid-tooltip"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input id="Id" type="hidden" asp-for="Id"/>
+
+                            <div class="row mb-2 mt-5 mt-md-4 justify-content-evenly align-items-end pt-3">
+                                <div class="col-2 d-flex justify-content-center">
+                                    <input type="submit" value="Guardar" class="btn btn-primary d-block mx-auto">
+                                </div>
+                                <div class="col-2 d-flex justify-content-center">
+                                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

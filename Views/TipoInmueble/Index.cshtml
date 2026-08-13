@@ -1,0 +1,23 @@
+@using inmobiliaria2026.Models.ViewModels
+@model TipoInmuebleViewModel
+@{
+    ViewData["Title"] = "Tipos de Inmueble";
+}
+
+<link rel="stylesheet" href="~/css/tablas.css">
+<link rel="stylesheet" href="~/css/styles.css">
+
+<h1 id="titulo" data-modelo="@nameof(TipoInmueble)" class="text-center mt-2 display-4">Tipos de Inmuebles</h1>
+
+<partial name="_TipoInmuebleTabla" model="Model.TiposInmuebles"/>
+
+<partial name="_TipoInmuebleFormModal" model="Model.TipoInmueble"/>
+
+<partial name="_ModalPregunta"/>
+
+@if(!string.IsNullOrEmpty(Model.MensajeError)) {
+    <partial name="_MensajeError" model="Model.MensajeError"/>
+}
+
+
+<script type="module" src="~/js/tiposInmueble.js"></script>
