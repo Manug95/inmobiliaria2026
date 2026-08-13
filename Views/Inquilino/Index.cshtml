@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="~/css/tablas.css">
 <link rel="stylesheet" href="~/css/styles.css">
 
-<h1 id="titulo" data-modelo="@nameof(Inquilino)" class="text-center mt-2">Inquilinos</h1>
+<h1 id="titulo" data-modelo="@nameof(Inquilino)" class="text-center mt-2 display-4">Inquilinos</h1>
 
 @*aca va la tabla*@
 <partial name="_InquilinoTabla" model="Model.Inquilinos"/>
@@ -16,7 +16,5 @@
 @if(!string.IsNullOrEmpty(Model.MensajeError)) {
     <partial name="_MensajeError" model="Model.MensajeError"/>
 }
-
-
 
 <script type="module" src="~/js/inquilinos.js"></script>

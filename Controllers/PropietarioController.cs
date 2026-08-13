@@ -40,18 +40,14 @@ public class PropietarioController : Controller
         return Json(new { datos = propietarios });
     }
 
-    public IActionResult Guardar(Propietario propietario)
+    public async Task<IActionResult> Guardar(Propietario propietario)
     {
         if (ModelState.IsValid)
         {
             if (propietario.Id > 0)
-            {
-                _repo.ActualizarAsync(propietario);
-            }
+                await _repo.ActualizarAsync(propietario);
             else
-            {
-                _repo.CrearAsync(propietario);
-            }
+                await _repo.CrearAsync(propietario);
         }
         else
         {
@@ -70,9 +66,9 @@ public class PropietarioController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    public IActionResult Eliminar(int id)
+    public async Task<IActionResult> Eliminar(int id)
     {
-        _repo.EliminarAsync(id);
+        await _repo.EliminarAsync(id);
         return RedirectToAction(nameof(Index));
     }
 

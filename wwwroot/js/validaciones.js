@@ -73,17 +73,22 @@ export function validarNombreApellido(cadena) {
   return;
 }
 
+/**
+ * @param {string} cadena 
+ * @returns {undefined | { errorMessage: string }} El mensaje de error si falla la validación
+ */
 export function validarTelefono(cadena) {
+  if (cadena.trim().length == 0) return;
   if (cadena.length > 25) return { errorMessage: "El máximo de caracteres de de 25." };
 
-  const regExp = /^(\+54\s)?0?(\d{2,4})\s(15\s)?(\d{4}-?\d{4})|(\d{3}-?\d{4})|(\d{2}-?\d{4})$/;
-  if (!regExp.test(cadena)) return { errorMessage: "El teléfono ingresado NO es valido" };
+  // const regExp = /^(\+54\s)?0?(\d{2,4})\s(15\s)?(\d{4}-?\d{4})|(\d{3}-?\d{4})|(\d{2}-?\d{4})$/;
+  // if (!regExp.test(cadena)) return { errorMessage: "El teléfono ingresado NO es valido" };
   return;
 }
 
 export function validarEmail(cadena) {
   if (cadena.length > 100) return { errorMessage: "El máximo de caracteres de de 100" };
-  const regExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const regExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // la ultima parte {2,} podria ser {2,4}
   if (!regExp.test(cadena)) return { errorMessage: "El EMAIL ingresado NO es valido" };
   return;
 }

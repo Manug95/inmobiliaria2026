@@ -40,18 +40,14 @@ public class InquilinoController : Controller
         return Json(new { datos = inquilinos });
     }
 
-    public IActionResult Guardar(Inquilino inquilino)
+    public async Task<IActionResult> Guardar(Inquilino inquilino)
     {
         if (ModelState.IsValid)
         {
             if (inquilino.Id > 0)
-            {
-                _repo.ActualizarAsync(inquilino);
-            }
+                await _repo.ActualizarAsync(inquilino);
             else
-            {
-                _repo.CrearAsync(inquilino);
-            }
+                await _repo.CrearAsync(inquilino);
         }
         else
         {
