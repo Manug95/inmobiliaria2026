@@ -9,6 +9,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IPropietarioRepository, PropietarioRepository>();
 builder.Services.AddScoped<IInquilinoRepository, InquilinoRepository>();
 builder.Services.AddScoped<ITipoInmuebleRepository, TipoInmuebleRepository>();
+builder.Services.AddScoped<IInmuebleRepository, InmuebleRepository>();
 
 var app = builder.Build();
 

@@ -48,12 +48,12 @@
                                 @* @if (User.IsInRole(Rol.ADMIN.ToString())) { *@
                                     <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
                                 @* } *@
-                                @* <a class="icon-enlace" asp-action="FormularioInmueble" asp-controller="Inmueble" asp-route-idProp="@item.Id" data-bs-toggle="tooltip" data-bs-title="Registrar Inmueble">
+                                <a class="icon-enlace" asp-action="FormularioInmueble" asp-controller="Inmueble" asp-route-idProp="@item.Id" data-bs-toggle="tooltip" data-bs-title="Registrar Inmueble">
                                     <i class="bi bi-building-add fs-3 text-success"></i>
-                                </a> *@
-                                @* <a class="icon-enlace" asp-action="Index" asp-controller="Inmueble" asp-route-idProp="@item.Id" data-bs-toggle="tooltip" data-bs-title="Ver Inmuebles">
+                                </a>
+                                <a class="icon-enlace" asp-action="Index" asp-controller="Inmueble" asp-route-idProp="@item.Id" data-bs-toggle="tooltip" data-bs-title="Ver Inmuebles">
                                     <i class="bi bi-buildings fs-3 text-info"></i>
-                                </a> *@
+                                </a>
                             </div>
                         </td>
                     </tr>

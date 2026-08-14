@@ -15,6 +15,7 @@ public class TipoInmuebleController : Controller
         _repo = repo;
     }
 
+    [HttpGet]
     public async Task<IActionResult> Index([FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10)
     {
         IList<TipoInmueble> tiposInmueble = await _repo.ListarAsync(cantidadPaginado, (pagina - 1) * cantidadPaginado);
@@ -34,6 +35,7 @@ public class TipoInmuebleController : Controller
         return View(viewModel);
     }
 
+    [HttpPost]
     public async Task<IActionResult> Guardar([FromForm] TipoInmueble tipoInmueble)
     {
         if (ModelState.IsValid)
@@ -58,6 +60,7 @@ public class TipoInmuebleController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpGet]
     public async Task<IActionResult> Eliminar([FromRoute] int id)
     {
         if (id <= 0)

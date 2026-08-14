@@ -1,0 +1,144 @@
+@using inmobiliaria2026.Models.ViewModels
+@model InmuebleViewModel;
+
+<link rel="stylesheet" href="~/css/styles.css">
+
+<div class="container-md align-middle">
+    <div class="d-flex justify-content-center align-items-center vh-50 w-100">
+        <form asp-action="Guardar" id="form-inmueble" class="p-3 w-75 mx-auto border rounded-4 shadow-sm needs-validation mt-3 mb-3 bg-light-subtle" novalidate>
+            <div class="row mb-md-4 border rounded-4">
+                <div class="col-12 col-md-6 mt-md-1 mb-md-3">
+                    <div class="position-relative">
+                        <label asp-for="InmuebleFormData.Calle" class="form-label fw-bold">Calle</label>
+                        <input type="text" asp-for="InmuebleFormData.Calle" class="form-control" id="calle">
+                        <div id="tpe_calle" class="invalid-tooltip"></div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 mt-md-1 mb-md-3">
+                    <div class="position-relative">
+                        <label asp-for="InmuebleFormData.NroCalle" class="form-label fw-bold">Nro</label>
+                        <input type="number" asp-for="InmuebleFormData.NroCalle" class="form-control" id="nro">
+                        <div id="tpe_nro" class="invalid-tooltip"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-md-4">
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="InmuebleFormData.IdTipoInmueble" class="form-label fw-bold">Tipo de inmueble</label>
+                        <i class="bi bi-plus-square fs-5 text-primary align-middle icon-hover d-inline-block"  data-bs-toggle="tooltip" data-bs-title="Nuevo Tipo Inmueble" id="add_tipo" style="cursor: pointer;"></i>
+                        <select asp-for="InmuebleFormData.IdTipoInmueble" class="form-select" id="tipo_inm">
+                            <option value="" selected disabled>Seleccione el tipo</option>
+                            @for (int i = 0; i < Model?.TiposInmuebles?.Count(); i++) {
+                                <option value="@Model?.TiposInmuebles.ElementAt(i).Id">@Model?.TiposInmuebles.ElementAt(i).Tipo</option>
+                            }
+                        </select>
+                        <div id="tpe_tipo_inm" class="invalid-tooltip"></div>
+                    </div>
+                </div>
+                @* <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="InmuebleFormData.Uso" class="form-label fw-bold">Uso que tendrá el inmueble</label>
+                        <select asp-for="InmuebleFormData.Uso" class="form-select" id="uso">
+                            <option value="" selected disabled>Seleccione el uso</option>
+                            <option value="RESIDENCIAL">RESIDENCIAL</option>
+                            <option value="COMERCIAL">COMERCIAL</option>
+                        </select>
+                        <div id="tpe_uso" class="invalid-tooltip"></div>
+                    </div>
+                </div> *@
+            </div>
+
+            <div class="row mb-md-4">
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="InmuebleFormData.CantidadAmbientes" class="form-label fw-bold">Cantidad de ambientes</label>
+                        <input type="number" asp-for="InmuebleFormData.CantidadAmbientes" class="form-control" id="cant_amb">
+                        <div id="tpe_cant_amb" class="invalid-tooltip"></div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="InmuebleFormData.Precio" class="form-label fw-bold">Precio</label>
+                        <input type="number" asp-for="InmuebleFormData.Precio" class="form-control" id="precio">
+                        <div id="tpe_precio" class="invalid-tooltip"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-md-4">
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="InmuebleFormData.Latitud" class="form-label fw-bold">Latitud</label>
+                        <input type="number" asp-for="InmuebleFormData.Latitud" class="form-control" id="latitud">
+                        <div id="tpe_latitud" class="invalid-tooltip"></div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="InmuebleFormData.Longitud" class="form-label fw-bold">Longitud</label>
+                        <input type="number" asp-for="InmuebleFormData.Longitud" class="form-control" id="longitud">
+                        <div id="tpe_longitud" class="invalid-tooltip"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-md-4">
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <label for="buscador" class="form-label fw-bold">nombre o apellido del propietario</label>
+                    <input type="text" class="form-control" id="buscador">
+                </div>
+                 <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="InmuebleFormData.IdPropietario" class="form-label fw-bold">Propietario</label>
+                        <select asp-for="InmuebleFormData.IdPropietario" class="form-select" id="propietario">
+                            @if(Model.InmuebleFormData!.Duenio != null) {
+                                <option value="@Model.InmuebleFormData.Duenio.Id" selected>@Model.InmuebleFormData.Duenio</option>
+                            } else {
+                                <option value="" selected disabled>Seleccione el propietario</option>
+                                @for (int i = 0; i < Model?.Propietarios?.Count(); i++) {
+                                    <option value="@Model?.Propietarios.ElementAt(i).Id"
+                                        selected="@(Model?.Propietarios.Count() == 1)"
+                                    >
+                                        @Model?.Propietarios.ElementAt(i).ToString()
+                                    </option>
+                                }
+                            }
+                        </select>
+                        <div id="tpe_propietario" class="invalid-tooltip"></div>
+                    </div>
+                </div>
+            </div>
+
+            @if(Model?.InmuebleFormData?.Id > 0) {
+                <div class="row mb-md-4">
+                    <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                        <div class="form-check">
+                            <label asp-for="InmuebleFormData.IdPropietario" class="form-check-label fw-bold">Habilitado</label>
+                            <input type="checkbox" asp-for="InmuebleFormData.Disponible" class="form-check-input" id="disponible">
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <input id="Id" type="hidden" asp-for="InmuebleFormData.Id"/>
+            <input id="NuevoTipo" type="hidden" asp-for="InmuebleFormData.NuevoTipo"/>
+            <input id="NuevoTipoDescripcion" type="hidden" asp-for="InmuebleFormData.NuevoTipoDescripcion"/>
+
+            <div class="row mb-2 mt-5 mt-md-4 justify-content-evenly align-items-end pt-3">
+                <div class="col-2 d-flex justify-content-center">
+                    <input type="submit" value="Guardar" class="btn btn-primary d-block mx-auto">
+                </div>
+                <div class="col-2 d-flex justify-content-center">
+                    <a class="btn btn-secondary px-3" type="button" asp-action="Index">Volver</a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<partial name="_TipoInmuebleFormModal" model="new TipoInmueble()"></partial>
+
+<script type="module" src="~/js/inmuebleForm.js"></script>
