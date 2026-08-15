@@ -9,11 +9,12 @@ import {
   validarNombreTipoInmueble,
   validarDescripcionTipoInmueble,
   validarCalle,
-  validarCantidadAmbientes,
+  validarCupo,
   validarLatitud,
   validarLongitud,
   validarNroCalle,
-  validarPrecio
+  validarPrecio,
+  validarSenia
 } from "./validaciones.js";
 
 
@@ -92,8 +93,9 @@ function getFormValues() {
     nro: getFormInputValue("nro"),
     tipo_inm: getFormInputValue("tipo_inm"),
     uso: getFormInputValue("uso"),
-    cant_amb: getFormInputValue("cant_amb"),
+    cupo: getFormInputValue("cupo"),
     precio: getFormInputValue("precio"),
+    senia: getFormInputValue("senia"),
     latitud: getFormInputValue("latitud"),
     longitud: getFormInputValue("longitud"),
     propietario: getFormInputValue("propietario"),
@@ -110,8 +112,9 @@ function validarFormulario(values) {
     ["nro", validarNroCalle],
     ["tipo_inm", validarFormSelect],
     ["uso", validarFormSelect],
-    ["cant_amb", validarCantidadAmbientes],
+    ["cupo", validarCupo],
     ["precio", validarPrecio],
+    ["senia", validarSenia],
     ["latitud", validarLatitud],
     ["longitud", validarLongitud],
     ["propietario", validarFormSelect]

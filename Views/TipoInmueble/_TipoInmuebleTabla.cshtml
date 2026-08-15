@@ -27,9 +27,7 @@
                         <td class="align-middle">
                             <div class="d-flex justify-content-evenly align-items-center">
                                 <i id="edit-@item.Id" class="bi bi-pencil-square fs-3 text-primary icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Editar"></i>
-                                @* @if (User.IsInRole(Rol.ADMIN.ToString())) { *@
-                                    <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
-                                @* } *@
+                                <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
                             </div>
                         </td>
                     </tr>

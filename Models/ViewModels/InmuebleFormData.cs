@@ -21,12 +21,15 @@ public class InmuebleFormData
 
     [Required]
     [Display(Name = "Cantidad de Ambientes")]
-    public int? CantidadAmbientes { get; set; }
+    public int? Cupo { get; set; }
 
     [Required]
     [Range(0, double.MaxValue)]
     [DataType(DataType.Currency)]
     public decimal? Precio { get; set; }
+    [Required]
+    [Range(1, 100, ErrorMessage = "El porcentaje debe estan entre 1 y 100")]
+    public int Senia { get; set; }
 
     [Required]
     public string? Calle { get; set; }

@@ -42,32 +42,28 @@
                                         <div id="tpe_tipo" class="invalid-tooltip"></div>
                                     </div>
                                 </div>
-                                @* <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
                                     <div class="position-relative">
-                                        <label asp-for="Inmueble.Uso" class="form-label fw-bold">Uso que tendrá el inmueble</label>
-                                        <select asp-for="Inmueble.Uso" class="form-control" id="uso">
-                                            <option value="" selected disabled>Seleccione el uso</option>
-                                            <option value="RESIDENCIAL" selected disabled>RESIDENCIAL</option>
-                                            <option value="COMERCIAL" selected disabled>COMERCIAL</option>
-                                        </select>
-                                        <div id="tpe_uso" class="invalid-tooltip"></div>
+                                        <label asp-for="InmuebleFormData.Cupo" class="form-label fw-bold">Cupo</label>
+                                        <input type="number" asp-for="InmuebleFormData.Cupo" class="form-control" id="cupo">
+                                        <div id="tpe_cupo" class="invalid-tooltip"></div>
                                     </div>
-                                </div> *@
+                                </div>
                             </div>
 
                             <div class="row mb-md-4">
                                 <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
                                     <div class="position-relative">
-                                        <label asp-for="Inmueble.CantidadAmbientes" class="form-label fw-bold">Cantidad de ambientes</label>
-                                        <input type="text" asp-for="Inmueble.CantidadAmbientes" class="form-control" id="cant_amb">
-                                        <div id="tpe_cant_amb" class="invalid-tooltip"></div>
+                                        <label asp-for="InmuebleFormData.Precio" class="form-label fw-bold">Precio</label>
+                                        <input type="number" asp-for="InmuebleFormData.Precio" class="form-control" id="precio">
+                                        <div id="tpe_precio" class="invalid-tooltip"></div>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
                                     <div class="position-relative">
-                                        <label asp-for="Inmueble.Precio" class="form-label fw-bold">Precio</label>
-                                        <input type="text" asp-for="Inmueble.Precio" class="form-control" id="precio">
-                                        <div id="tpe_precio" class="invalid-tooltip"></div>
+                                        <label asp-for="InmuebleFormData.Senia" class="form-label fw-bold">Seña</label>
+                                        <input type="number" asp-for="InmuebleFormData.Senia" class="form-control" id="senia">
+                                        <div id="tpe_senia" class="invalid-tooltip"></div>
                                     </div>
                                 </div>
                             </div>

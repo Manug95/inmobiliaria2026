@@ -38,13 +38,16 @@
                         @Html.DisplayNameFor(model => model.Tipo).ToUpper()
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.CantidadAmbientes).ToUpper()
+                        @Html.DisplayNameFor(model => model.Cupo).ToUpper()
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Duenio).ToUpper()
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Precio).ToUpper()
+                    </th>
+                    <th>
+                        % @Html.DisplayNameFor(model => model.Senia).ToUpper()
                     </th>
                     <th></th>
                 </tr>
@@ -60,7 +63,7 @@
                             @Html.DisplayFor(modelItem => item.Tipo!.Tipo)
                         </td>
                         <td class="align-middle py-0 ps-2">
-                            @Html.DisplayFor(modelItem => item.CantidadAmbientes)
+                            @Html.DisplayFor(modelItem => item.Cupo)
                         </td>
                         <td class="align-middle py-0 ps-2">
                             @(item.Duenio != null ? item.Duenio.ToString().Split('-').ElementAt(0) : "Sin Dueño")
@@ -68,14 +71,15 @@
                         <td class="align-middle py-0 ps-2">
                             @Html.DisplayFor(modelItem => item.Precio)
                         </td>
+                        <td class="align-middle py-0 ps-2">
+                            @Html.DisplayFor(modelItem => item.Senia)
+                        </td>
                         <td>
                             <div class="d-flex justify-content-evenly align-items-center contenedor-iconos">
                                 <a class="icon-enlace" asp-action="FormularioInmueble" asp-route-id="@item.Id">
                                     <i class="bi bi-pencil-square fs-3 icon-hover text-primary" data-bs-toggle="tooltip" data-bs-title="Editar"></i>
                                 </a>
-                                @* @if (User.IsInRole(Rol.ADMIN.ToString())) { *@
-                                    <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
-                                @* } *@
+                                <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
                                 <i id="det-@item.Id" class="bi bi-file-earmark-text fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
                                 <a class="icon-enlace" asp-controller="Contrato" asp-action="Index" asp-route-idInm="@item.Id">
                                     <i class="bi bi-file-earmark-text fs-3 icon-hover text-warning" data-bs-toggle="tooltip" data-bs-title="Ver Contratos"></i>

@@ -23,6 +23,7 @@ public class InquilinoController : Controller
         ViewBag.cantPag = Math.Ceiling((decimal)cantidadInquilinos / cantidadPaginado);
         ViewBag.paginaSiguiente = pagina + 1;
         ViewBag.paginaAnterior = pagina - 1;
+        ViewBag.linkActivo = "inquilinos";
 
         InquilinoViewModel viewModel = new InquilinoViewModel
         {

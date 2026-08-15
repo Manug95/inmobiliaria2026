@@ -23,6 +23,7 @@ public class PropietarioController : Controller
         ViewBag.cantPag = Math.Ceiling((decimal)cantidadPropietarios / cantidadPaginado);
         ViewBag.paginaSiguiente = pagina + 1;
         ViewBag.paginaAnterior = pagina - 1;
+        ViewBag.linkActivo = "propietarios";
 
         PropietarioViewModel viewModel = new PropietarioViewModel
         {

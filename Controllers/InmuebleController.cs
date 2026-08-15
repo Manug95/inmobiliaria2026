@@ -22,46 +22,38 @@ public class InmuebleController : Controller
     [HttpGet]
     public async Task<IActionResult> Index([FromQuery] string? prop, [FromQuery] int idProp = 0, [FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10, [FromQuery] int disp = (int)Disponiblilidad.TODOS)
     {
+        if (idProp < 0 || pagina < 0 || cantidadPaginado < 0)
+            return BadRequest();
+
         IList<Inmueble>? inmuebles;
-        int cantidadInmuebles;
+        int cantidadInmuebles = await _repo.ContarInmuebles(disp, idProp);
 
-        if (idProp == 0)
-        {
-            inmuebles = await _repo.ListarInmuebles(disp, pagina, cantidadPaginado, prop);
-            cantidadInmuebles = await _repo.ContarInmuebles(disp);
-        }
-        else
-        {
-            inmuebles = await _repo.ListarInmueblesPorPropietario(idProp, pagina, cantidadPaginado);
-            cantidadInmuebles = inmuebles.Count;
-        }
-
-
-        // IList<TipoInmueble> tiposInmuebles = await _repoTipoInmueble.ListarAsync(10, 0);
-
-        ViewBag.cantPag = Math.Ceiling((decimal)cantidadInmuebles / cantidadPaginado);
-        ViewBag.paginaSiguiente = pagina + 1;
-        ViewBag.paginaAnterior = pagina - 1;
-        ViewBag.disponible = disp;
-        // ViewBag.propietario = idProp == 0 ? prop : (inmuebles.First()?.Duenio?.Apellido + " " + inmuebles.First()?.Duenio?.Nombre);
-        ViewBag.idProp = idProp;
         if (idProp != 0)
         {
+            inmuebles = await _repo.ListarInmueblesPorPropietario(idProp, pagina, cantidadPaginado);
             if (inmuebles.Count != 0)
                 ViewBag.propietario = inmuebles.First()?.Duenio?.Apellido + " " + inmuebles.First()?.Duenio?.Nombre;
         }
         else
-            ViewBag.propietario = prop;
-
-        InmuebleViewModel viewModel = new InmuebleViewModel
         {
-            Inmuebles = inmuebles,
-            // Inmueble = new Inmueble(),
-            // TiposInmuebles = tiposInmuebles,
-            MensajeError = TempData["MensajeError"] as string
-        };
+            inmuebles = await _repo.ListarInmuebles(disp, pagina, cantidadPaginado, prop);
+            ViewBag.propietario = prop;
+        }
+        
 
-        return View(viewModel);
+        ViewBag.linkActivo = "inmuebles";
+        ViewBag.cantPag = Math.Ceiling((decimal)cantidadInmuebles / cantidadPaginado);
+        ViewBag.paginaSiguiente = pagina + 1;
+        ViewBag.paginaAnterior = pagina - 1;
+        ViewBag.disponible = disp;
+        ViewBag.idProp = idProp;
+
+        return View(new InmuebleViewModel
+            {
+                Inmuebles = inmuebles,
+                MensajeError = TempData["MensajeError"] as string
+            }
+        );
     }
 
     /*
@@ -90,13 +82,14 @@ public class InmuebleController : Controller
             Inmueble inmueble = new Inmueble
             {
                 Calle = inmuebleForm.Calle,
-                CantidadAmbientes = (int)inmuebleForm.CantidadAmbientes!,
+                Cupo = (int)inmuebleForm.Cupo!,
                 IdPropietario = inmuebleForm.IdPropietario,
                 IdTipoInmueble = inmuebleForm.IdTipoInmueble,
                 Latitud = inmuebleForm.Latitud != null ? (decimal)inmuebleForm.Latitud : 0,
                 Longitud = inmuebleForm.Longitud != null ? (decimal)inmuebleForm.Longitud : 0,
                 NroCalle = (uint)inmuebleForm.NroCalle!,
                 Precio = (decimal)inmuebleForm.Precio!,
+                Senia = inmuebleForm.Senia!,
                 // Foto = inmuebleForm.Foto,
             };
 
@@ -149,19 +142,22 @@ public class InmuebleController : Controller
                 {
                     Id = inmueble.Id,
                     Calle = inmueble.Calle,
-                    CantidadAmbientes = inmueble.CantidadAmbientes,
+                    Cupo = inmueble.Cupo,
                     IdPropietario = inmueble.IdPropietario,
                     IdTipoInmueble = inmueble.IdTipoInmueble,
                     Latitud = inmueble.Latitud,
                     Longitud = inmueble.Longitud,
                     NroCalle = inmueble.NroCalle,
                     Precio = inmueble.Precio,
+                    Senia = inmueble.Senia,
                     Disponible = inmueble.Disponible,
                     Duenio = inmueble.Duenio
                 };
             }
 
         }
+
+        ViewBag.linkActivo = "inmuebles";
 
         InmuebleViewModel viewModel = new InmuebleViewModel
         {

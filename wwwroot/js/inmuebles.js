@@ -71,8 +71,9 @@ function agregarDatosAlModal(datos) {
   getElementById("propietario_detalle").textContent = `${datos.duenio.apellido}, ${datos.duenio.nombre}`;
   getElementById("tipo_inmueble_detalle").textContent = datos.tipo.tipo;
   // getElementById("uso_detalle").textContent = datos.uso;
-  getElementById("cant_amb_detalle").textContent = datos.cantidadAmbientes;
+  getElementById("cupo_detalle").textContent = datos.cupo;
   getElementById("precio_detalle").textContent = datos.precio;
+  getElementById("senia_detalle").textContent = datos.senia;
   getElementById("dir_detalle").textContent = `${datos.calle} ${datos.nroCalle}`;
   getElementById("lat_detalle").textContent = datos.latitud;
   getElementById("long_detalle").textContent = datos.longitud;

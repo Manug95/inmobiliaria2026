@@ -19,10 +19,11 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                 SET 
                 {nameof(Inmueble.IdPropietario)} = @{nameof(Inmueble.IdPropietario)},
                 {nameof(Inmueble.IdTipoInmueble)} = @{nameof(Inmueble.IdTipoInmueble)},
-                {nameof(Inmueble.CantidadAmbientes)} = @{nameof(Inmueble.CantidadAmbientes)},
+                {nameof(Inmueble.Cupo)} = @{nameof(Inmueble.Cupo)},
                 {nameof(Inmueble.Calle)} = @{nameof(Inmueble.Calle)}, 
                 {nameof(Inmueble.NroCalle)} = @{nameof(Inmueble.NroCalle)}, 
                 {nameof(Inmueble.Precio)} = @{nameof(Inmueble.Precio)}, 
+                {nameof(Inmueble.Senia)} = @{nameof(Inmueble.Senia)}, 
                 {nameof(Inmueble.Disponible)} = @{nameof(Inmueble.Disponible)},
                 {nameof(Inmueble.Foto)} = @{nameof(Inmueble.Foto)} 
                 WHERE {nameof(Inmueble.Id)} = @{nameof(Inmueble.Id)};"
@@ -32,10 +33,11 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
             {
                 command.Parameters.AddWithValue($"{nameof(Inmueble.IdPropietario)}", inmueble.IdPropietario);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.IdTipoInmueble)}", inmueble.IdTipoInmueble);
-                command.Parameters.AddWithValue($"{nameof(Inmueble.CantidadAmbientes)}", inmueble.CantidadAmbientes);
+                command.Parameters.AddWithValue($"{nameof(Inmueble.Cupo)}", inmueble.Cupo);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.Calle)}", inmueble.Calle);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.NroCalle)}", inmueble.NroCalle);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.Precio)}", inmueble.Precio);
+                command.Parameters.AddWithValue($"{nameof(Inmueble.Senia)}", inmueble.Senia);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.Disponible)}", inmueble.Disponible);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.Foto)}", inmueble.Foto);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.Id)}", inmueble.Id);
@@ -49,7 +51,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
         return estaModificado;
     }
 
-    public async Task<int> ContarInmuebles(int? disponible)
+    public async Task<int> ContarInmuebles(int? disponible, int? idProp)
     {
         int cantidadInmuebles = 0;
 
@@ -63,6 +65,8 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
 
             if (disponible.HasValue && disponible.Value >= 0 && disponible.Value < 2)
                 sql += $" AND {nameof(Inmueble.Disponible)} = {disponible}";
+            if (idProp.HasValue && idProp.Value > 0)
+                sql += $" AND {nameof(Inmueble.IdPropietario)} = {idProp.Value}";
 
             using (var command = new MySqlCommand(sql + ";", connection))
             {
@@ -86,24 +90,26 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                 (
                     {nameof(Inmueble.IdPropietario)}, 
                     {nameof(Inmueble.IdTipoInmueble)}, 
-                    {nameof(Inmueble.CantidadAmbientes)}, 
+                    {nameof(Inmueble.Cupo)}, 
                     {nameof(Inmueble.Calle)}, 
                     {nameof(Inmueble.NroCalle)}, 
                     {nameof(Inmueble.Latitud)}, 
                     {nameof(Inmueble.Longitud)}, 
                     {nameof(Inmueble.Precio)},
+                    {nameof(Inmueble.Senia)},
                     {nameof(Inmueble.Foto)} 
                 )
                 VALUES 
                 (
                     @{nameof(Inmueble.IdPropietario)}, 
                     @{nameof(Inmueble.IdTipoInmueble)}, 
-                    @{nameof(Inmueble.CantidadAmbientes)}, 
+                    @{nameof(Inmueble.Cupo)}, 
                     @{nameof(Inmueble.Calle)}, 
                     @{nameof(Inmueble.NroCalle)}, 
                     @{nameof(Inmueble.Latitud)}, 
                     @{nameof(Inmueble.Longitud)}, 
                     @{nameof(Inmueble.Precio)},
+                    @{nameof(Inmueble.Senia)},
                     @{nameof(Inmueble.Foto)} 
                 );
                 
@@ -114,12 +120,13 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
             {
                 command.Parameters.AddWithValue($"{nameof(Inmueble.IdPropietario)}", inmueble.IdPropietario);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.IdTipoInmueble)}", inmueble.IdTipoInmueble);
-                command.Parameters.AddWithValue($"{nameof(Inmueble.CantidadAmbientes)}", inmueble.CantidadAmbientes);
+                command.Parameters.AddWithValue($"{nameof(Inmueble.Cupo)}", inmueble.Cupo);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.Calle)}", inmueble.Calle);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.NroCalle)}", inmueble.NroCalle);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.Latitud)}", inmueble.Latitud);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.Longitud)}", inmueble.Longitud);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.Precio)}", inmueble.Precio);
+                command.Parameters.AddWithValue($"{nameof(Inmueble.Senia)}", inmueble.Senia);
                 command.Parameters.AddWithValue($"{nameof(Inmueble.Foto)}", inmueble.Foto);
 
                 try
@@ -181,12 +188,13 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                     i.{nameof(Inmueble.Id)}, 
                     i.{nameof(Inmueble.IdPropietario)}, 
                     i.{nameof(Inmueble.IdTipoInmueble)}, 
-                    i.{nameof(Inmueble.CantidadAmbientes)}, 
+                    i.{nameof(Inmueble.Cupo)}, 
                     i.{nameof(Inmueble.Calle)}, 
                     i.{nameof(Inmueble.NroCalle)}, 
                     IFNULL(i.{nameof(Inmueble.Latitud)}, 0) AS latitud, 
                     IFNULL(i.{nameof(Inmueble.Longitud)}, 0) AS longitud, 
                     i.{nameof(Inmueble.Precio)}, 
+                    i.{nameof(Inmueble.Senia)}, 
                     i.{nameof(Inmueble.Disponible)}, 
                     i.{nameof(Inmueble.Foto)}, 
                     ti.{nameof(TipoInmueble.Tipo)}, 
@@ -223,7 +231,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                             Id = reader.GetInt32(nameof(Inmueble.Id)),
                             IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
                             IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
-                            CantidadAmbientes = reader.GetInt32(nameof(Inmueble.CantidadAmbientes)),
+                            Cupo = reader.GetInt32(nameof(Inmueble.Cupo)),
                             Calle = reader.GetString(nameof(Inmueble.Calle)),
                             NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
                             Latitud = reader.GetDecimal("latitud"),
@@ -231,6 +239,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                             Disponible = reader.GetBoolean(nameof(Inmueble.Disponible)),
                             Foto = reader[nameof(Inmueble.Foto)] == DBNull.Value ? null : reader.GetString(nameof(Inmueble.Foto)),
                             Precio = reader.GetDecimal(nameof(Inmueble.Precio)),
+                            Senia = reader.GetInt32(nameof(Inmueble.Senia)),
                             Duenio = new Propietario
                             {
                                 Id = reader.GetInt32(nameof(Inmueble.IdPropietario)),
@@ -263,12 +272,13 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                     i.{nameof(Inmueble.Id)}, 
                     i.{nameof(Inmueble.IdPropietario)}, 
                     i.{nameof(Inmueble.IdTipoInmueble)}, 
-                    i.{nameof(Inmueble.CantidadAmbientes)}, 
+                    i.{nameof(Inmueble.Cupo)}, 
                     i.{nameof(Inmueble.Calle)}, 
                     i.{nameof(Inmueble.NroCalle)}, 
                     IFNULL(i.{nameof(Inmueble.Latitud)}, 0) AS latitud, 
                     IFNULL(i.{nameof(Inmueble.Longitud)}, 0) AS longitud, 
                     i.{nameof(Inmueble.Precio)}, 
+                    i.{nameof(Inmueble.Senia)}, 
                     i.{nameof(Inmueble.Disponible)}, 
                     i.{nameof(Inmueble.Foto)}, 
                     ti.{nameof(TipoInmueble.Tipo)}, 
@@ -312,7 +322,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                             Id = reader.GetInt32(nameof(Inmueble.Id)),
                             IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
                             IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
-                            CantidadAmbientes = reader.GetInt32(nameof(Inmueble.CantidadAmbientes)),
+                            Cupo = reader.GetInt32(nameof(Inmueble.Cupo)),
                             Calle = reader.GetString(nameof(Inmueble.Calle)),
                             NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
                             Latitud = reader.GetDecimal("latitud"),
@@ -320,6 +330,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                             Disponible = reader.GetBoolean(nameof(Inmueble.Disponible)),
                             Foto = reader[nameof(Inmueble.Foto)] == DBNull.Value ? null : reader.GetString(nameof(Inmueble.Foto)),
                             Precio = reader.GetDecimal(nameof(Inmueble.Precio)),
+                            Senia = reader.GetInt32(nameof(Inmueble.Senia)),
                             Duenio = new Propietario
                             {
                                 Id = reader.GetInt32(nameof(Inmueble.IdPropietario)),
@@ -357,12 +368,13 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                     i.{nameof(Inmueble.Id)}, 
                     i.{nameof(Inmueble.IdPropietario)}, 
                     i.{nameof(Inmueble.IdTipoInmueble)}, 
-                    i.{nameof(Inmueble.CantidadAmbientes)}, 
+                    i.{nameof(Inmueble.Cupo)}, 
                     i.{nameof(Inmueble.Calle)}, 
                     i.{nameof(Inmueble.NroCalle)}, 
                     IFNULL(i.{nameof(Inmueble.Latitud)}, 0) AS latitud, 
                     IFNULL(i.{nameof(Inmueble.Longitud)}, 0) AS longitud, 
                     i.{nameof(Inmueble.Precio)}, 
+                    i.{nameof(Inmueble.Senia)}, 
                     i.{nameof(Inmueble.Disponible)}, 
                     i.{nameof(Inmueble.Foto)}, 
                     ti.{nameof(TipoInmueble.Tipo)} AS tipoInmueble, 
@@ -401,13 +413,14 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                             Id = reader.GetInt32(nameof(Inmueble.Id)),
                             IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
                             IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
-                            CantidadAmbientes = reader.GetInt32(nameof(Inmueble.CantidadAmbientes)),
+                            Cupo = reader.GetInt32(nameof(Inmueble.Cupo)),
                             Calle = reader.GetString(nameof(Inmueble.Calle)),
                             NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
                             Latitud = reader.GetDecimal("latitud"),
                             Longitud = reader.GetDecimal("longitud"),
                             Disponible = reader.GetBoolean(nameof(Inmueble.Disponible)),
                             Precio = reader.GetDecimal(nameof(Inmueble.Precio)),
+                            Senia = reader.GetInt32(nameof(Inmueble.Senia)),
                             Foto = reader[nameof(Inmueble.Foto)] == DBNull.Value ? null : reader.GetString(nameof(Inmueble.Foto)),
                             Duenio = new Propietario
                             {
@@ -441,12 +454,13 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                     i.{nameof(Inmueble.Id)}, 
                     i.{nameof(Inmueble.IdPropietario)}, 
                     i.{nameof(Inmueble.IdTipoInmueble)}, 
-                    i.{nameof(Inmueble.CantidadAmbientes)}, 
+                    i.{nameof(Inmueble.Cupo)}, 
                     i.{nameof(Inmueble.Calle)}, 
                     i.{nameof(Inmueble.NroCalle)}, 
                     IFNULL(i.{nameof(Inmueble.Latitud)}, 0) AS latitud, 
                     IFNULL(i.{nameof(Inmueble.Longitud)}, 0) AS longitud, 
                     i.{nameof(Inmueble.Precio)}, 
+                    i.{nameof(Inmueble.Senia)}, 
                     i.{nameof(Inmueble.Disponible)}, 
                     i.{nameof(Inmueble.Foto)}, 
                     ti.{nameof(TipoInmueble.Tipo)} AS tipoInmueble, 
@@ -476,13 +490,14 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                             Id = reader.GetInt32(nameof(Inmueble.Id)),
                             IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
                             IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
-                            CantidadAmbientes = reader.GetInt32(nameof(Inmueble.CantidadAmbientes)),
+                            Cupo = reader.GetInt32(nameof(Inmueble.Cupo)),
                             Calle = reader.GetString(nameof(Inmueble.Calle)),
                             NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
                             Latitud = reader.GetDecimal("latitud"),
                             Longitud = reader.GetDecimal("longitud"),
                             Disponible = reader.GetBoolean(nameof(Inmueble.Disponible)),
                             Precio = reader.GetDecimal(nameof(Inmueble.Precio)),
+                            Senia = reader.GetInt32(nameof(Inmueble.Senia)),
                             Foto = reader[nameof(Inmueble.Foto)] == DBNull.Value ? null : reader.GetString(nameof(Inmueble.Foto)),
                             Duenio = new Propietario
                             {

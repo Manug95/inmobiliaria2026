@@ -137,25 +137,25 @@ export function validarCalle(cadena) {
   return;
 }
 
-export function validarCantidadAmbientes(cadena, requrido = true) {
+export function validarCupo(cadena, requrido = true) {
   if (cadena.length === 0) {
     if (!requrido) return;
 
-    return { errorMessage: "La cantidad de ambientes es obligatoria" };
+    return { errorMessage: "El cupo del inmueble es obligatorio" };
   }
   if (isNaN(cadena)) {
-    return { errorMessage: "La cantidad de ambientes debe ser un número" };
+    return { errorMessage: "El cupo debe ser un número" };
   }
-  const cantidad = parseInt(cadena, 10);
+  const cupo = parseInt(cadena, 10);
 
-  if (!Number.isInteger(cantidad) || (cantidad < Number.parseFloat(cadena))) {
-    return { errorMessage: "La cantidad de ambientes debe ser un número entero" };
+  if (!Number.isInteger(cupo) || (cupo < Number.parseFloat(cadena))) {
+    return { errorMessage: "El cupo debe ser un número entero" };
   }
-  if (cantidad <= 0) {
-    return { errorMessage: "La cantidad de ambientes debe ser mayor que 0" };
+  if (cupo <= 0) {
+    return { errorMessage: "El cupo debe ser mayor que 0" };
   }
-  if (cantidad > 100) {
-    return { errorMessage: "La cantidad de ambientes no puede superar los 100" };
+  if (cupo > 100) {
+    return { errorMessage: "El cupo no puede superar los 100" };
   }
   return;
 }
@@ -172,6 +172,28 @@ export function validarPrecio(cadena, requrido = true) {
   }
   if (precioNum <= 0) {
     return { errorMessage: "Debe ser mayor que 0" };
+  }
+  return;
+}
+
+export function validarSenia(cadena) {
+  if (cadena.length === 0) {
+    return { errorMessage: "El porcentaje de la seña del inmueble es obligatorio" };
+  }
+  if (isNaN(cadena)) {
+    return { errorMessage: "El debe ser un número" };
+  }
+  
+  const senia = parseInt(cadena, 10);
+
+  if (!Number.isInteger(senia) || (senia < Number.parseFloat(cadena))) {
+    return { errorMessage: "El debe ser un número entero" };
+  }
+  if (senia <= 0) {
+    return { errorMessage: "El debe ser mayor que 0" };
+  }
+  if (senia > 100) {
+    return { errorMessage: "No puede se mayor que 100" };
   }
   return;
 }

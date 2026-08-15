@@ -24,6 +24,7 @@ public class TipoInmuebleController : Controller
         ViewBag.cantPag = Math.Ceiling((decimal)cantidadTiposInmueble / cantidadPaginado);
         ViewBag.paginaSiguiente = pagina + 1;
         ViewBag.paginaAnterior = pagina - 1;
+        ViewBag.linkActivo = "inmuebles";
 
         TipoInmuebleViewModel viewModel = new TipoInmuebleViewModel
         {

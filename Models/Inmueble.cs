@@ -14,13 +14,17 @@ public class Inmueble
     public int IdTipoInmueble { get; set; }
     [Display(Name = "Tipo Inmueble")]
     public TipoInmueble? Tipo { get; set; }
-    [Required]
-    [Display(Name = "Cant. Ambientes")]
-    public int CantidadAmbientes { get; set; }
+    [Required(ErrorMessage = "El cupo es requerido")]
+    [Display(Name = "Cupo")]
+    public int Cupo { get; set; }
     [Required]
     [Range(0, double.MaxValue)]
     [DataType(DataType.Currency)]
     public decimal Precio { get; set; }
+    [Required]
+    [Range(1, 100, ErrorMessage = "El porcentaje debe estan entre 1 y 100")]
+    [Display(Name = "Seña")]
+    public int Senia { get; set; }
     [Required]
     [StringLength(100, ErrorMessage = "El maximo de caracteres es 100")]
     public string? Calle { get; set; }
@@ -52,7 +56,7 @@ public class Inmueble
         Id: {Id}
         IdPropietario: {IdPropietario}
         IdTipoInmueble: {IdTipoInmueble}
-        CantidadAmbientes: {CantidadAmbientes}
+        Cupo: {Cupo}
         Precio: {Precio}
         Calle: {Calle}
         NroCalle: {NroCalle}
