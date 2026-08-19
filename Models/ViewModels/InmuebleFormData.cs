@@ -5,6 +5,7 @@ namespace inmobiliaria2026.Models.ViewModels;
 public class InmuebleFormData
 {
     [Display(Name = "Nro Inmueble")]
+    [Range(0, int.MaxValue, ErrorMessage = "ID del inmueble incorrecta")]
     public int Id { get; set; }
 
     [Required]
@@ -20,7 +21,6 @@ public class InmuebleFormData
     public TipoInmueble? Tipo { get; set; }
 
     [Required]
-    [Display(Name = "Cantidad de Ambientes")]
     public int? Cupo { get; set; }
 
     [Required]
@@ -45,8 +45,28 @@ public class InmuebleFormData
 
     public string? NuevoTipo { get; set; }
     public string? NuevoTipoDescripcion { get; set; }
+    public IFormFile? FotoFile { get; set; }
+    public string? Foto { get; set; }
 
     public InmuebleFormData() { }
+
+    public Inmueble GetInmueble()
+    {
+        return new Inmueble
+        {
+            Calle = Calle,
+            Cupo = (int)Cupo!,
+            IdPropietario = IdPropietario,
+            IdTipoInmueble = IdTipoInmueble,
+            Latitud = Latitud != null ? (decimal)Latitud : 0,
+            Longitud = Longitud != null ? (decimal)Longitud : 0,
+            NroCalle = (uint)NroCalle!,
+            Precio = (decimal)Precio!,
+            Senia = Senia!,
+            Foto = Foto,
+            Disponible = Disponible
+        };
+    }
 
     public override string ToString()
     {

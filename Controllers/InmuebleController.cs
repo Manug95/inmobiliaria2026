@@ -63,44 +63,35 @@ public class InmuebleController : Controller
         entoces con este Bind le digo al framework que tenga en cuenta eso para poder mapear los campos del formulario correctamente
     */
     [HttpPost]
-    public async Task<IActionResult> Guardar([Bind(Prefix = "InmuebleFormData")] [FromForm] InmuebleFormData inmuebleForm)
+    public async Task<IActionResult> Guardar([Bind(Prefix = "InmuebleFormData")] [FromForm] InmuebleFormData inmuebleForm, [FromServices] IFileService fileService)
     {
-        if (inmuebleForm.IdTipoInmueble == 0)
-        {
-            int idTipoInmuebleNuevo = await _repoTipoInmueble.CrearAsync(
-                new TipoInmueble
-                {
-                    Tipo = inmuebleForm.NuevoTipo,
-                    Descripcion = inmuebleForm.NuevoTipoDescripcion
-                }
-            );
-            inmuebleForm.IdTipoInmueble = idTipoInmuebleNuevo;
-        }
-
         if (ModelState.IsValid)
         {
-            Inmueble inmueble = new Inmueble
+            if (inmuebleForm.IdTipoInmueble == 0)
             {
-                Calle = inmuebleForm.Calle,
-                Cupo = (int)inmuebleForm.Cupo!,
-                IdPropietario = inmuebleForm.IdPropietario,
-                IdTipoInmueble = inmuebleForm.IdTipoInmueble,
-                Latitud = inmuebleForm.Latitud != null ? (decimal)inmuebleForm.Latitud : 0,
-                Longitud = inmuebleForm.Longitud != null ? (decimal)inmuebleForm.Longitud : 0,
-                NroCalle = (uint)inmuebleForm.NroCalle!,
-                Precio = (decimal)inmuebleForm.Precio!,
-                Senia = inmuebleForm.Senia!,
-                // Foto = inmuebleForm.Foto,
-            };
+                int idTipoInmuebleNuevo = await _repoTipoInmueble.CrearAsync(
+                    new TipoInmueble
+                    {
+                        Tipo = inmuebleForm.NuevoTipo,
+                        Descripcion = inmuebleForm.NuevoTipoDescripcion
+                    }
+                );
+                inmuebleForm.IdTipoInmueble = idTipoInmuebleNuevo;
+            }
 
-            if (inmuebleForm.Id > 0)
+            Inmueble inmueble = inmuebleForm.GetInmueble();
+
+            await _repo.CrearAsync(inmueble);
+
+            if (inmuebleForm.FotoFile != null)
             {
-                inmueble.Id = inmuebleForm.Id;
-                inmueble.Disponible = inmuebleForm.Disponible;
+                if (!inmuebleForm.FotoFile.ContentType.Contains("image/"))
+                    return BadRequest();
+                
+                string portadaURL = await fileService.GuardarImagen(inmuebleForm.FotoFile, "foto_" + inmueble.Id);
+                inmueble.Foto = portadaURL;
                 await _repo.ActualizarAsync(inmueble);
             }
-            else
-                await _repo.CrearAsync(inmueble);
         }
         else
         {
@@ -110,7 +101,66 @@ public class InmuebleController : Controller
                 var campo = estado.Key;
                 foreach (var error in estado.Value.Errors)
                 {
-                    errorMsg += $" - {error.ErrorMessage}";
+                    errorMsg += $"{error.ErrorMessage}</br>";
+                }
+            }
+            TempData["MensajeError"] = errorMsg;
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Actualizar([Bind(Prefix = "InmuebleFormData")] [FromForm] InmuebleFormData inmuebleForm, [FromServices] IFileService fileService)
+    {
+        if (ModelState.IsValid)
+        {
+            if (inmuebleForm.IdTipoInmueble == 0)
+            {
+                int idTipoInmuebleNuevo = await _repoTipoInmueble.CrearAsync(
+                    new TipoInmueble
+                    {
+                        Tipo = inmuebleForm.NuevoTipo,
+                        Descripcion = inmuebleForm.NuevoTipoDescripcion
+                    }
+                );
+                inmuebleForm.IdTipoInmueble = idTipoInmuebleNuevo;
+            }
+
+            Inmueble? inmueble = await _repo.ObtenerPorIdAsync(inmuebleForm.Id);
+            if (inmueble == null)
+                return BadRequest();
+
+            inmueble.Calle = inmuebleForm.Calle;
+            inmueble.Cupo = (int)inmuebleForm.Cupo!;
+            inmueble.IdPropietario = inmuebleForm.IdPropietario;
+            inmueble.IdTipoInmueble = inmuebleForm.IdTipoInmueble;
+            inmueble.Latitud = inmuebleForm.Latitud != null ? (decimal)inmuebleForm.Latitud : 0;
+            inmueble.Longitud = inmuebleForm.Longitud != null ? (decimal)inmuebleForm.Longitud : 0;
+            inmueble.NroCalle = (uint)inmuebleForm.NroCalle!;
+            inmueble.Precio = (decimal)inmuebleForm.Precio!;
+            inmueble.Senia = inmuebleForm.Senia;
+            inmueble.Disponible = inmuebleForm.Disponible;
+
+            if (inmuebleForm.FotoFile != null)
+            {
+                if (!inmuebleForm.FotoFile.ContentType.Contains("image/"))
+                    return BadRequest();
+                
+                string portadaURL = await fileService.GuardarImagen(inmuebleForm.FotoFile, "portada_" + inmueble.Id);
+                inmueble.Foto = portadaURL;
+            }
+            await _repo.ActualizarAsync(inmueble);
+        }
+        else
+        {
+            string errorMsg = "";
+            foreach (var estado in ModelState)
+            {
+                var campo = estado.Key;
+                foreach (var error in estado.Value.Errors)
+                {
+                    errorMsg += $"{error.ErrorMessage}</br>";
                 }
             }
             TempData["MensajeError"] = errorMsg;
@@ -120,7 +170,7 @@ public class InmuebleController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> FormularioInmueble(int id = 0, int idProp = 0)
+    public async Task<IActionResult> FormularioInmueble([FromRoute] int id = 0, [FromQuery] int idProp = 0)
     {
         IList<TipoInmueble> tiposInmuebles = await _repoTipoInmueble.ListarAsync(10, 0);
         IList<Propietario> propietarios = [];
@@ -151,13 +201,15 @@ public class InmuebleController : Controller
                     Precio = inmueble.Precio,
                     Senia = inmueble.Senia,
                     Disponible = inmueble.Disponible,
-                    Duenio = inmueble.Duenio
+                    Duenio = inmueble.Duenio,
+                    Foto = inmueble.Foto
                 };
             }
 
         }
 
         ViewBag.linkActivo = "inmuebles";
+        ViewBag.accion = id > 0 ? "Actualizar" : "Guardar";
 
         InmuebleViewModel viewModel = new InmuebleViewModel
         {
@@ -187,6 +239,18 @@ public class InmuebleController : Controller
         
         Inmueble? inmueble = await _repo.ObtenerPorIdAsync(id);
         return Json(new { inmueble });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Detalle([FromRoute] int id)
+    {
+        if (id <= 0)
+            return BadRequest();
+        
+        Inmueble? inmueble = await _repo.ObtenerPorIdAsync(id);
+        IList<string> fotos = [];
+        
+        return View("DetalleInmueble", new DetalleInmuebleViewModel(inmueble, fotos));
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

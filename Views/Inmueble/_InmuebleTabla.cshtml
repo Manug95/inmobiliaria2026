@@ -80,7 +80,10 @@
                                     <i class="bi bi-pencil-square fs-3 icon-hover text-primary" data-bs-toggle="tooltip" data-bs-title="Editar"></i>
                                 </a>
                                 <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
-                                <i id="det-@item.Id" class="bi bi-file-earmark-text fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
+                                @* <i id="det-@item.Id" class="bi bi-file-earmark-text fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i> *@
+                                <a  class="icon-enlace" asp-controller="Inmueble" asp-action="Detalle" asp-route-id="@item.Id">
+                                    <i id="det-@item.Id" class="bi bi-building fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
+                                </a>
                                 <a class="icon-enlace" asp-controller="Contrato" asp-action="Index" asp-route-idInm="@item.Id">
                                     <i class="bi bi-file-earmark-text fs-3 icon-hover text-warning" data-bs-toggle="tooltip" data-bs-title="Ver Contratos"></i>
                                 </a>

@@ -230,8 +230,8 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
 
             using (var command = new MySqlCommand(sql + ";", connection))
             {
-                if (!string.IsNullOrWhiteSpace(nomApe)) command.Parameters.AddWithValue($"nomApe", $"%{nomApe}%");
-                if (!string.IsNullOrWhiteSpace(orderBy) && campos.Contains(orderBy, StringComparer.OrdinalIgnoreCase)) command.Parameters.AddWithValue($"orderBy", orderBy);
+                if (!string.IsNullOrWhiteSpace(nomApe)) command.Parameters.AddWithValue("nomApe", $"{nomApe}%");
+                if (!string.IsNullOrWhiteSpace(orderBy) && campos.Contains(orderBy, StringComparer.OrdinalIgnoreCase)) command.Parameters.AddWithValue("orderBy", orderBy);
                 if (offset.HasValue && limit.HasValue)
                 {
                     command.Parameters.AddWithValue($"limit", limit.Value);
