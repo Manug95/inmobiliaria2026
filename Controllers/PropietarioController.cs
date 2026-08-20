@@ -33,7 +33,7 @@ public class PropietarioController : Controller
     [HttpGet]
     public async Task<IActionResult> Listar([FromQuery] string? nomApe, [FromQuery] string? orderBy, [FromQuery] string? order, [FromQuery] int? offset = 1, [FromQuery] int? limit = 10)
     {
-        IList<Propietario> propietarios = await _repo.ListarPropietarios(nomApe, orderBy, order, (offset - 1) * limit, limit);
+        IList<Propietario> propietarios = await _repo.ListarPropietarios(nomApe, orderBy, order, offset, limit);
         return Json(new { datos = propietarios });
     }
 

@@ -165,7 +165,7 @@ public class InmuebleController : Controller
     [HttpGet]
     public async Task<IActionResult> Formulario([FromRoute] int id = 0, [FromQuery] int idProp = 0)
     {
-        IList<TipoInmueble> tiposInmuebles = await _repoTipoInmueble.ListarAsync(10, 0);
+        IList<TipoInmueble> tiposInmuebles = await _repoTipoInmueble.ListarAsync(10, 1);
         IList<Propietario> propietarios = [];
 
         if (idProp > 0)
