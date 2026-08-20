@@ -80,10 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
       buscar(e.target.value);
     }, 500)
   );
-
-  // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-
 });
 
 function getFormValues() {

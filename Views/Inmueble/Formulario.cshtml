@@ -121,6 +121,18 @@
                 </div>
             </div>
 
+            @if(ViewBag.accion == "Actualizar"){
+                <div class="row mb-md-4">
+                    <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                        <div class="position-relative">
+                            <label asp-for="InmuebleFormData.FotoFileExtras" class="form-label fw-bold">Fotos del inmueble</label>
+                            <input type="file"  asp-for="InmuebleFormData.FotoFileExtras" class="form-control" id="fotos" accept="image/*" multiple>
+                            <div id="tpe_fotos" class="invalid-tooltip"></div>
+                        </div>
+                    </div>
+                </div>
+            }
+
             @if(Model?.InmuebleFormData?.Id > 0) {
                 <div class="row mb-md-4">
                     <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
@@ -147,6 +159,28 @@
         </form>
 
     </div>
+
+    @if(ViewBag.accion == "Actualizar"){
+        <div class="">
+            @foreach(var foto in Model.Fotos ?? []){
+                <div class="row">
+                    <div class="col-11">
+                        <img src="@foto" alt="foto del inmueble">
+                    </div>
+                    <div class="col-1">
+                        @{
+                            string nombreFoto = foto.Split("/")[foto.Length-1];
+                        }
+                        <form id="form_eliminar_foto" method="post" asp-action="EliminarFoto" asp-route-foto="@nombreFoto">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
 
 <partial name="_TipoInmuebleFormModal" model="new TipoInmueble()"></partial>

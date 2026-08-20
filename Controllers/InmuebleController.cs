@@ -139,6 +139,19 @@ public class InmuebleController : Controller
                 string portadaURL = await fileService.GuardarImagen(inmuebleForm.FotoFile, "portada_" + inmueble.Id);
                 inmueble.Foto = portadaURL;
             }
+
+            // if (inmuebleForm.FotoFileExtras != null && inmuebleForm.FotoFileExtras.Any())
+            // {
+            //     var rutasExtras = new List<string>();
+            //     foreach(var foto in inmuebleForm.FotoFileExtras)
+            //     {
+            //         if (!foto.ContentType.Contains("image/"))
+            //             return BadRequest();
+                
+            //         string portadaURL = await fileService.GuardarImagen(foto, "portada_" + inmueble.Id);
+            //     }
+            // }
+
             await _repo.ActualizarAsync(inmueble);
         }
         else

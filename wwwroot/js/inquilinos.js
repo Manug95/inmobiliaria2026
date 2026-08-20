@@ -13,8 +13,6 @@ import {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
   getElementById("btn_add").addEventListener("click", e => {
     getElementById("nombre").value = "";
@@ -54,10 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("td .bi-trash")?.forEach(i => {
     i.addEventListener("click", e => {
       const idFila = e.target.id.split("-")[1];
-
-      // getElementById("btn_si").href = `/Inquilino/Eliminar/${idFila}`;
       getElementById("form_eliminar").action = `/Inquilino/Eliminar/${idFila}`;
-
       mostrarPregunta(null);
     });
   });

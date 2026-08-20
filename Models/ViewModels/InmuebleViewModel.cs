@@ -8,4 +8,5 @@ public class InmuebleViewModel
     public IEnumerable<TipoInmueble>? TiposInmuebles { get; set; }
     public IEnumerable<Propietario>? Propietarios { get; set; }
     public string? MensajeError { get; set; }
+    public IEnumerable<string>? Fotos { get; set; } = [];
 }

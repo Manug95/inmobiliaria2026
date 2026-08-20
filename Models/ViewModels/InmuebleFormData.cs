@@ -46,6 +46,7 @@ public class InmuebleFormData
     public string? NuevoTipo { get; set; }
     public string? NuevoTipoDescripcion { get; set; }
     public IFormFile? FotoFile { get; set; }
+    public IList<IFormFile>? FotoFileExtras { get; set; }
     public string? Foto { get; set; }
 
     public InmuebleFormData() { }

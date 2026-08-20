@@ -12,9 +12,6 @@ import {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-
   getElementById("btn_add").addEventListener("click", e => {
     getElementById("tipo").value = "";
     getElementById("descripcion").value = "";
@@ -47,10 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("td .bi-trash")?.forEach(i => {
     i.addEventListener("click", e => {
       const idFila = e.target.id.split("-")[1];
-
-      // getElementById("btn_si").href = `/TipoInmueble/Eliminar/${idFila}`;
       getElementById("form_eliminar").action = `/TipoInmueble/Eliminar/${idFila}`;
-
       mostrarPregunta(null);
     });
   });
