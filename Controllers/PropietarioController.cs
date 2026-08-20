@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using inmobiliaria2026.Interfaces;
 using inmobiliaria2026.Models;
-using inmobiliaria2026.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace inmobiliaria2026.Controllers;
 
@@ -15,33 +15,30 @@ public class PropietarioController : Controller
         _repo = repo;
     }
 
-    public async Task<IActionResult> Index(int pagina = 1, int cantidadPaginado = 10)
+    [HttpGet]
+    public async Task<IActionResult> Index([FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10)
     {
-        IList<Propietario> propietarios = await _repo.ListarAsync(cantidadPaginado, (pagina - 1) * cantidadPaginado);
+        IList<Propietario> propietarios = await _repo.ListarAsync(cantidadPaginado, pagina);
         int cantidadPropietarios = await _repo.ContarPropietarios();
 
         ViewBag.cantPag = Math.Ceiling((decimal)cantidadPropietarios / cantidadPaginado);
         ViewBag.paginaSiguiente = pagina + 1;
         ViewBag.paginaAnterior = pagina - 1;
         ViewBag.linkActivo = "propietarios";
+        ViewBag.MensajeError = TempData["MensajeError"] as string;
 
-        PropietarioViewModel viewModel = new PropietarioViewModel
-        {
-            Propietarios = propietarios,
-            Propietario = new Propietario(),
-            MensajeError = TempData["MensajeError"] as string
-        };
-
-        return View(viewModel);
+        return View(propietarios);
     }
 
-    public async Task<IActionResult> Listar(string? nomApe, string? orderBy, string? order, int? offset = 1, int? limit = 10)
+    [HttpGet]
+    public async Task<IActionResult> Listar([FromQuery] string? nomApe, [FromQuery] string? orderBy, [FromQuery] string? order, [FromQuery] int? offset = 1, [FromQuery] int? limit = 10)
     {
         IList<Propietario> propietarios = await _repo.ListarPropietarios(nomApe, orderBy, order, (offset - 1) * limit, limit);
         return Json(new { datos = propietarios });
     }
 
-    public async Task<IActionResult> Guardar(Propietario propietario)
+    [HttpPost]
+    public async Task<IActionResult> Guardar([FromForm] Propietario propietario)
     {
         if (ModelState.IsValid)
         {
@@ -52,24 +49,21 @@ public class PropietarioController : Controller
         }
         else
         {
-            string errorMsg = "";
-            foreach (var estado in ModelState)
-            {
-                var campo = estado.Key;
-                foreach (var error in estado.Value.Errors)
-                {
-                    errorMsg += $" - {error.ErrorMessage}";
-                }
-            }
-            TempData["MensajeError"] = errorMsg + "";
+            TempData["MensajeError"] = ModelStateError(ModelState);
         }
 
         return RedirectToAction(nameof(Index));
     }
 
-    public async Task<IActionResult> Eliminar(int id)
+    [HttpPost]
+    public async Task<IActionResult> Eliminar([FromRoute] int id)
     {
-        await _repo.EliminarAsync(id);
+        if (id <= 0)
+            return BadRequest();
+
+        if (!await _repo.EliminarAsync(id))
+            TempData["MensajeError"] = "No se pudo borrar el registro";
+        
         return RedirectToAction(nameof(Index));
     }
 
@@ -77,5 +71,19 @@ public class PropietarioController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    private string ModelStateError(ModelStateDictionary modelState)
+    {
+        string errorMsg = "";
+        foreach (var estado in modelState)
+        {
+            var campo = estado.Key;
+            foreach (var error in estado.Value.Errors)
+            {
+                errorMsg += $"{error.ErrorMessage}</br>";
+            }
+        }
+        return errorMsg;
     }
 }

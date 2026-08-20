@@ -176,7 +176,7 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
             using (var command = new MySqlCommand(sql + ";", connection))
             {
                 command.Parameters.AddWithValue($"limit", limit);
-                command.Parameters.AddWithValue($"offset", offset);
+                command.Parameters.AddWithValue($"offset", (offset - 1) * limit);
 
                 connection.Open();
 
@@ -235,7 +235,7 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
                 if (offset.HasValue && limit.HasValue)
                 {
                     command.Parameters.AddWithValue($"limit", limit.Value);
-                    command.Parameters.AddWithValue($"offset", offset.Value);
+                    command.Parameters.AddWithValue($"offset", (offset.Value - 1) * limit.Value);
                 }
 
                 connection.Open();

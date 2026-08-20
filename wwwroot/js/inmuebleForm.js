@@ -41,9 +41,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   });
 
-  const TipoInmueble = getElementById("form-tipoInmueble");
+  const tipoInmuebleForm = getElementById("form-tipoInmueble");
   
-  TipoInmueble?.addEventListener("submit", (e) => {
+  tipoInmuebleForm?.addEventListener("submit", (e) => {
     e.preventDefault();
     const formValues = getTipoInmuebleFormValues();
     
@@ -60,7 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } 
     
     return;
-
   });
 
   getElementById("add_tipo").addEventListener("click", e => {
@@ -82,8 +81,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 500)
   );
 
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+  // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
 });
 

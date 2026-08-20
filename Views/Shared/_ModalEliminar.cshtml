@@ -1,0 +1,19 @@
+<div id="modal-pregunta" class="modal fade modal-sm" tabindex="-1" aria-labelledby="titulo-modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div id="titulo-modal" class="modal-title fs-5">Alerta</div>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body justify-content-center align-items-center">
+                <p id="pregunta" class="text-center"><strong class="text-danger">¿Está seguro de eliminar el registro?</strong></p>
+            </div>
+            <div class="modal-footer justify-content-around">
+                <form id="form_eliminar" method="post">
+                    <button id="btn_si" type="submit" class="btn btn-danger">&nbsp;&nbsp;SI&nbsp;&nbsp;</button>
+                </form>
+                <button id="btn_no" class="btn btn-secondary" type="button" data-bs-dismiss="modal">&nbsp;NO&nbsp;</button>
+            </div>
+        </div>
+    </div>
+</div>

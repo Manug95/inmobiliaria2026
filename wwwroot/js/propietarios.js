@@ -16,8 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   mostrarMensaje(false, null);
 
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+  // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
   getElementById("btn_add").addEventListener("click", e => {
     getElementById("nombre").value = "";
@@ -39,24 +39,21 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     // resetValidationStatus();
     
-
     const formValues = getFormValues();
     
     if (validarFormulario(formValues)) {
-      setTimeout((form) => { form.submit(); }, 500, form);
+      form.submit();
     }
 
     return;
-
   });
 
   document.querySelectorAll(".bi-trash")?.forEach(i => {
     i.addEventListener("click", e => {
-      // const fila = e.target.parentElement.parentElement.parentElement;
-      // const idFila = fila.id;
       const idFila = e.target.id.split("-")[1];
 
-      getElementById("btn_si").href = `/Propietario/Eliminar/${idFila}`;
+      // getElementById("btn_si").href = `/Propietario/Eliminar/${idFila}`;
+      getElementById("form_eliminar").action = `/Propietario/Eliminar/${idFila}`;
 
       mostrarPregunta(null);
     });
@@ -64,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll("td .bi-pencil-square").forEach(i => {
     i.addEventListener("click", e => {
-      // const fila = e.target.parentElement.parentElement.parentElement;
       const idFIla = e.target.id.split("-")[1];
       const fila = getElementById(idFIla);
       const datosFila = getRawValues(fila);
@@ -98,11 +94,6 @@ function resetValidationStatus() {
     resetValidationErrorMessage("tpe_telefono");
     resetValidationErrorMessage("tpe_email");
 }
-
-// async function enviar(formValues) {
-//   const respuesta = await enviarPOST("/vacunacion", formValues);
-//   mostrarMensaje(respuesta.ok, respuesta.mensaje ?? "Vacunación Registrada");
-// }
 
 function getFormValues() {
   return {
@@ -150,8 +141,6 @@ function validarFormulario(values) {
     return result === undefined;
   })
   .every(v => v);
-
-  const form = getElementById("form-propietario");
 
   return esValido;
 }

@@ -147,7 +147,7 @@ public class TipoInmuebleRepository : BaseRepository, ITipoInmuebleRepository
             using (var command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue($"limit", limit);
-                command.Parameters.AddWithValue($"offset", offset);
+                command.Parameters.AddWithValue($"offset", (offset - 1) * limit);
                 
                 connection.Open();
 

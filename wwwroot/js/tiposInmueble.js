@@ -12,8 +12,8 @@ import {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+  // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
   getElementById("btn_add").addEventListener("click", e => {
     getElementById("tipo").value = "";
@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const datosFila = getRawValues(fila);
 
       getElementById("tipo").value = datosFila.tipo;
+      getElementById("descripcion").value = datosFila.descripcion != "Sin Descripción" ? datosFila.descripcion : "";
       getElementById("Id").value = datosFila.id;
 
       resetValidationStatus();
@@ -47,7 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
     i.addEventListener("click", e => {
       const idFila = e.target.id.split("-")[1];
 
-      getElementById("btn_si").href = `/TipoInmueble/Eliminar/${idFila}`;
+      // getElementById("btn_si").href = `/TipoInmueble/Eliminar/${idFila}`;
+      getElementById("form_eliminar").action = `/TipoInmueble/Eliminar/${idFila}`;
 
       mostrarPregunta(null);
     });
@@ -62,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const formValues = getFormValues();
     
     if (validarFormulario(formValues)) {
-      // setTimeout((form) => { form.submit(); }, 500, form);
       form.submit();
     }
 

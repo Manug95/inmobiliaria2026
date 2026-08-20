@@ -3,6 +3,7 @@ using inmobiliaria2026.Interfaces;
 using inmobiliaria2026.Models;
 using inmobiliaria2026.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace inmobiliaria2026.Controllers;
 
@@ -48,12 +49,9 @@ public class InmuebleController : Controller
         ViewBag.disponible = disp;
         ViewBag.idProp = idProp;
 
-        return View(new InmuebleViewModel
-            {
-                Inmuebles = inmuebles,
-                MensajeError = TempData["MensajeError"] as string
-            }
-        );
+        ViewBag.MensajeError = TempData["MensajeError"] as string;
+
+        return View(inmuebles);
     }
 
     /*
@@ -63,7 +61,7 @@ public class InmuebleController : Controller
         entoces con este Bind le digo al framework que tenga en cuenta eso para poder mapear los campos del formulario correctamente
     */
     [HttpPost]
-    public async Task<IActionResult> Guardar([Bind(Prefix = "InmuebleFormData")] [FromForm] InmuebleFormData inmuebleForm, [FromServices] IFileService fileService)
+    public async Task<IActionResult> Guardar([Bind(Prefix = nameof(InmuebleFormData))] [FromForm] InmuebleFormData inmuebleForm, [FromServices] IFileService fileService)
     {
         if (ModelState.IsValid)
         {
@@ -95,23 +93,14 @@ public class InmuebleController : Controller
         }
         else
         {
-            string errorMsg = "";
-            foreach (var estado in ModelState)
-            {
-                var campo = estado.Key;
-                foreach (var error in estado.Value.Errors)
-                {
-                    errorMsg += $"{error.ErrorMessage}</br>";
-                }
-            }
-            TempData["MensajeError"] = errorMsg;
+            TempData["MensajeError"] = ModelStateError(ModelState);
         }
 
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Actualizar([Bind(Prefix = "InmuebleFormData")] [FromForm] InmuebleFormData inmuebleForm, [FromServices] IFileService fileService)
+    public async Task<IActionResult> Actualizar([Bind(Prefix = nameof(InmuebleFormData))] [FromForm] InmuebleFormData inmuebleForm, [FromServices] IFileService fileService)
     {
         if (ModelState.IsValid)
         {
@@ -154,23 +143,14 @@ public class InmuebleController : Controller
         }
         else
         {
-            string errorMsg = "";
-            foreach (var estado in ModelState)
-            {
-                var campo = estado.Key;
-                foreach (var error in estado.Value.Errors)
-                {
-                    errorMsg += $"{error.ErrorMessage}</br>";
-                }
-            }
-            TempData["MensajeError"] = errorMsg;
+            TempData["MensajeError"] = ModelStateError(ModelState);
         }
 
         return RedirectToAction(nameof(Index));
     }
 
     [HttpGet]
-    public async Task<IActionResult> FormularioInmueble([FromRoute] int id = 0, [FromQuery] int idProp = 0)
+    public async Task<IActionResult> Formulario([FromRoute] int id = 0, [FromQuery] int idProp = 0)
     {
         IList<TipoInmueble> tiposInmuebles = await _repoTipoInmueble.ListarAsync(10, 0);
         IList<Propietario> propietarios = [];
@@ -222,17 +202,20 @@ public class InmuebleController : Controller
         return View(viewModel);
     }
 
-    public async Task<IActionResult> Eliminar(int id)
+    [HttpPost]
+    public async Task<IActionResult> Eliminar([FromRoute] int id)
     {
         if (id <= 0)
             return BadRequest();
 
-        await _repo.EliminarAsync(id);
+        if (!await _repo.EliminarAsync(id))
+            TempData["MensajeError"] = "No se pudo borrar el registro";
+
         return RedirectToAction(nameof(Index));
     }
 
     [HttpGet]
-    public async Task<IActionResult> Buscar(int id)
+    public async Task<IActionResult> Buscar([FromRoute] int id)
     {
         if (id <= 0)
             return BadRequest();
@@ -250,12 +233,26 @@ public class InmuebleController : Controller
         Inmueble? inmueble = await _repo.ObtenerPorIdAsync(id);
         IList<string> fotos = [];
         
-        return View("DetalleInmueble", new DetalleInmuebleViewModel(inmueble, fotos));
+        return View(new DetalleInmuebleViewModel(inmueble, fotos));
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    private string ModelStateError(ModelStateDictionary modelState)
+    {
+        string errorMsg = "";
+        foreach (var estado in modelState)
+        {
+            var campo = estado.Key;
+            foreach (var error in estado.Value.Errors)
+            {
+                errorMsg += $"{error.ErrorMessage}</br>";
+            }
+        }
+        return errorMsg;
     }
 }
