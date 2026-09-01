@@ -6,7 +6,7 @@ namespace inmobiliaria2026.Repositories;
 
 public class PropietarioRepository : BaseRepository, IPropietarioRepository
 {
-    private readonly string[] campos = ["Id", "Nombre", "Apellido", "Dni", "Telefono", "Email"];
+    private readonly string[] _campos = ["Id", "Nombre", "Apellido", "Dni", "Telefono", "Email"];
 
     public PropietarioRepository(IConfiguration config) : base(config) { }
 
@@ -14,7 +14,7 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
     {
         bool modificado = false;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 UPDATE propietarios 
@@ -51,7 +51,7 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
     {
         int cantidadPropietarios = 0;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT COUNT({nameof(Propietario.Id)}) AS cantidad 
@@ -74,7 +74,7 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
     {
         int id = 0;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 INSERT INTO propietarios 
@@ -131,7 +131,7 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
     {
         bool fueBorrado = false;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 UPDATE propietarios 
@@ -157,7 +157,7 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
         
         var propietarios = new List<Propietario>();
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT 
@@ -206,7 +206,7 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
     {
         var propietarios = new List<Propietario>();
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT 
@@ -223,7 +223,7 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
 
             if (!string.IsNullOrWhiteSpace(nomApe))
                 sql += $" AND ({nameof(Propietario.Nombre)} LIKE @nomApe OR {nameof(Propietario.Apellido)} LIKE @nomApe)";
-            if (!string.IsNullOrWhiteSpace(orderBy) && campos.Contains(orderBy, StringComparer.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(orderBy) && _campos.Contains(orderBy, StringComparer.OrdinalIgnoreCase))
                 sql += $" ORDER BY @orderBy {order}";
             if (offset.HasValue && limit.HasValue)
                 sql += $" LIMIT @limit OFFSET @offset";
@@ -231,7 +231,7 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
             using (var command = new MySqlCommand(sql + ";", connection))
             {
                 if (!string.IsNullOrWhiteSpace(nomApe)) command.Parameters.AddWithValue("nomApe", $"{nomApe}%");
-                if (!string.IsNullOrWhiteSpace(orderBy) && campos.Contains(orderBy, StringComparer.OrdinalIgnoreCase)) command.Parameters.AddWithValue("orderBy", orderBy);
+                if (!string.IsNullOrWhiteSpace(orderBy) && _campos.Contains(orderBy, StringComparer.OrdinalIgnoreCase)) command.Parameters.AddWithValue("orderBy", orderBy);
                 if (offset.HasValue && limit.HasValue)
                 {
                     command.Parameters.AddWithValue($"limit", limit.Value);
@@ -268,7 +268,7 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
 
         Propietario? propietario = null;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT 

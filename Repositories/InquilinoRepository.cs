@@ -6,7 +6,7 @@ namespace inmobiliaria2026.Repositories;
 
 public class InquilinoRepository : BaseRepository, IInquilinoRepository
 {
-    private readonly string[] campos = ["Id", "Nombre", "Apellido", "Dni", "Telefono", "Email"];
+    private readonly string[] _campos = ["Id", "Nombre", "Apellido", "Dni", "Telefono", "Email"];
 
     public InquilinoRepository(IConfiguration config) : base(config) { }
     
@@ -14,7 +14,7 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
     {
         bool estaModificado = false;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 UPDATE inquilinos 
@@ -51,7 +51,7 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
     {
         int cantidadInquilinos = 0;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT COUNT({nameof(Inquilino.Id)}) AS cantidad 
@@ -77,7 +77,7 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
     {
         int id = 0;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 INSERT INTO inquilinos 
@@ -135,7 +135,7 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
     {
         bool estaBorrado = false;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 UPDATE inquilinos 
@@ -164,7 +164,7 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
 
         var inquilinos = new List<Inquilino>();
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT 
@@ -213,7 +213,7 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
     {
         var inquilinos = new List<Inquilino>();
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT 
@@ -230,7 +230,7 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
 
             if (!string.IsNullOrWhiteSpace(nomApe))
                 sql += $" AND ({nameof(Inquilino.Nombre)} LIKE @nomApe OR {nameof(Inquilino.Apellido)} LIKE @nomApe)";
-            if (!string.IsNullOrWhiteSpace(orderBy) && campos.Contains(orderBy, StringComparer.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(orderBy) && _campos.Contains(orderBy, StringComparer.OrdinalIgnoreCase))
                 sql += $" ORDER BY @orderBy {order}";
             if (offset.HasValue && limit.HasValue)
                 sql += $" LIMIT @limit OFFSET @offset";
@@ -239,7 +239,7 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
             {
                 if (!string.IsNullOrWhiteSpace(nomApe)) 
                     command.Parameters.AddWithValue($"nomApe", $"%{nomApe}%");
-                if (!string.IsNullOrWhiteSpace(orderBy) && campos.Contains(orderBy, StringComparer.OrdinalIgnoreCase)) 
+                if (!string.IsNullOrWhiteSpace(orderBy) && _campos.Contains(orderBy, StringComparer.OrdinalIgnoreCase)) 
                     command.Parameters.AddWithValue($"orderBy", orderBy);
                 if (offset.HasValue && limit.HasValue)
                 {
@@ -277,7 +277,7 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
 
         Inquilino? inquilino = null;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT 

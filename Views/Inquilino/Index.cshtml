@@ -52,6 +52,9 @@
                             <div class="d-flex justify-content-evenly align-items-center">
                                 <i id="edit-@item.Id" class="bi bi-pencil-square fs-3 text-primary icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Editar"></i>
                                 <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
+                                <a class="icon-enlace" asp-controller="Inmueble" asp-action="Reservar" asp-route-idInquilino="@item.Id" data-bs-toggle="tooltip" data-bs-title="Reservar Inmueble">
+                                    <i class="bi bi-house-door fs-3 text-success icon-hover"></i>
+                                </a>
                             </div>
                         </td>
                     </tr>

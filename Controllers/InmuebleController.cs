@@ -23,7 +23,7 @@ public class InmuebleController : Controller
     [HttpGet]
     public async Task<IActionResult> Index([FromQuery] string? prop, [FromQuery] int idProp = 0, [FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10, [FromQuery] int disp = (int)Disponiblilidad.TODOS)
     {
-        if (idProp < 0 || pagina < 0 || cantidadPaginado < 0)
+        if (idProp < 0 || pagina <= 0 || cantidadPaginado <= 0 || !Enum.IsDefined(typeof(Disponiblilidad), disp))
             return BadRequest();
 
         IList<Inmueble>? inmuebles;
@@ -44,6 +44,7 @@ public class InmuebleController : Controller
 
         ViewBag.linkActivo = "inmuebles";
         ViewBag.cantPag = Math.Ceiling((decimal)cantidadInmuebles / cantidadPaginado);
+        ViewBag.cantidadPaginado = cantidadPaginado;
         ViewBag.paginaSiguiente = pagina + 1;
         ViewBag.paginaAnterior = pagina - 1;
         ViewBag.disponible = disp;
@@ -247,6 +248,43 @@ public class InmuebleController : Controller
         IList<string> fotos = [];
         
         return View(new DetalleInmuebleViewModel(inmueble, fotos));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Reservar(
+        [FromQuery] FiltroInmuebleViewModel filtros, 
+        [FromQuery] int pagina = 1, 
+        [FromQuery] int cantidadPaginado = 10
+    )
+    {
+        List<Inmueble> inmuebles = [];
+        List<TipoInmueble>? tipoInmuebles = await _repoTipoInmueble.ListarAsync(100, 1);
+
+        if (!ModelState.IsValid)
+        {
+            filtros.TiposInmuebles = tipoInmuebles;
+            filtros.Inmuebles = inmuebles;
+            return View(filtros);
+        }
+
+        if (filtros.Desde != null && filtros.Hasta != null)
+        {
+            inmuebles = await _repo.ListarInmueblesParaAlquilar(filtros.Desde, filtros.Hasta, filtros.TipoInmueble, filtros.Cupo, filtros.MontoMax, pagina, cantidadPaginado);
+            long cantidadInmuebles = await _repo.ContarInmueblesParaAlquilar(filtros.Desde, filtros.Hasta, filtros.TipoInmueble, filtros.Cupo, filtros.MontoMax);
+
+            if (inmuebles.Count == 0)
+                ViewBag.Mensaje = "No se encontraron resultados";
+            
+            ViewBag.cantPag = (int)Math.Ceiling((decimal)cantidadInmuebles / cantidadPaginado);
+            ViewBag.cantidadPaginado = cantidadPaginado;
+            ViewBag.paginaSiguiente = pagina + 1;
+            ViewBag.paginaAnterior = pagina - 1;
+            ViewBag.linkActivo = "inmuebles";
+        }
+
+        filtros.TiposInmuebles = tipoInmuebles;
+        filtros.Inmuebles = inmuebles;
+        return View(filtros);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

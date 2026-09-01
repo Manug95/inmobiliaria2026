@@ -1,0 +1,212 @@
+@using inmobiliaria2026.Models.ViewModels
+@model FiltroInmuebleViewModel;
+
+@{
+    ViewData["Title"] = "Reservar";
+    string dir = "";
+}
+
+<link rel="stylesheet" href="~/css/styles.css">
+<link rel="stylesheet" href="~/css/tablas.css">
+
+<div class="container-fluid px-0 align-middle mt-2">
+    <div class="d-flex justify-content-center align-items-center vh-50 w-100">
+        @* <form asp-action="Reservar" method="get" id="form-buscar-inmuebles" class="px-3 py-0 w-100 mx-auto needs-validation mb-3 bg-light-subtle" novalidate> *@
+        <form asp-action="Reservar" method="get" id="form-buscar-inmuebles" class="px-3 py-0 w-100 mx-auto border rounded-4 shadow-sm needs-validation mb-3 bg-light-subtle" novalidate>
+            <div class="row mb-md-4">
+                <div class="col-12 col-md-4 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="Desde" class="form-label fw-bold">Desde</label>
+                        <input type="date" asp-for="Desde" class="form-control" id="FechaInicio" value="@Model.Desde">
+                        <span asp-validation-for="Desde" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="Hasta" class="form-label fw-bold">Hasta</label>
+                        <input type="date" asp-for="Hasta" class="form-control" id="FechaFin" value="@Model.Hasta">
+                        <span asp-validation-for="Hasta" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="TipoInmueble" class="form-label fw-bold">Tipo de inmueble</label>
+                        <select asp-for="TipoInmueble" class="form-select" id="IdTipoInmueble">
+                            <option value="" selected disabled>Seleccione el tipo</option>
+                            @foreach (var tipoInm in Model.TiposInmuebles)
+                            {
+                                <option value="@tipoInm.Id" selected="@(Model.TipoInmueble == tipoInm.Id)">@tipoInm.Tipo</option>
+                            }
+                        </select>
+                        <span asp-validation-for="TipoInmueble" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-md-4">
+                <div class="col-12 col-md-4 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="Cupo" class="form-label fw-bold">Cupo</label>
+                        <input type="number" asp-for="Cupo" class="form-control" id="cupo" value="@Model.Cupo">
+                        <span asp-validation-for="Cupo" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="MontoMax" class="form-label fw-bold">Precio Máximo</label>
+                        <input type="number" asp-for="MontoMax" class="form-control" id="precio" value="@Model.MontoMax">
+                        <span asp-validation-for="MontoMax" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            @* <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                <div class="position-relative">
+                    <label asp-for="SeniaMaxima" class="form-label fw-bold">Seña</label>
+                    <input type="number" asp-for="SeniaMaxima" class="form-control" id="Senia" value="@Model.SeniaMaxima">
+                    <div id="tpe_Senia" class="invalid-tooltip"></div>
+                </div>
+            </div> *@
+
+            <input id="IdInquilino" type="hidden" asp-for="IdInquilino" value="@Model.IdInquilino"/>
+
+            <div class="row mb-3 mt-2 mt-md-1 justify-content-evenly align-items-end pt-3">
+                <div class="col-2 d-flex justify-content-center">
+                    <input type="submit" value="Buscar" class="btn btn-primary d-block mx-auto">
+                </div>
+                <div class="col-2 d-flex justify-content-center">
+                    <a class="btn btn-secondary px-3" type="button" asp-controller="@(Model.IdInquilino > 0 ? "Inquilino": "Inmueble")" asp-action="Index">Volver</a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@*aca va la tabla con los inmuebles que cumplen las condiciones del form de arriba*@
+@if (Model.Inmuebles.Count > 0) {
+    @* <div class="container-fluid bg-light-subtle"> *@
+    <div class="container-fluid shadow-sm border rounded-4 bg-light-subtle">
+        <div class="row fixed-height-table-container-alquilar">
+            <div class="my-4 rounded-3">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light position-sticky top-0">
+                        <tr>
+                            <th >DIRECCIÓN</th>
+                            <th>TIPO DE INMUEBLE</th>
+                            <th>CUPO</th>
+                            <th>DUEÑO</th>
+                            <th>MONTO POR DIA</th>
+                            <th>SEÑA</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpo">
+                        @foreach (var item in Model.Inmuebles) {
+                            <tr id="@item.Id">
+                                <td class="align-middle py-0 ps-2">
+                                    @{dir = item.Calle + " " + item.NroCalle;}
+                                    @dir
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => item.Tipo!.Tipo)
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => item.Cupo)
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @(item.Duenio != null ? item.Duenio.ToString().Split('-').ElementAt(0) : "Sin Dueño")
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => item.Precio)
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @(Html.DisplayFor(modelItem => item.Senia)) %
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-evenly align-items-center contenedor-iconos">
+                                        <a  class="icon-enlace" asp-action="Detalle" asp-route-id="@item.Id">
+                                            <i class="bi bi-building fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
+                                        </a>
+                                        <a class="icon-enlace" asp-controller="Reserva" asp-action="Formulario" 
+                                            asp-route-idInm="@item.Id" 
+                                            asp-route-idInq="@Model.IdInquilino"
+                                            asp-route-desde="@Model.Desde"
+                                            asp-route-hasta="@Model.Hasta"
+                                        >
+                                            <i class="bi bi-file-earmark-text fs-3 icon-hover text-success" data-bs-toggle="tooltip" data-bs-title="Crear Reserva"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <nav>
+                <ul id="paginador" class="pagination justify-content-center my-2">
+                    <li id="flecha-pag-izq" class="page-item @(ViewBag.paginaAnterior == 0 ? "disabled" : "")">
+                        <a 
+                            asp-action="Reservar" 
+                            asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" 
+                            asp-route-pagina="@ViewBag.paginaAnterior" 
+                            asp-route-Desde="@Model.Desde" 
+                            asp-route-Hasta="@Model.Hasta" 
+                            asp-route-TipoInmueble="@Model.TipoInmueble" 
+                            asp-route-Cupo="@Model.Cupo" 
+                            asp-route-MontoMax="@Model.MontoMax" 
+                            asp-route-disp="@ViewBag.disponible" class="page-link">
+                        <span>&laquo;</span></a>
+                    </li>
+                    @for (int i = 1; i <= ViewBag.cantPag; i++) {
+                        <li class="page-item">
+                            <a 
+                                asp-action="Reservar" 
+                                asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" 
+                                asp-route-pagina="@i" 
+                                asp-route-Desde="@Model.Desde" 
+                                asp-route-Hasta="@Model.Hasta" 
+                                asp-route-TipoInmueble="@Model.TipoInmueble" 
+                                asp-route-Cupo="@Model.Cupo" 
+                                asp-route-MontoMax="@Model.MontoMax" 
+                                asp-route-disp="@ViewBag.disponible" 
+                                class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")"
+                                >
+                                @i
+                            </a>
+                        </li>
+                    }
+                    <li id="flecha-pag-der" class="page-item @(ViewBag.paginaSiguiente > ViewBag.cantPag ? "disabled" : "")">
+                        <a 
+                            asp-action="Reservar" 
+                            asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" 
+                            asp-route-pagina="@ViewBag.paginaSiguiente"  
+                            asp-route-Desde="@Model.Desde" 
+                            asp-route-Hasta="@Model.Hasta" 
+                            asp-route-TipoInmueble="@Model.TipoInmueble" 
+                            asp-route-Cupo="@Model.Cupo" 
+                            asp-route-MontoMax="@Model.MontoMax" 
+                            asp-route-disp="@ViewBag.disponible" class="page-link">
+                        <span>&raquo;</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(ViewBag.mensaje)) {
+    <partial name="_MensajeError" model="ViewBag.Mensaje"></partial>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script type="module" defer>
+        import { mostrarMensaje } from "/js/frontUtils.js";
+        document.addEventListener("DOMContentLoaded", _ => {
+            mostrarMensaje(false, null);
+        });
+    </script>
+}

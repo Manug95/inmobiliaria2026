@@ -37,6 +37,7 @@ public class Inmueble
     [DataType(DataType.ImageUrl)]
     [Display(Name = "Portada")]
     public string? Foto { get; set; }
+    public List<string>? Fotos { get; set; } = [];
 
     public Inmueble() { }
 

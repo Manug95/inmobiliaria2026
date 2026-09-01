@@ -1,0 +1,121 @@
+@using Microsoft.AspNetCore.Html
+@model IEnumerable<Reserva>
+
+@{
+    ViewData["Title"] = "Reservas";
+}
+
+<link rel="stylesheet" href="~/css/tablas.css">
+<link rel="stylesheet" href="~/css/styles.css">
+
+<div class="container-fluid shadow border rounded-4 mt-4 bg-light-subtle position-relative">
+    <div class="table-responsive my-4 rounded-3 fixed-height-table-container">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 100px;">
+                        @Html.DisplayNameFor(model => model.Id)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.FechaInicio).ToUpper()
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.FechaFin).ToUpper()
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Monto).ToUpper()
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.FechaTerminado).ToUpper()
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="cuerpo">
+                @foreach (var item in Model)
+                {
+                    <tr id="@item.Id">
+                        <td class="align-middle py-0 ps-2" style="width: 100px;">
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td class="align-middle py-0 ps-2">
+                            @Html.DisplayFor(modelItem => item.FechaInicio)
+                        </td>
+                        <td class="align-middle py-0 ps-2">
+                            @Html.DisplayFor(modelItem => item.FechaFin)
+                        </td>
+                        <td class="align-middle py-0 ps-2">
+                            @Html.DisplayFor(modelItem => item.Monto)
+                        </td>
+                        <td class="align-middle py-0 ps-2">
+                            @(item.FechaTerminado != null ? Html.DisplayFor(modelItem => item.FechaTerminado) : new HtmlString(" - "))
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-evenly align-items-center">
+                                <a class="icon-enlace" asp-action="Formulario" asp-controller="Reserva" asp-route-id="@item.Id" data-bs-toggle="tooltip" data-bs-title="Editar">
+                                    <i class="bi bi-pencil-square fs-3 text-primary"></i>
+                                </a>
+                                <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
+                                <i id="det-@item.Id" class="bi bi-file-earmark-text fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
+                                <a class="icon-enlace" asp-action="Renovar" asp-controller="Reserva" asp-route-id="@item.Id" data-bs-toggle="tooltip" data-bs-title="Renovar Reserva">
+                                    <i class="bi bi-file-earmark-plus fs-3 text-success"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <nav>
+        <ul id="paginador" class="pagination justify-content-center">
+            <li id="flecha-pag-izq" class="page-item @(ViewBag.paginaAnterior == 0 ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Anterior">
+                @if(ViewBag.idInm != null) {
+                    <a asp-action="Index" asp-route-idInm="@ViewBag.idInm" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaAnterior" class="page-link"><span>&laquo;</span></a>
+                } else {
+                    <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaAnterior" class="page-link"><span>&laquo;</span></a>
+                }
+            </li>
+            @for (int i = 1; i <= ViewBag.cantPag; i++) {
+                <li class="page-item">
+                    @if(ViewBag.idInm != null) {
+                        <a asp-action="Index" asp-route-idInm="@ViewBag.idInm" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@i" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a>
+                    } else {
+                        <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@i" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a>
+                    }
+                </li>
+            }
+            <li id="flecha-pag-der" class="page-item @(ViewBag.offsetSiguiente > ViewBag.cantPag ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Siguiente">
+                @if(ViewBag.idInm != null) {
+                    <a asp-action="Index" asp-route-idInm="@ViewBag.idInm" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaSiguiente" class="page-link"><span>&raquo;</span></a>
+                } else {
+                    <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaSiguiente" class="page-link"><span>&raquo;</span></a>
+                }
+            </li>
+        </ul>
+    </nav>
+    @if(ViewBag.idInm != null) {
+        <div class="position-absolute bottom-0 start-0 ms-4 mb-2 contenedor-iconos">
+            <a asp-controller="Inmueble" asp-action="Index" class="icon-enlace d-inline-block">
+                <i class="bi bi-box-arrow-in-left fs-1 text-primary" data-bs-toggle="tooltip" data-bs-title="Volver a Inmuebles"></i>
+            </a>
+        </div>
+        <div class="position-absolute bottom-0 end-0 me-4 mb-2 contenedor-iconos">
+            <a asp-action="Index" class="icon-enlace d-inline-block">
+                <i class="bi bi-arrow-counterclockwise fs-1 text-primary" data-bs-toggle="tooltip" data-bs-title="Recargar Reservas"></i>
+            </a>
+        </div>
+    }
+</div>
+
+<partial name="_DetalleReservaModal"/>
+
+<partial name="_ModalEliminar"/>
+
+@if(!string.IsNullOrEmpty(ViewBag.MensajeError)) {
+    <partial name="_MensajeError" model="ViewBag.MensajeError"/>
+}
+
+@section Scripts {
+    <script type="module" src="~/js/reservas.js"></script>
+}

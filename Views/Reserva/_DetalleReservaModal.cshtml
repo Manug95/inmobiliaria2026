@@ -1,0 +1,61 @@
+<div id="modal_detalle_reserva" class="modal fade modal-xl" tabindex="-1" aria-describedby="titulo-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div id="titulo-modal" class="modal-title fs-5">Detalle de la Reserva n° <span id="nro"></span></div>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="body-detalle" class="modal-body justify-content-center align-items-center">
+                <div class="container-md align-middle">
+                    <div class="d-flex justify-content-center align-items-center vh-50 w-100">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col">
+                                    <span class="fw-bold fs-3">Dirección Inmueble: &nbsp;</span>
+                                    <span id="direccion"></span>
+                                </div>
+                                <div class="col">
+                                    <span class="fw-bold fs-3">Propietario: &nbsp;</span>
+                                    <span id="propietario"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <span class="fw-bold fs-3">Inquilino: &nbsp;</span>
+                                    <span id="inquilino"></span>
+                                </div>
+                                <div class="col">
+                                    <span class="fw-bold fs-3">Tipo Inmueble: &nbsp;</span>
+                                    <span id="detalle_tipo"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <span class="fw-bold fs-3">Fecha de Inicio: &nbsp;</span>
+                                    <span id="fIni"></span>
+                                </div>
+                                <div class="col">
+                                    <span class="fw-bold fs-3">Fecha de Finalización: &nbsp;</span>
+                                    <span id="fFin"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <span class="fw-bold fs-3">Precio por día: &nbsp;</span>
+                                    <span id="monto"></span>
+                                </div>
+                                <div class="col">
+                                    <span class="fw-bold fs-3">Fecha Terminado: &nbsp;</span>
+                                    <span id="fTerm"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="body-mensaje" class="modal-body justify-content-center align-items-center d-none">
+                <p id="mensaje" class="text-center text-danger fw-bold fs-5">No se encontraron los datos</p>
+            </div>
+        </div>
+    </div>
+</div>

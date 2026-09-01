@@ -6,7 +6,7 @@
 
 .fixed-height-table-container-alquilar {
     /* height: 380px; */
-    max-height: 380px;
+    max-height: 500px;
     overflow-y: auto;
 }
 

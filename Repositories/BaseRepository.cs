@@ -3,11 +3,11 @@ namespace inmobiliaria2026.Repositories;
 public abstract class BaseRepository
 {
     protected readonly IConfiguration _configuration;
-    protected readonly string connectionString;
+    protected readonly string _connectionString;
 
     public BaseRepository(IConfiguration config)
     {
         _configuration = config;
-        connectionString = config["ConnectionStrings:MySql"]!;
+        _connectionString = config["ConnectionStrings:MySql"]!;
     }
 }

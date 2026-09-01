@@ -1,0 +1,110 @@
+@using System.Globalization
+
+@model Reserva;
+
+@{
+    Inquilino? inquilino;
+    ViewData["Title"] = "Formulario Reserva";
+}
+
+<link rel="stylesheet" href="~/css/styles.css">
+
+<div class="container-md align-middle mt-3">
+    <div class="d-flex justify-content-center align-items-center vh-50 w-100">
+        <form asp-action="Guardar" method="post" id="form-reserva" class="p-3 w-75 mx-auto border rounded-4 shadow-sm needs-validation mt-3 mb-3 bg-light-subtle" novalidate>
+            @if (ViewBag.IdInquilino == 0) {
+                <div class="row mb-md-4 border rounded-4">
+                    <div class="col-12 col-md-6 mt-md-1 mb-md-3">
+                        <label for="buscador" class="form-label fw-bold">Escriba nombre o apellido del inquilino</label>
+                        <input type="text" class="form-control" id="buscador">
+                    </div>
+                    <div class="col-12 col-md-6 mt-md-1 mb-md-3">
+                        <div class="position-relative">
+                            <label asp-for="IdInquilino" class="form-label fw-bold">Inquilino</label>
+                            <select asp-for="IdInquilino" class="form-select" id="IdInquilino">
+                                @if (Model.Id > 0) {
+                                    inquilino = Model.Inquilino;
+                                    <option value="@Model.IdInquilino" selected>@inquilino?.ToString()</option>
+                                }
+                            </select>
+                            <div id="tpe_IdInquilino" class="invalid-tooltip"></div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="row mb-md-4">
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="FechaInicio" class="form-label fw-bold">Fecha de Inicio</label>
+                        <input type="date" asp-for="FechaInicio" class="form-control" id="FechaInicio" value="@(Model.FechaInicio.HasValue ? Model.FechaInicio.Value.ToString("yyyy-MM-dd") : "")">
+                        <div id="tpe_FechaInicio" class="invalid-tooltip"></div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <div class="position-relative">
+                        <label asp-for="FechaFin" class="form-label fw-bold">Fecha de Finalización</label>
+                        <input type="date" asp-for="FechaFin" class="form-control" id="FechaFin" value="@(Model.FechaFin.HasValue ? Model.FechaFin.Value.ToString("yyyy-MM-dd") : "")">
+                        <div id="tpe_FechaFin" class="invalid-tooltip"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-md-4">
+                @if (Model.Id > 0) {
+                    <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                        <div class="position-relative">
+                            <label asp-for="FechaTerminado" class="form-label fw-bold">Fecha Terminación de la Reserva</label>
+                            <input type="date" asp-for="FechaTerminado" class="form-control" id="FechaTerminado" value="@(Model.FechaTerminado.HasValue ? Model.FechaTerminado.Value.ToString("yyyy-MM-dd") : "")">
+                            <div id="tpe_FechaTerminado" class="invalid-tooltip"></div>
+                        </div>
+                    </div>
+                }
+                <div class="col-12 col-md-6 mt-5 mt-md-3 mb-md-0">
+                    <label asp-for="Monto" class="form-label fw-bold">Precio por día</label>
+                    <div class="position-relative input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" asp-for="Monto" class="form-control rounded-end" id="Monto" 
+                            value="@(Model.Monto.HasValue 
+                                    ? Model.Monto.Value.ToString(CultureInfo.InvariantCulture) 
+                                    : (ViewBag.inmueble != null ? ViewBag.inmueble.Precio.ToString(CultureInfo.InvariantCulture) : ""))"
+                            >
+                        <div id="tpe_Monto" class="invalid-tooltip"></div>
+                    </div>
+                </div>
+            </div>
+
+            <input id="Id" type="hidden" asp-for="Id"/>
+            <input id="IdInmueble" type="hidden" asp-for="IdInmueble" value="@ViewBag!.IdInmueble"/>
+            @if (ViewBag!.IdInquilino > 0) { <input id="IdInquilino" type="hidden" asp-for="IdInquilino" value="@ViewBag.IdInquilino"/> }
+
+            <div class="row mb-2 mt-5 mt-md-4 justify-content-evenly align-items-end pt-3">
+                <div class="col-2 d-flex justify-content-center">
+                    @if (ViewBag!.IdInmueble == 0 && Model.Id == 0) {
+                        <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" data-bs-title="Todavía no ha seleccionado un Inmueble" data-bs-custom-class="custom-tooltip-disabled">
+                            <input type="submit" value="Guardar" class="btn btn-primary d-block mx-auto" disabled>
+                        </span>
+                    } else {
+                        <input type="submit" value="Guardar" class="btn btn-primary d-block mx-auto">
+                    }
+                </div>
+                <div class="col-2 d-flex justify-content-center">
+                    <a class="btn btn-secondary px-3" type="button" asp-controller="@((ViewBag.IdInmueble == 0 && Model.Id == 0) ? "Inmueble" : "Reserva")" 
+                        asp-action="@((ViewBag.IdInmueble == 0 && Model.Id == 0) ? "Reservar" : "Index")"
+                    >
+                        @((ViewBag.IdInmueble == 0 && Model.Id == 0) ? "Ir a Reservar" : "Cancelar")
+                    </a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@if (ViewBag.MensajeError != null) {
+    <partial name="_MensajeError" model="ViewBag.MensajeError"/>
+}
+
+@section Scripts {
+    <script type="module" src="~/js/reservaForm.js"></script>
+}

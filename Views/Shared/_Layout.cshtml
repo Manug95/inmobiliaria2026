@@ -19,7 +19,7 @@
     </style>
 </head>
 <body>
-    <header>
+    <header style="height: 5vh">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-1 p-0 fs-4" style="background-color: #e3f2fd;">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Inmobiliaria</a>
@@ -42,7 +42,15 @@
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item text-dark" asp-area="" asp-controller="Inmueble" asp-action="Index">Lista Inmuebles</a></li>
                                 <li><a class="dropdown-item text-dark" asp-area="" asp-controller="TipoInmueble" asp-action="Index">Tipos de Inmuebles</a></li>
-                                @* <li><a class="dropdown-item text-dark" asp-area="" asp-controller="Inmueble" asp-action="Alquilar">Alquilar Inmueble</a></li> *@
+                                <li><a class="dropdown-item text-dark" asp-area="" asp-controller="Inmueble" asp-action="Reservar">Reservar Inmueble</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown @(ViewBag?.linkActivo == "reservas" ? "active-link" : "")">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Reservas
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item text-dark" asp-area="" asp-controller="Reserva" asp-action="Index">Lista Reservas</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -51,12 +59,12 @@
         </nav>
     </header>
     <div class="container-fluid">
-        <main role="main" class="pb-3">
+        <main role="main" class="pb-3 overflow-y-auto" style="height: 90vh">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer text-muted" style="height: 5vh">
         <div class="container">
             &copy; 2026 - inmobiliaria2026 - Gutierrez Manuel
         </div>

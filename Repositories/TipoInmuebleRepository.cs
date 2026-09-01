@@ -12,7 +12,7 @@ public class TipoInmuebleRepository : BaseRepository, ITipoInmuebleRepository
     {
         bool estaModificado = false;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 UPDATE tipos_inmueble 
@@ -43,7 +43,7 @@ public class TipoInmuebleRepository : BaseRepository, ITipoInmuebleRepository
     {
         int cantidadTiposInmueble = 0;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT COUNT({nameof(TipoInmueble.Id)}) AS cantidad 
@@ -66,7 +66,7 @@ public class TipoInmuebleRepository : BaseRepository, ITipoInmuebleRepository
     {
         int id = 0;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 INSERT INTO tipos_inmueble 
@@ -107,7 +107,7 @@ public class TipoInmuebleRepository : BaseRepository, ITipoInmuebleRepository
     {
         bool estaBorrado = false;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 UPDATE tipos_inmueble
@@ -132,7 +132,7 @@ public class TipoInmuebleRepository : BaseRepository, ITipoInmuebleRepository
     {
         var tiposInmuebles = new List<TipoInmueble>();
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT 
@@ -175,7 +175,7 @@ public class TipoInmuebleRepository : BaseRepository, ITipoInmuebleRepository
         
         TipoInmueble? tipoInmueble = null;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT 

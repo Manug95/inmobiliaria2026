@@ -12,7 +12,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
     {
         bool estaModificado = false;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 UPDATE inmuebles 
@@ -55,7 +55,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
     {
         int cantidadInmuebles = 0;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT COUNT({nameof(Inmueble.Id)}) AS cantidad 
@@ -63,15 +63,70 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                 WHERE {nameof(Inmueble.Borrado)} = 0"
             ;
 
-            if (disponible.HasValue && disponible.Value >= 0 && disponible.Value < 2)
-                sql += $" AND {nameof(Inmueble.Disponible)} = {disponible}";
+            if (disponible.HasValue && Enum.IsDefined(typeof(Disponiblilidad), disponible.Value))
+                sql += $" AND {nameof(Inmueble.Disponible)} = @disponible";
             if (idProp.HasValue && idProp.Value > 0)
-                sql += $" AND {nameof(Inmueble.IdPropietario)} = {idProp.Value}";
+                sql += $" AND {nameof(Inmueble.IdPropietario)} = @idPropietario";
 
             using (var command = new MySqlCommand(sql + ";", connection))
             {
+                if (disponible.HasValue && Enum.IsDefined(typeof(Disponiblilidad), disponible.Value))
+                    command.Parameters.AddWithValue("disponible", disponible.Value);
+                if (idProp.HasValue && idProp.Value > 0)
+                    command.Parameters.AddWithValue("idPropietario", idProp.Value);
+
                 connection.Open();
                 cantidadInmuebles = Convert.ToInt32(command.ExecuteScalar());
+                connection.Close();
+            }
+        }
+
+        return cantidadInmuebles;
+    }
+
+    public async Task<long> ContarInmueblesParaAlquilar(string desde, string hasta, int? tipo, int? cupo, decimal? precio)
+    {
+        long cantidadInmuebles = 0;
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = @$"
+                SELECT COUNT(i.{nameof(Inmueble.Id)}) AS cantidad 
+                FROM inmuebles AS i
+                INNER JOIN tipos_inmueble AS ti 
+                    ON i.{nameof(Inmueble.IdTipoInmueble)} = ti.id 
+                WHERE i.{nameof(Inmueble.Borrado)} = 0 
+                    AND i.{nameof(Inmueble.Disponible)} = 1 
+                    AND i.{nameof(Inmueble.Id)} NOT IN (
+                        SELECT DISTINCT r.{nameof(Reserva.IdInmueble)} 
+                        FROM reservas AS r
+                        WHERE {nameof(Reserva.FechaInicio)} BETWEEN @desde AND @hasta 
+                            OR {nameof(Reserva.FechaFin)} BETWEEN @desde AND @hasta 
+                            OR (@desde >= {nameof(Reserva.FechaInicio)} AND @desde <= {nameof(Reserva.FechaFin)}) 
+                            OR (@hasta >= {nameof(Reserva.FechaInicio)} AND @hasta <= {nameof(Reserva.FechaFin)}) 
+                    )"
+            ;
+
+            if (tipo.HasValue)
+                sql += $" AND i.{nameof(Inmueble.IdTipoInmueble)} = @tipo";
+
+            if (cupo.HasValue)
+                sql += $" AND i.{nameof(Inmueble.Cupo)} = @cupo";
+
+            if (precio.HasValue)
+                sql += $" AND i.{nameof(Inmueble.Precio)} <= @precio";
+
+            using (var command = new MySqlCommand(sql + ";", connection))
+            {
+                command.Parameters.AddWithValue("desde", desde);
+                command.Parameters.AddWithValue("hasta", hasta);
+
+                if (tipo.HasValue) command.Parameters.AddWithValue("tipo", tipo.Value);
+                if (cupo.HasValue) command.Parameters.AddWithValue("cupo", cupo.Value);
+                if (precio.HasValue) command.Parameters.AddWithValue("precio", precio.Value);
+
+                connection.Open();
+                cantidadInmuebles = Convert.ToInt64(command.ExecuteScalar());
                 connection.Close();
             }
         }
@@ -83,7 +138,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
     {
         int id = 0;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 INSERT INTO inmuebles 
@@ -156,7 +211,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
     {
         bool estaEliminado = false;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 UPDATE inmuebles 
@@ -177,11 +232,66 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
         return estaEliminado;
     }
 
+    public async Task<bool> EliminarImagen(string ruta)
+    {
+        bool estaBorrada = false;
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = "DELETE FROM imagenes WHERE ruta = @ruta;";
+
+            using (var command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("ruta", ruta);
+
+                connection.Open();
+                estaBorrada = command.ExecuteNonQuery() > 0;
+                connection.Close();
+            }
+        }
+
+        return estaBorrada;
+    }
+
+    public async Task<bool> GuardarImagen(int inmuebleId, string ruta)
+    {
+        bool imagenGuardada = false;
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = @$"INSERT INTO imagenes (inmuebleId, ruta) VALUES (@inmuebleId, @ruta);";
+
+            using (var command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("inmuebleId", inmuebleId);
+                command.Parameters.AddWithValue("ruta", ruta);
+
+                try
+                {
+                    connection.Open();
+                    imagenGuardada = command.ExecuteNonQuery() > 0;
+                }
+                catch (MySqlException mye)
+                {
+                    Console.WriteLine(mye.Message);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                connection.Close();
+            }
+        }
+
+        return imagenGuardada;
+    }
+
     public async Task<List<Inmueble>> ListarAsync(int limit, int offset)
     {
-        var inmuebles = new List<Inmueble>();
+        var diccionarioInmuebles = new Dictionary<int, Inmueble>();
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT 
@@ -197,6 +307,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                     i.{nameof(Inmueble.Senia)}, 
                     i.{nameof(Inmueble.Disponible)}, 
                     i.{nameof(Inmueble.Foto)}, 
+                    img.ruta AS imagen, 
                     ti.{nameof(TipoInmueble.Tipo)}, 
                     p.{nameof(Propietario.Nombre)}, 
                     p.{nameof(Propietario.Apellido)}, 
@@ -204,6 +315,8 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                 FROM inmuebles AS i 
                 INNER JOIN tipos_inmueble AS ti 
                     ON i.{nameof(Inmueble.IdTipoInmueble)} = ti.id 
+                LEFT JOIN imagenes AS img
+                    ON img.inmuebleId = i.{nameof(Inmueble.Id)} 
                 INNER JOIN propietarios AS p 
                     ON i.{nameof(Inmueble.IdPropietario)} = p.id 
                 WHERE {nameof(Inmueble.Borrado)} = 0"
@@ -226,46 +339,56 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                 {
                     while (reader.Read())
                     {
-                        inmuebles.Add(new Inmueble
+                        int inmuebleId = reader.GetInt32(nameof(Inmueble.Id));
+                        if (!diccionarioInmuebles.ContainsKey(inmuebleId))
                         {
-                            Id = reader.GetInt32(nameof(Inmueble.Id)),
-                            IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
-                            IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
-                            Cupo = reader.GetInt32(nameof(Inmueble.Cupo)),
-                            Calle = reader.GetString(nameof(Inmueble.Calle)),
-                            NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
-                            Latitud = reader.GetDecimal("latitud"),
-                            Longitud = reader.GetDecimal("longitud"),
-                            Disponible = reader.GetBoolean(nameof(Inmueble.Disponible)),
-                            Foto = reader[nameof(Inmueble.Foto)] == DBNull.Value ? null : reader.GetString(nameof(Inmueble.Foto)),
-                            Precio = reader.GetDecimal(nameof(Inmueble.Precio)),
-                            Senia = reader.GetInt32(nameof(Inmueble.Senia)),
-                            Duenio = new Propietario
+                            Inmueble inmueble = new Inmueble
                             {
-                                Id = reader.GetInt32(nameof(Inmueble.IdPropietario)),
-                                Nombre = reader.GetString(nameof(Propietario.Nombre)),
-                                Apellido = reader.GetString(nameof(Propietario.Apellido)),
-                                Dni = reader.GetString(nameof(Propietario.Dni))
-                            },
-                            Tipo = new TipoInmueble
-                            {
-                                Id = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
-                                Tipo = reader.GetString(nameof(TipoInmueble.Tipo))
-                            }
-                        });
+                                Id = inmuebleId,
+                                IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                                IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                                Cupo = reader.GetInt32(nameof(Inmueble.Cupo)),
+                                Calle = reader.GetString(nameof(Inmueble.Calle)),
+                                NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
+                                Latitud = reader.GetDecimal("latitud"),
+                                Longitud = reader.GetDecimal("longitud"),
+                                Disponible = reader.GetBoolean(nameof(Inmueble.Disponible)),
+                                Foto = reader[nameof(Inmueble.Foto)] == DBNull.Value ? null : reader.GetString(nameof(Inmueble.Foto)),
+                                Precio = reader.GetDecimal(nameof(Inmueble.Precio)),
+                                Senia = reader.GetInt32(nameof(Inmueble.Senia)),
+                                Fotos = [],
+                                Duenio = new Propietario
+                                {
+                                    Id = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                                    Nombre = reader.GetString(nameof(Propietario.Nombre)),
+                                    Apellido = reader.GetString(nameof(Propietario.Apellido)),
+                                    Dni = reader.GetString(nameof(Propietario.Dni))
+                                },
+                                Tipo = new TipoInmueble
+                                {
+                                    Id = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                                    Tipo = reader.GetString(nameof(TipoInmueble.Tipo))
+                                }
+                            };
+                            
+                            if (reader["imagen"] != DBNull.Value)
+                                inmueble.Fotos.Add(reader.GetString("imagen"));
+                                
+                            diccionarioInmuebles.Add(inmuebleId, inmueble);
+                        }
                     }
                 }
             }
         }
 
-        return inmuebles;
+        return diccionarioInmuebles.Values.ToList();
     }
 
-    public async Task<IList<Inmueble>> ListarInmuebles(int disponible, int? offset = null, int? limit = null, string? nomApeProp = null)
+    public async Task<IList<Inmueble>> ListarInmuebles(int disponible, int? offset, int? limit, string? nomApeProp)
     {
         var inmuebles = new List<Inmueble>();
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT 
@@ -293,8 +416,8 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                 WHERE {nameof(Inmueble.Borrado)} = 0"
             ;
 
-            if (disponible >= 0 && disponible < 2)
-                sql += $" AND {nameof(Inmueble.Disponible)} = {disponible}";
+            if (Enum.IsDefined(typeof(Disponiblilidad), disponible))
+                sql += $" AND {nameof(Inmueble.Disponible)} = @disponible";
 
             if (!string.IsNullOrWhiteSpace(nomApeProp))
                 sql += $" AND (p.{nameof(Propietario.Nombre)} LIKE @nomApe OR p.{nameof(Propietario.Apellido)} LIKE @nomApe)";
@@ -304,7 +427,10 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
 
             using (var command = new MySqlCommand(sql + ";", connection))
             {
-                if (!string.IsNullOrWhiteSpace(nomApeProp)) command.Parameters.AddWithValue($"nomApe", $"%{nomApeProp}%");
+                if (Enum.IsDefined(typeof(Disponiblilidad), disponible))
+                    command.Parameters.AddWithValue("disponible", disponible);
+                if (!string.IsNullOrWhiteSpace(nomApeProp)) 
+                    command.Parameters.AddWithValue($"nomApe", $"{nomApeProp}%");
                 if (offset.HasValue && limit.HasValue)
                 {
                     command.Parameters.AddWithValue($"limit", limit.Value);
@@ -352,16 +478,108 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
         return inmuebles;
     }
 
-    public Task<IList<Inmueble>> ListarInmueblesParaAlquilar(string desde, string hasta, string? uso, int? tipo, int? cantAmb, decimal? precio, int offset, int limit)
+    public async Task<List<Inmueble>> ListarInmueblesParaAlquilar(string desde, string hasta, int? tipo, int? cupo, decimal? precio, int offset, int limit)
     {
-        throw new NotImplementedException();
+        var inmuebles = new List<Inmueble>();
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = @$"
+                SELECT 
+                    i.*, 
+                    ti.{nameof(TipoInmueble.Tipo)} AS tipoInmueble, 
+                    p.{nameof(Propietario.Nombre)} AS nombreProp, 
+                    p.{nameof(Propietario.Apellido)} AS apellidoProp, 
+                    p.{nameof(Propietario.Dni)} AS dniProp 
+                FROM inmuebles AS i 
+                INNER JOIN tipos_inmueble AS ti 
+                    ON i.{nameof(Inmueble.IdTipoInmueble)} = ti.id 
+                INNER JOIN propietarios AS p 
+                    ON i.{nameof(Inmueble.IdPropietario)} = p.id 
+                WHERE i.{nameof(Inmueble.Borrado)} = 0 
+                    AND i.{nameof(Inmueble.Disponible)} = 1 
+                    AND i.{nameof(Inmueble.Id)} NOT IN (
+                        SELECT DISTINCT {nameof(Reserva.IdInmueble)} 
+                        FROM reservas 
+                        WHERE {nameof(Reserva.FechaInicio)} BETWEEN @desde AND @hasta 
+                            OR {nameof(Reserva.FechaFin)} BETWEEN @desde AND @hasta 
+                            OR (@desde >= {nameof(Reserva.FechaInicio)} AND @desde <= {nameof(Reserva.FechaFin)}) 
+                            OR (@hasta >= {nameof(Reserva.FechaInicio)} AND @hasta <= {nameof(Reserva.FechaFin)}) 
+                    )" 
+            ;
+
+            if (tipo.HasValue)
+                sql += $" AND i.{nameof(Inmueble.IdTipoInmueble)} = @tipo";
+
+            if (cupo.HasValue)
+                sql += $" AND i.{nameof(Inmueble.Cupo)} = @cupo";
+
+            if (precio.HasValue)
+                sql += $" AND i.{nameof(Inmueble.Precio)} <= @precio";
+
+            if (offset > 0 && limit > 0)
+                sql += " LIMIT @limit OFFSET @offset";
+
+            using (var command = new MySqlCommand(sql + ";", connection))
+            {
+                command.Parameters.AddWithValue("desde", desde);
+                command.Parameters.AddWithValue("hasta", hasta);
+
+                if (tipo.HasValue) command.Parameters.AddWithValue("tipo", tipo.Value);
+                if (cupo.HasValue) command.Parameters.AddWithValue("cupo", cupo.Value);
+                if (precio.HasValue) command.Parameters.AddWithValue("precio", precio.Value);
+
+                if (offset > 0 && limit > 0)
+                {
+                    command.Parameters.AddWithValue("limit", limit);
+                    command.Parameters.AddWithValue("offset", (offset - 1) * limit);
+                }
+
+                connection.Open();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        inmuebles.Add(new Inmueble
+                        {
+                            Id = reader.GetInt32(nameof(Inmueble.Id)),
+                            IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                            IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                            Cupo = reader.GetInt32(nameof(Inmueble.Cupo)),
+                            Calle = reader.GetString(nameof(Inmueble.Calle)),
+                            NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
+                            Latitud = reader[nameof(Inmueble.Latitud)] == DBNull.Value ? 0 : reader.GetDecimal(nameof(Inmueble.Latitud)),
+                            Longitud = reader[nameof(Inmueble.Longitud)] == DBNull.Value ? 0 : reader.GetDecimal(nameof(Inmueble.Longitud)),
+                            Disponible = reader.GetBoolean(nameof(Inmueble.Disponible)),
+                            Precio = reader.GetDecimal(nameof(Inmueble.Precio)),
+                            Senia = reader.GetInt32(nameof(Inmueble.Senia)),
+                            Duenio = new Propietario
+                            {
+                                Id = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                                Nombre = reader.GetString("nombreProp"),
+                                Apellido = reader.GetString("apellidoProp"),
+                                Dni = reader.GetString("dniProp")
+                            },
+                            Tipo = new TipoInmueble
+                            {
+                                Id = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                                Tipo = reader.GetString("tipoInmueble")
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        return inmuebles;
     }
 
     public async Task<IList<Inmueble>> ListarInmueblesPorPropietario(int idProp, int? offset, int? limit)
     {
         var inmuebles = new List<Inmueble>();
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT 
@@ -447,7 +665,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
     {
         Inmueble? inmueble = null;
 
-        using (var connection = new MySqlConnection(connectionString))
+        using (var connection = new MySqlConnection(_connectionString))
         {
             string sql = @$"
                 SELECT 
@@ -463,6 +681,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                     i.{nameof(Inmueble.Senia)}, 
                     i.{nameof(Inmueble.Disponible)}, 
                     i.{nameof(Inmueble.Foto)}, 
+                    img.ruta AS imagen, 
                     ti.{nameof(TipoInmueble.Tipo)} AS tipoInmueble, 
                     p.{nameof(Propietario.Nombre)} AS nombreDuenio, 
                     p.{nameof(Propietario.Apellido)} AS apellidoDuenio, 
@@ -470,6 +689,8 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                 FROM inmuebles AS i 
                 INNER JOIN tipos_inmueble AS ti 
                     ON i.{nameof(Inmueble.IdTipoInmueble)} = ti.id 
+                LEFT JOIN imagenes AS img
+                    ON img.inmuebleId = i.{nameof(Inmueble.Id)} 
                 INNER JOIN propietarios AS p 
                     ON i.{nameof(Inmueble.IdPropietario)} = p.id 
                 WHERE i.{nameof(Inmueble.Id)} = @{nameof(Inmueble.Id)} AND {nameof(Inmueble.Borrado)} = 0;"
@@ -483,35 +704,42 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
 
                 using (var reader = command.ExecuteReader())
                 {
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        inmueble = new Inmueble
+                        if (inmueble == null)
                         {
-                            Id = reader.GetInt32(nameof(Inmueble.Id)),
-                            IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
-                            IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
-                            Cupo = reader.GetInt32(nameof(Inmueble.Cupo)),
-                            Calle = reader.GetString(nameof(Inmueble.Calle)),
-                            NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
-                            Latitud = reader.GetDecimal("latitud"),
-                            Longitud = reader.GetDecimal("longitud"),
-                            Disponible = reader.GetBoolean(nameof(Inmueble.Disponible)),
-                            Precio = reader.GetDecimal(nameof(Inmueble.Precio)),
-                            Senia = reader.GetInt32(nameof(Inmueble.Senia)),
-                            Foto = reader[nameof(Inmueble.Foto)] == DBNull.Value ? null : reader.GetString(nameof(Inmueble.Foto)),
-                            Duenio = new Propietario
+                            inmueble = new Inmueble
                             {
-                                Id = reader.GetInt32(nameof(Inmueble.IdPropietario)),
-                                Nombre = reader.GetString("nombreDuenio"),
-                                Apellido = reader.GetString("apellidoDuenio"),
-                                Dni = reader.GetString("dniDuenio")
-                            },
-                            Tipo = new TipoInmueble
-                            {
-                                Id = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
-                                Tipo = reader.GetString("tipoInmueble")
-                            }
-                        };
+                                Id = reader.GetInt32(nameof(Inmueble.Id)),
+                                IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                                IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                                Cupo = reader.GetInt32(nameof(Inmueble.Cupo)),
+                                Calle = reader.GetString(nameof(Inmueble.Calle)),
+                                NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
+                                Latitud = reader.GetDecimal("latitud"),
+                                Longitud = reader.GetDecimal("longitud"),
+                                Disponible = reader.GetBoolean(nameof(Inmueble.Disponible)),
+                                Precio = reader.GetDecimal(nameof(Inmueble.Precio)),
+                                Senia = reader.GetInt32(nameof(Inmueble.Senia)),
+                                Foto = reader[nameof(Inmueble.Foto)] == DBNull.Value ? null : reader.GetString(nameof(Inmueble.Foto)),
+                                Fotos = [],
+                                Duenio = new Propietario
+                                {
+                                    Id = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                                    Nombre = reader.GetString("nombreDuenio"),
+                                    Apellido = reader.GetString("apellidoDuenio"),
+                                    Dni = reader.GetString("dniDuenio")
+                                },
+                                Tipo = new TipoInmueble
+                                {
+                                    Id = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                                    Tipo = reader.GetString("tipoInmueble")
+                                }
+                            };
+                        }
+
+                        if (reader["imagen"] != DBNull.Value)
+                            inmueble?.Fotos?.Add(reader.GetString("imagen"));
                     }
                 }
             }
