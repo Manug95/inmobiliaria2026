@@ -7,17 +7,24 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace inmobiliaria2026.Controllers;
 
-public class InmuebleController : Controller
+public class InmuebleController : ControladorBase
 {
     private readonly IInmuebleRepository _repo;
     private readonly ITipoInmuebleRepository _repoTipoInmueble;
     private readonly IPropietarioRepository _repoPropietario;
+    private readonly IImagenRepository _repoImagenes;
 
-    public InmuebleController(IInmuebleRepository repo, ITipoInmuebleRepository repoTipoInmueble, IPropietarioRepository repoPropietario)
+    public InmuebleController(
+        IInmuebleRepository repo, 
+        ITipoInmuebleRepository repoTipoInmueble, 
+        IPropietarioRepository repoPropietario,
+        IImagenRepository repoImagenes
+    )
     {
         _repo = repo;
         _repoPropietario = repoPropietario;
         _repoTipoInmueble = repoTipoInmueble;
+        _repoImagenes = repoImagenes;
     }
 
     [HttpGet]
@@ -78,19 +85,7 @@ public class InmuebleController : Controller
                 inmuebleForm.IdTipoInmueble = idTipoInmuebleNuevo;
             }
 
-            Inmueble inmueble = inmuebleForm.GetInmueble();
-
-            await _repo.CrearAsync(inmueble);
-
-            if (inmuebleForm.FotoFile != null)
-            {
-                if (!inmuebleForm.FotoFile.ContentType.Contains("image/"))
-                    return BadRequest();
-                
-                string portadaURL = await fileService.GuardarImagen(inmuebleForm.FotoFile, "foto_" + inmueble.Id);
-                inmueble.Foto = portadaURL;
-                await _repo.ActualizarAsync(inmueble);
-            }
+            await _repo.CrearAsync(inmuebleForm.GetInmueble());
         }
         else
         {
@@ -132,27 +127,6 @@ public class InmuebleController : Controller
             inmueble.Senia = inmuebleForm.Senia;
             inmueble.Disponible = inmuebleForm.Disponible;
 
-            if (inmuebleForm.FotoFile != null)
-            {
-                if (!inmuebleForm.FotoFile.ContentType.Contains("image/"))
-                    return BadRequest();
-                
-                string portadaURL = await fileService.GuardarImagen(inmuebleForm.FotoFile, "portada_" + inmueble.Id);
-                inmueble.Foto = portadaURL;
-            }
-
-            // if (inmuebleForm.FotoFileExtras != null && inmuebleForm.FotoFileExtras.Any())
-            // {
-            //     var rutasExtras = new List<string>();
-            //     foreach(var foto in inmuebleForm.FotoFileExtras)
-            //     {
-            //         if (!foto.ContentType.Contains("image/"))
-            //             return BadRequest();
-                
-            //         string portadaURL = await fileService.GuardarImagen(foto, "portada_" + inmueble.Id);
-            //     }
-            // }
-
             await _repo.ActualizarAsync(inmueble);
         }
         else
@@ -161,6 +135,62 @@ public class InmuebleController : Controller
         }
 
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> GuardarImagenes([FromForm] Imagen imagenForm, [FromServices] IFileService fileService)
+    {
+        if (imagenForm.ImagenFile != null && imagenForm.ImagenFile.ContentType.Contains("image/"))
+        {
+            Inmueble? inmueble = await _repo.ObtenerPorIdAsync(imagenForm.InmuebleId);
+            if (inmueble != null)
+            {
+                try
+                {
+                    if (inmueble.Foto != null)
+                    {
+                        fileService.BorrarImagenPortada(inmueble.Foto); //Path.GetFileName(inmueble.Foto)
+                    }
+                    string portadaURL = await fileService.GuardarImagenPortada(imagenForm.ImagenFile, "portada_" + imagenForm.InmuebleId);
+                    inmueble.Foto = portadaURL;
+                    await _repo.ActualizarAsync(inmueble);
+                }
+                catch (Exception e)
+                {
+                    TempData["MensajeError"] = e.Message;
+                    return RedirectToAction(nameof(FormulariosImagenes), new { id = imagenForm.InmuebleId });
+                }
+            }
+        }
+
+        if (imagenForm.ImagenesFile != null && imagenForm.ImagenesFile.Count != 0)
+        {
+            string nombreArchivo = "";
+            try
+            {
+                string ImagenURL;
+                foreach(var foto in imagenForm.ImagenesFile)
+                {
+                    nombreArchivo = foto.FileName;
+                    if (foto.ContentType.Contains("image/"))
+                    {
+                        ImagenURL = await fileService.GuardarImagenInterior(foto, Guid.NewGuid().ToString(), imagenForm.InmuebleId);
+                        await _repoImagenes.CrearAsync(new Imagen()
+                        {
+                            InmuebleId = imagenForm.InmuebleId,
+                            Ruta = ImagenURL
+                        });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                TempData["MensajeError"] = $"Error en la imagen '{nombreArchivo}', {e.Message}";
+                return RedirectToAction(nameof(FormulariosImagenes), new { id = imagenForm.InmuebleId });
+            }
+        }
+
+        return RedirectToAction(nameof(FormulariosImagenes), new { id = imagenForm.InmuebleId });
     }
 
     [HttpGet]
@@ -216,6 +246,22 @@ public class InmuebleController : Controller
         return View(viewModel);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> FormulariosImagenes([FromRoute] int id = 0)
+    {
+        Inmueble? inmueble = await _repo.ObtenerPorIdAsync(id);
+        List<Imagen> imagenes = await _repoImagenes.ListarPorInmuebleAsync(id, 10, 1);
+
+        ViewBag.MensajeError = TempData["MensajeError"] as string;
+
+        return View(new Imagen()
+        {
+            Ruta = inmueble?.Foto,
+            InmuebleId = inmueble!.Id,
+            Imagenes = imagenes
+        });
+    }
+
     [HttpPost]
     public async Task<IActionResult> Eliminar([FromRoute] int id)
     {
@@ -226,6 +272,60 @@ public class InmuebleController : Controller
             TempData["MensajeError"] = "No se pudo borrar el registro";
 
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> EliminarPortada([FromRoute] int id, [FromServices] IFileService fileService)
+    {
+        if (id <= 0)
+            return BadRequest();
+
+        try
+        {
+            Inmueble? inmueble = await _repo.ObtenerPorIdAsync(id);
+
+            if (inmueble == null)
+                return NotFound();
+
+            if (inmueble.Foto != null)
+            {
+                fileService.BorrarImagenPortada(inmueble.Foto);
+
+                inmueble.Foto = null;
+                await _repo.ActualizarAsync(inmueble);
+            }
+        }
+        catch (Exception e)
+        {
+            TempData["MensajeError"] = $"{e.Message}";
+        }
+
+        return RedirectToAction(nameof(FormulariosImagenes), new { id });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> EliminarImagenInterior([FromRoute] int id, [FromForm] Imagen imagen, [FromServices] IFileService fileService)
+    {
+        if (id <= 0)
+            return BadRequest();
+
+        if (await _repoImagenes.EliminarAsync(id))
+        {
+            try
+            {
+                fileService.BorrarImagenInterior(Path.GetFileName(imagen.Ruta!), imagen.InmuebleId);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "No se pudo borrar la imagen";
+            }
+        } 
+        else
+            TempData["MensajeError"] = "No se pudo borrar la imagen";
+
+        
+
+        return RedirectToAction(nameof(FormulariosImagenes), new { id = imagen.InmuebleId });
     }
 
     [HttpGet]
@@ -291,19 +391,5 @@ public class InmuebleController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
-
-    private string ModelStateError(ModelStateDictionary modelState)
-    {
-        string errorMsg = "";
-        foreach (var estado in modelState)
-        {
-            var campo = estado.Key;
-            foreach (var error in estado.Value.Errors)
-            {
-                errorMsg += $"{error.ErrorMessage}</br>";
-            }
-        }
-        return errorMsg;
     }
 }

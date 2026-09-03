@@ -1,0 +1,165 @@
+@using inmobiliaria2026.Models.ViewModels
+@model Imagen;
+@{
+    ViewData["Title"] = "Formulario Imagenes";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row p-3 w-75 mx-auto border rounded-4 shadow-sm mt-3 mb-3 bg-light-subtle">
+        <div class="container">
+            <h2 class="mb-4">Subir foto portada</h2>
+
+            <div class="row">
+                <div class="col-12 col-md-6 col-lg-4 mt-3 mt-md-3 mb-3">
+                    <form asp-controller="Inmueble" asp-action="GuardarImagenes" method="POST" enctype="multipart/form-data">
+                        <label asp-for="ImagenFile" class="form-label fw-bold">Portada</label>
+                        <input id="inputFotoPortada" type="file"  asp-for="ImagenFile" class="form-control" id="foto" accept="image/*">
+                        <input type="hidden" asp-for="InmuebleId">
+                        <input id="btn-subir-portada" type="submit" value="Subir" class="btn btn-primary mt-3" disabled>
+                    </form>
+                    <form id="form-borrar-portada" asp-controller="Inmueble" asp-action="EliminarPortada" asp-route-id="@Model.InmuebleId" method="POST" class="mt-2 @(Model.Ruta == null ? "d-none" : "")">
+                        <input type="submit" value="Eliminar Existente" class="btn btn-danger">
+                    </form>
+                </div>
+                <div id="previewPortada" class="col-12 col-md-6 col-lg-8 mt-3 mt-md-3 mb-3" style="height: 250px;">
+                    @if (Model.Ruta != null){
+                        <img id="imgPortada" class="img-thumbnail w-50 h-100" src="@Model.Ruta" alt="portada del inmueble">
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row p-3 w-75 mx-auto border rounded-4 shadow-sm mt-3 mb-3 bg-light-subtle">
+        <div class="container">
+            <h2 class="mb-4">Subir fotos del interior</h2>
+
+            <form method="post" asp-controller="Inmueble" asp-action="GuardarImagenes" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label asp-for="ImagenesFile" class="form-label">Selecciona las fotos</label>
+                    <input type="file" id="Fotos" asp-for="ImagenesFile" multiple accept="image/*" class="form-control" />
+                </div>
+                <input type="hidden" asp-for="InmuebleId">
+
+                <div id="preview" class="row"></div>
+
+                <button id="btn-subir-fotos" type="submit" class="btn btn-primary mt-3" disabled>Subir</button>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.Imagenes.Count > 0){
+        <div class="row p-2 w-75 mx-auto border rounded-4 shadow-sm mt-3 mb-3 bg-light-subtle">
+            <div class="container">
+                <h2 class="mb-4">Fotos del interior</h2>
+                <div class="row">
+                    @foreach (var imagen in Model.Imagenes){
+                        <div class="col-md-4 col-sm-6 mb-4">
+                            <div class="card shadow-sm">
+                                <div class="img-container">
+                                    <img src="@imagen.Ruta" class="card-img-top fixed-img" alt="foto del interior del inmueble">
+                                </div>
+                                @* <img src="@imagen.Ruta" class="card-img-top img-fluid" alt="foto del interior del inmueble"> *@
+
+                                <div class="card-body">
+                                    <form method="post" asp-controller="Inmueble" asp-action="EliminarImagenInterior" asp-route-id="@imagen.Id">
+                                        <input type="hidden" asp-for="InmuebleId">
+                                        <input type="hidden" asp-for="Ruta" value="@imagen.Ruta">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="bi bi-trash"></i> Borrar
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if(!string.IsNullOrEmpty(ViewBag.MensajeError)) {
+    <partial name="_MensajeError" model="ViewBag.MensajeError"/>
+}
+
+@section Scripts {
+    <script>
+        const inputFotos = document.getElementById("Fotos");
+        const preview = document.getElementById("preview");
+        const inputFotoPortada = document.getElementById("inputFotoPortada");
+        const previewPortada = document.getElementById("previewPortada");
+        const formBorrarPortada = document.getElementById("form-borrar-portada");
+        const btnSubirPortada = document.getElementById("btn-subir-portada");
+        const btnSubirFotos = document.getElementById("btn-subir-fotos");
+
+        inputFotos.addEventListener("change", function (event) {
+            preview.innerHTML = "";
+            btnSubirFotos.disabled = true;
+
+            Array.from(event.target.files).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const col = document.createElement("div");
+                    col.className = "col-md-3 col-sm-4 mb-3";
+                    col.dataset.index = index;
+
+                    col.innerHTML = `
+                        <div class="card shadow-sm">
+                            <img src="${e.target.result}" class="card-img-top img-fluid" alt="${file.name}">
+                            <div class="card-body p-2 d-flex justify-content-between align-items-center">
+                                <small class="text-muted">${file.name}</small>
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-btn">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    preview.append(col);
+
+                    btnSubirFotos.disabled = false;
+
+                    col.querySelector(".remove-btn").addEventListener("click", () => {
+                        removeFile(index);
+                        col.remove();
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function removeFile(index) {
+            const dt = new DataTransfer();
+            Array.from(inputFotos.files).forEach((file, i) => {
+                if (i !== index) 
+                    dt.items.add(file);
+            });
+            inputFotos.files = dt.files;
+            if (dt.items.length == 0) {
+                inputFotos.nodeValue = null;
+                btnSubirFotos.disabled = true;
+            }
+        }
+
+        inputFotoPortada.addEventListener("change", function (event) {
+            btnSubirPortada.disabled = true;
+            const imgPortada = document.getElementById("imgPortada");
+            if (imgPortada != null)
+                previewPortada.removeChild(imgPortada);
+
+            Array.from(event.target.files).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement("img");
+                    img.src = `${e.target.result}`;
+                    img.id = "imgPortada";
+                    img.classList.add("img-thumbnail", "w-50", "h-100");
+                    img.alt = "portada del inmueble";
+                    previewPortada.prepend(img);
+                    btnSubirPortada.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
+}

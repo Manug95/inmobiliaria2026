@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace inmobiliaria2026.Controllers;
 
-public class InquilinoController : Controller
+public class InquilinoController : ControladorBase
 {
     private readonly IInquilinoRepository _repo;
 
@@ -71,19 +71,5 @@ public class InquilinoController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
-
-    private string ModelStateError(ModelStateDictionary modelState)
-    {
-        string errorMsg = "";
-        foreach (var estado in modelState)
-        {
-            var campo = estado.Key;
-            foreach (var error in estado.Value.Errors)
-            {
-                errorMsg += $"{error.ErrorMessage}</br>";
-            }
-        }
-        return errorMsg;
     }
 }

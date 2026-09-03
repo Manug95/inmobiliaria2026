@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace inmobiliaria2026.Controllers;
 
-public class TipoInmuebleController : Controller
+public class TipoInmuebleController : ControladorBase
 {
     private readonly ITipoInmuebleRepository _repo;
 
@@ -64,19 +64,5 @@ public class TipoInmuebleController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
-
-    private string ModelStateError(ModelStateDictionary modelState)
-    {
-        string errorMsg = "";
-        foreach (var estado in modelState)
-        {
-            var campo = estado.Key;
-            foreach (var error in estado.Value.Errors)
-            {
-                errorMsg += $"{error.ErrorMessage}</br>";
-            }
-        }
-        return errorMsg;
     }
 }

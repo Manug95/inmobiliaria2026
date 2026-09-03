@@ -63,14 +63,14 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                 WHERE {nameof(Inmueble.Borrado)} = 0"
             ;
 
-            if (disponible.HasValue && Enum.IsDefined(typeof(Disponiblilidad), disponible.Value))
+            if (disponible.HasValue && ((int)Disponiblilidad.HABILITADOS == disponible.Value || (int)Disponiblilidad.NO_HABILITADOS == disponible.Value))
                 sql += $" AND {nameof(Inmueble.Disponible)} = @disponible";
             if (idProp.HasValue && idProp.Value > 0)
                 sql += $" AND {nameof(Inmueble.IdPropietario)} = @idPropietario";
 
             using (var command = new MySqlCommand(sql + ";", connection))
             {
-                if (disponible.HasValue && Enum.IsDefined(typeof(Disponiblilidad), disponible.Value))
+                if (disponible.HasValue && ((int)Disponiblilidad.HABILITADOS == disponible.Value || (int)Disponiblilidad.NO_HABILITADOS == disponible.Value))
                     command.Parameters.AddWithValue("disponible", disponible.Value);
                 if (idProp.HasValue && idProp.Value > 0)
                     command.Parameters.AddWithValue("idPropietario", idProp.Value);
@@ -416,7 +416,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                 WHERE {nameof(Inmueble.Borrado)} = 0"
             ;
 
-            if (Enum.IsDefined(typeof(Disponiblilidad), disponible))
+            if ((int)Disponiblilidad.HABILITADOS == disponible || (int)Disponiblilidad.NO_HABILITADOS == disponible)
                 sql += $" AND {nameof(Inmueble.Disponible)} = @disponible";
 
             if (!string.IsNullOrWhiteSpace(nomApeProp))
@@ -427,7 +427,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
 
             using (var command = new MySqlCommand(sql + ";", connection))
             {
-                if (Enum.IsDefined(typeof(Disponiblilidad), disponible))
+                if ((int)Disponiblilidad.HABILITADOS == disponible || (int)Disponiblilidad.NO_HABILITADOS == disponible)
                     command.Parameters.AddWithValue("disponible", disponible);
                 if (!string.IsNullOrWhiteSpace(nomApeProp)) 
                     command.Parameters.AddWithValue($"nomApe", $"{nomApeProp}%");

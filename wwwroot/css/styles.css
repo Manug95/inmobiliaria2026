@@ -47,3 +47,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   /* --bs-tooltip-color: var(--bs-white); */
   /* background-color: red; */
 }
+
+.fixed-img {
+    height: 200px;          /* altura fija */
+    width: 100%;            /* ocupa todo el ancho */
+    object-fit: cover;      /* recorta proporcionalmente */
+}

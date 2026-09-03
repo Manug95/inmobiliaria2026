@@ -79,6 +79,9 @@
                                 <a class="icon-enlace" asp-action="Formulario" asp-route-id="@item.Id">
                                     <i class="bi bi-pencil-square fs-3 icon-hover text-primary" data-bs-toggle="tooltip" data-bs-title="Editar"></i>
                                 </a>
+                                <a class="icon-enlace" asp-action="FormulariosImagenes" asp-route-id="@item.Id">
+                                    <i class="bi bi-images fs-3 icon-hover text-secondary" data-bs-toggle="tooltip" data-bs-title="Gestionar Imágenes"></i>
+                                </a>
                                 <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
                                 <a  class="icon-enlace" asp-controller="Inmueble" asp-action="Detalle" asp-route-id="@item.Id">
                                     <i id="det-@item.Id" class="bi bi-building fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
