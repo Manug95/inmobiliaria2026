@@ -4,9 +4,10 @@
 }
 
 <link rel="stylesheet" href="~/css/tablas.css">
-<link rel="stylesheet" href="~/css/styles.css">
 
-<div class="container-fluid shadow border rounded-4 mt-5 bg-light-subtle position-relative">
+<h1 class="text-center display-4">Tipos de Inmueble</h1>
+
+<div class="container-fluid shadow border rounded-4 mt-3 bg-light-subtle position-relative">
     <div class="table-responsive my-4 rounded-3 fixed-height-table-container">
         <table class="table table-hover mb-0">
             <thead class="table-light">
@@ -44,15 +45,15 @@
     <nav>
         <ul id="paginador" class="pagination justify-content-center">
             <li id="flecha-pag-izq" class="page-item @(ViewBag.paginaAnterior == 0 ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Anterior">
-                <a asp-action="Index" asp-route-cantidadPaginado="10" asp-route-pagina="@ViewBag.paginaAnterior" class="page-link"><span>&laquo;</span></a>
+                <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaAnterior" class="page-link"><span>&laquo;</span></a>
             </li>
             @for (int i = 1; i <= ViewBag.cantPag; i++) {
                 <li class="page-item">
-                    <a asp-action="Index" asp-route-cantidadPaginado="10" asp-route-pagina="@i" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a>
+                    <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@i" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a>
                 </li>
             }
             <li id="flecha-pag-der" class="page-item @(ViewBag.paginaSiguiente > ViewBag.cantPag ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Siguiente">
-                <a asp-action="Index" asp-route-cantidadPaginado="10" asp-route-pagina="@ViewBag.paginaSiguiente" class="page-link"><span>&raquo;</span></a>
+                <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaSiguiente" class="page-link"><span>&raquo;</span></a>
             </li>
         </ul>
     </nav>

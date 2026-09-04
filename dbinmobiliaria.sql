@@ -31,7 +31,7 @@ CREATE TABLE `imagenes` (
   PRIMARY KEY (`id`),
   KEY `inmuebleId` (`inmuebleId`),
   CONSTRAINT `imagenes_ibfk_1` FOREIGN KEY (`inmuebleId`) REFERENCES `inmuebles` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,6 +40,7 @@ CREATE TABLE `imagenes` (
 
 LOCK TABLES `imagenes` WRITE;
 /*!40000 ALTER TABLE `imagenes` DISABLE KEYS */;
+INSERT INTO `imagenes` VALUES (1,'/Uploads\\Inmuebles\\3\\46ebaa5b-1cda-459a-84a2-2a43104cf09d.jpg',3),(4,'/Uploads\\Inmuebles\\3\\f521f819-e117-41ce-9a30-3ff4bafc8f3e.jpg',3);
 /*!40000 ALTER TABLE `imagenes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -78,7 +79,7 @@ CREATE TABLE `inmuebles` (
 
 LOCK TABLES `inmuebles` WRITE;
 /*!40000 ALTER TABLE `inmuebles` DISABLE KEYS */;
-INSERT INTO `inmuebles` VALUES (1,3,2,'CALLE',12.21310000,123.12314000,125.00,1,0,321,'/Uploads\\foto_1.jpg',4,20),(2,6,3,'Villarino',12.34500000,67.78900000,500.00,1,0,338,'/Uploads\\foto_2.jpg',2,5),(3,4,4,'Mitre',21.54300000,76.98700000,130.00,1,0,618,NULL,0,0),(4,3,2,'lolol',12.23452460,54.42523500,654321.00,0,1,1237,NULL,0,0),(5,3,2,'callerina',12.23452460,54.42523500,654321.00,1,1,1234,NULL,0,0),(6,7,3,'Buenos Aires',12.34560000,12.65430000,400.00,1,0,464,NULL,0,0),(7,5,3,'Gral. Pinto',13.45670000,13.76540000,123.00,1,0,846,NULL,0,0),(8,7,1,'Buenos Aires',12.34568000,12.86540000,650.00,1,0,465,NULL,0,0),(9,4,1,'Mitre',21.54400000,76.98800000,123.00,1,0,620,NULL,0,0),(10,8,3,'Entre Ríos',15.45345000,15.63463000,450.00,1,0,432,NULL,0,0),(11,6,2,'Irigoyen',23.32523500,124.25562000,370.00,1,0,100,NULL,0,0),(12,4,4,'Illia',53.25623000,45.32423000,235.00,1,0,587,NULL,0,0),(13,10,1,'Corrientes',53.32532000,143.62622300,350.00,1,0,346,NULL,0,0),(14,4,4,'Belgrano',57.43563400,21.25626000,520.00,0,0,240,NULL,0,0),(15,1,1,'San Luis',45.15610000,15.45400000,999.99,1,0,123,'/Uploads\\foto_15.jpg',0,0),(16,2,1,'San Juan',NULL,NULL,200.00,1,0,123,NULL,0,0),(17,3,1,'Sarmiento',NULL,NULL,120.00,1,0,123,NULL,0,0),(18,3,1,'Santiago del Estero',NULL,NULL,150.00,1,0,123,NULL,0,0),(19,4,1,'Neuquén',NULL,NULL,250.00,1,0,123,NULL,0,0),(20,5,1,'Rosario',NULL,NULL,175.00,1,0,123,NULL,0,0),(21,4,2,'La Rioja',NULL,NULL,250.00,1,0,123,NULL,0,0),(22,5,2,'Catamarca',NULL,NULL,150.00,1,0,123,NULL,0,0),(23,6,2,'Santa Cruz',NULL,NULL,100.00,1,0,123,NULL,0,0),(24,7,2,'Tierra del Fuego',NULL,NULL,150.00,1,0,123,NULL,0,0),(25,6,3,'Santa Fé',NULL,NULL,100.00,1,0,123,NULL,0,0),(26,7,3,'Tucumán',NULL,NULL,210.00,1,0,123,NULL,0,0),(27,8,3,'Córdoba',NULL,NULL,170.00,1,0,123,NULL,0,0),(28,8,3,'Mendoza',NULL,NULL,150.00,1,0,123,NULL,0,0),(29,10,3,'Chaco',NULL,NULL,250.00,1,0,123,NULL,0,0),(30,1,3,'Misiones',NULL,NULL,200.00,1,0,123,'/Uploads\\foto_30.jpg',0,0),(31,10,4,'Buenos Aires',NULL,NULL,123.00,1,0,130,NULL,0,0),(32,1,4,'Salta',NULL,NULL,80.00,1,0,123,'/Uploads\\foto_32.jpg',0,0),(33,2,4,'Formosa',NULL,NULL,160.00,1,0,123,NULL,0,0),(34,2,4,'Entre Ríos',NULL,NULL,150.00,1,0,123,NULL,0,0),(35,3,4,'25 de Mayo',NULL,NULL,100.00,1,0,123,NULL,0,0),(36,4,4,'3 de Febrero',NULL,NULL,125.00,1,0,123,NULL,0,0),(37,1,2,'asd',0.00000000,0.00000000,1234.00,0,1,123,'/Uploads\\foto_37.jpg',0,0),(45,1,1,'Santa Maria',NULL,NULL,199.99,1,0,123,'/Uploads\\foto_45.jpg',0,0),(47,1,4,'una calle',0.00000000,0.00000000,343.00,1,0,3423,'/Uploads\\foto_47.jpg',0,0),(48,6,3,'the calle of the beast',66.66600000,66.66600000,666.66,0,0,666,'/Uploads\\foto_48.jpg',0,0),(49,6,3,'calle calle',66.00000000,66.00000000,543.00,0,0,432,'/Uploads\\foto_49.jpg',0,0),(50,1,3,'calle prueba',11.00000000,11.00000000,333.00,0,0,123,'/Uploads\\foto_50.jpg',0,0),(51,1,4,'inmueble',0.00000000,0.00000000,500.00,1,0,432,'/Uploads\\foto_51.jpg',0,0),(52,1,3,'tremendo casa',0.00000000,0.00000000,10.00,1,0,123,'/Uploads\\foto_52.jpg',0,0),(53,9,1,'que se yo',12.34500000,67.78900000,123.00,0,1,100,NULL,0,0),(54,7,3,'calle',12.34500000,67.78900000,500.00,0,0,12,'/Uploads\\foto_54.jpg',9,25);
+INSERT INTO `inmuebles` VALUES (1,3,2,'CALLE',12.21310000,123.12314000,125.00,1,0,321,'/Uploads\\Inmuebles\\portada_1.jpg',4,20),(2,6,3,'Villarino',12.34500000,67.78900000,500.00,1,0,338,'/Uploads\\Inmuebles\\portada_2.jpg',2,5),(3,4,4,'Mitre',21.54300000,76.98700000,130.00,1,0,618,NULL,3,15),(4,3,2,'lolol',12.23452460,54.42523500,654321.00,0,1,1237,NULL,0,0),(5,3,2,'callerina',12.23452460,54.42523500,654321.00,1,1,1234,NULL,0,0),(6,7,3,'Buenos Aires',12.34560000,12.65430000,400.00,1,0,464,NULL,5,20),(7,5,3,'Gral. Pinto',13.45670000,13.76540000,123.00,1,0,846,NULL,6,10),(8,7,1,'Buenos Aires',12.34568000,12.86540000,650.00,1,0,465,NULL,1,25),(9,4,1,'Mitre',21.54400000,76.98800000,123.00,1,0,620,NULL,1,5),(10,8,3,'Entre Ríos',15.45345000,15.63463000,450.00,1,0,432,NULL,8,35),(11,6,2,'Irigoyen',23.32523500,124.25562000,370.00,1,0,100,NULL,2,50),(12,4,4,'Illia',53.25623000,45.32423000,235.00,1,0,587,NULL,3,23),(13,10,1,'Corrientes',53.32532000,143.62622300,350.00,1,0,346,NULL,1,20),(14,4,4,'Belgrano',57.43563400,21.25626000,520.00,0,0,240,NULL,3,15),(15,1,1,'San Luis',45.15610000,15.45400000,999.99,1,0,123,'/Uploads\\Inmuebles\\portada_15.jpg',2,33);
 /*!40000 ALTER TABLE `inmuebles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -141,6 +142,40 @@ INSERT INTO `propietarios` VALUES (1,'Gutierrez','Manuel','12345678','2364123456
 UNLOCK TABLES;
 
 --
+-- Table structure for table `reservas`
+--
+
+DROP TABLE IF EXISTS `reservas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reservas` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `idInquilino` int unsigned NOT NULL,
+  `idInmueble` int unsigned NOT NULL,
+  `monto` decimal(10,2) NOT NULL,
+  `fechaInicio` date NOT NULL,
+  `fechaFin` date NOT NULL,
+  `fechaTerminado` date DEFAULT NULL,
+  `borrado` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idInquilino` (`idInquilino`),
+  KEY `idInmueble` (`idInmueble`),
+  CONSTRAINT `reservas_ibfk_1` FOREIGN KEY (`idInquilino`) REFERENCES `inquilinos` (`id`),
+  CONSTRAINT `reservas_ibfk_2` FOREIGN KEY (`idInmueble`) REFERENCES `inmuebles` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `reservas`
+--
+
+LOCK TABLES `reservas` WRITE;
+/*!40000 ALTER TABLE `reservas` DISABLE KEYS */;
+INSERT INTO `reservas` VALUES (1,1,8,650.00,'2026-09-02','2026-09-05',NULL,0),(2,2,8,650.00,'2026-09-06','2026-09-10',NULL,0),(3,2,8,650.00,'2026-09-11','2026-09-12',NULL,0);
+/*!40000 ALTER TABLE `reservas` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `tipos_inmueble`
 --
 
@@ -163,7 +198,7 @@ CREATE TABLE `tipos_inmueble` (
 
 LOCK TABLES `tipos_inmueble` WRITE;
 /*!40000 ALTER TABLE `tipos_inmueble` DISABLE KEYS */;
-INSERT INTO `tipos_inmueble` VALUES (1,'MONOAMBIENTE',NULL,1),(2,'LOFT',NULL,1),(3,'CASA',NULL,1),(4,'DEPARTAMENTO',NULL,1),(5,'wasd','epa',0);
+INSERT INTO `tipos_inmueble` VALUES (1,'MONOAMBIENTE',NULL,1),(2,'LOFT',NULL,1),(3,'CASA','asd',1),(4,'DEPARTAMENTO',NULL,1),(5,'wasd','epa',0);
 /*!40000 ALTER TABLE `tipos_inmueble` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -176,4 +211,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-08-20 17:20:36
+-- Dump completed on 2026-09-03 20:31:47

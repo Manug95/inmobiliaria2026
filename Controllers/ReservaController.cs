@@ -29,6 +29,7 @@ public class ReservaController : ControladorBase
         int cantidadReservas = await _repo.ContarReservas(idInm);
 
         ViewBag.cantPag = Math.Ceiling((decimal)cantidadReservas / cantidadPaginado);
+        ViewBag.cantidadPaginado = cantidadPaginado;
         ViewBag.paginaSiguiente = pagina + 1;
         ViewBag.paginaAnterior = pagina - 1;
         ViewBag.idInm = idInm;

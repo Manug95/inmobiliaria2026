@@ -22,6 +22,7 @@ public class PropietarioController : ControladorBase
         int cantidadPropietarios = await _repo.ContarPropietarios();
 
         ViewBag.cantPag = Math.Ceiling((decimal)cantidadPropietarios / cantidadPaginado);
+        ViewBag.cantidadPaginado = cantidadPaginado;
         ViewBag.paginaSiguiente = pagina + 1;
         ViewBag.paginaAnterior = pagina - 1;
         ViewBag.linkActivo = "propietarios";

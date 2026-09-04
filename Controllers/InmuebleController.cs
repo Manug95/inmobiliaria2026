@@ -69,7 +69,7 @@ public class InmuebleController : ControladorBase
         entoces con este Bind le digo al framework que tenga en cuenta eso para poder mapear los campos del formulario correctamente
     */
     [HttpPost]
-    public async Task<IActionResult> Guardar([Bind(Prefix = nameof(InmuebleFormData))] [FromForm] InmuebleFormData inmuebleForm, [FromServices] IFileService fileService)
+    public async Task<IActionResult> Guardar([Bind(Prefix = nameof(InmuebleFormData))] [FromForm] InmuebleFormData inmuebleForm)
     {
         if (ModelState.IsValid)
         {
@@ -96,7 +96,7 @@ public class InmuebleController : ControladorBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Actualizar([Bind(Prefix = nameof(InmuebleFormData))] [FromForm] InmuebleFormData inmuebleForm, [FromServices] IFileService fileService)
+    public async Task<IActionResult> Actualizar([Bind(Prefix = nameof(InmuebleFormData))] [FromForm] InmuebleFormData inmuebleForm)
     {
         if (ModelState.IsValid)
         {
@@ -345,9 +345,11 @@ public class InmuebleController : ControladorBase
             return BadRequest();
         
         Inmueble? inmueble = await _repo.ObtenerPorIdAsync(id);
-        IList<string> fotos = [];
+        List<Imagen> imagenes = await _repoImagenes.ListarPorInmuebleAsync(id, 100, 1);
+        List<string> fotos = [.. imagenes.Select(i => i.Ruta!)];
         
-        return View(new DetalleInmuebleViewModel(inmueble, fotos));
+        // return View(new DetalleInmuebleViewModel(inmueble, fotos));
+        return View(new DetalleInmuebleViewModel(inmueble, imagenes));
     }
 
     [HttpGet]

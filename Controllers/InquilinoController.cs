@@ -22,6 +22,7 @@ public class InquilinoController : ControladorBase
         int cantidadInquilinos = await _repo.ContarInquilinos();
 
         ViewBag.cantPag = Math.Ceiling((decimal)cantidadInquilinos / cantidadPaginado);
+        ViewBag.cantidadPaginado = cantidadPaginado;
         ViewBag.paginaSiguiente = pagina + 1;
         ViewBag.paginaAnterior = pagina - 1;
         ViewBag.linkActivo = "inquilinos";

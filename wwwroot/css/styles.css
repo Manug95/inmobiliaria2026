@@ -53,3 +53,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     width: 100%;            /* ocupa todo el ancho */
     object-fit: cover;      /* recorta proporcionalmente */
 }
+
+.fixed-carousel-img {
+    height: 500px;       /* altura fija para todas las imágenes */
+    object-fit: cover;   /* recorta proporcionalmente */
+}
+
+.active-link {
+    background-color: #c3e3fa !important;
+    color: black !important;
+    font-weight: bold;
+}
+
+.nav-font {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}

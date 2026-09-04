@@ -22,6 +22,7 @@ public class TipoInmuebleController : ControladorBase
         int cantidadTiposInmueble = await _repo.ContarTiposInmueble();
 
         ViewBag.cantPag = Math.Ceiling((decimal)cantidadTiposInmueble / cantidadPaginado);
+        ViewBag.cantidadPaginado = cantidadPaginado;
         ViewBag.paginaSiguiente = pagina + 1;
         ViewBag.paginaAnterior = pagina - 1;
         ViewBag.linkActivo = "inmuebles";

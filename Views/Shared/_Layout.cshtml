@@ -10,20 +10,12 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/styles.css">
     <link rel="stylesheet" href="~/inmobiliaria2026.styles.css" asp-append-version="true" />
-    <style>
-        .active-link {
-            background-color: #c3e3fa !important;
-            color: black !important;
-            font-weight: bold;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-        }
-    </style>
 </head>
 <body>
     <header style="height: 5vh">
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-1 p-0 fs-4" style="background-color: #e3f2fd;">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-1 p-0 fs-5" style="background-color: #e3f2fd;">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Inmobiliaria</a>
+                <a class="navbar-brand nav-font" asp-area="" asp-controller="Home" asp-action="Index">Inmobiliaria</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -31,27 +23,27 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item @(ViewBag?.linkActivo == "propietarios" ? "active-link" : "")">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Propietario" asp-action="Index">Propietarios</a>
+                            <a class="nav-link text-dark nav-font" asp-area="" asp-controller="Propietario" asp-action="Index">Propietarios</a>
                         </li>
                         <li class="nav-item @(ViewBag?.linkActivo == "inquilinos" ? "active-link" : "")">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Inquilino" asp-action="Index">Inquilinos</a>
+                            <a class="nav-link text-dark nav-font" asp-area="" asp-controller="Inquilino" asp-action="Index">Inquilinos</a>
                         </li>
                         <li class="nav-item dropdown @(ViewBag?.linkActivo == "inmuebles" ? "active-link" : "")">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle text-dark nav-font" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Inmuebles
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item text-dark" asp-area="" asp-controller="Inmueble" asp-action="Index">Lista Inmuebles</a></li>
-                                <li><a class="dropdown-item text-dark" asp-area="" asp-controller="TipoInmueble" asp-action="Index">Tipos de Inmuebles</a></li>
-                                <li><a class="dropdown-item text-dark" asp-area="" asp-controller="Inmueble" asp-action="Reservar">Reservar Inmueble</a></li>
+                                <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Inmueble" asp-action="Index">Lista Inmuebles</a></li>
+                                <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="TipoInmueble" asp-action="Index">Tipos de Inmuebles</a></li>
+                                <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Inmueble" asp-action="Reservar">Reservar Inmueble</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown @(ViewBag?.linkActivo == "reservas" ? "active-link" : "")">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle text-dark nav-font" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Reservas
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item text-dark" asp-area="" asp-controller="Reserva" asp-action="Index">Lista Reservas</a></li>
+                                <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Reserva" asp-action="Index">Lista Reservas</a></li>
                             </ul>
                         </li>
                     </ul>
