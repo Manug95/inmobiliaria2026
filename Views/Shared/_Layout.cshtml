@@ -46,6 +46,9 @@
                                 <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Reserva" asp-action="Index">Lista Reservas</a></li>
                             </ul>
                         </li>
+                        <li class="nav-item @(ViewBag?.linkActivo == "pagos" ? "active-link" : "")">
+                            <a class="nav-link text-dark nav-font" asp-area="" asp-controller="Pago" asp-action="Index">Pagos</a>
+                        </li>
                     </ul>
                 </div>
             </div>

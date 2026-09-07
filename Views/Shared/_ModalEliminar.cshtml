@@ -6,7 +6,7 @@
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body justify-content-center align-items-center">
-                <p id="pregunta" class="text-center"><strong class="text-danger">¿Está seguro de eliminar el registro?</strong></p>
+                <p id="pregunta" class="text-center"><strong class="text-danger">¿Está Seguro de @(ViewBag.linkActivo == "pagos" ? "Anular" : "Eliminar")?</strong></p>
             </div>
             <div class="modal-footer justify-content-around">
                 <form id="form_eliminar" method="post">

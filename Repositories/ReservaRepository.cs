@@ -344,6 +344,8 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                     inm.{nameof(Inmueble.Calle)}, 
                     inm.{nameof(Inmueble.NroCalle)}, 
                     inm.{nameof(Inmueble.IdTipoInmueble)}, 
+                    inm.{nameof(Inmueble.Precio)}, 
+                    inm.{nameof(Inmueble.Senia)}, 
                     ti.{nameof(Inmueble.Tipo)}, 
                     p.{nameof(Propietario.Nombre)} AS nombreProp, 
                     p.{nameof(Propietario.Apellido)} AS apellidoProp, 
@@ -387,6 +389,8 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                                 Id = reader.GetInt32(nameof(Reserva.IdInmueble)),
                                 IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
                                 IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                                Precio = reader.GetDecimal(nameof(Inmueble.Precio)),
+                                Senia = reader.GetInt32(nameof(Inmueble.Senia)),
                                 Calle = reader.GetString(nameof(Inmueble.Calle)),
                                 NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
                                 Tipo = new TipoInmueble

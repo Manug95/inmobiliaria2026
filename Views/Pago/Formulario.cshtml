@@ -1,0 +1,78 @@
+@using System.Globalization
+@model Pago;
+@{
+    ViewData["Title"] = "Registrar Pago";
+}
+
+<h1 class="text-center display-4">@(Model.Id == 0 ? "Registrar" : "Modificar") Pago</h1>
+
+<div class="container-md align-middle">
+    <div class="d-flex justify-content-center align-items-center vh-50 w-100">
+        <form id="form" asp-action="Guardar" id="form-pago" class="p-3 w-75 mx-auto border rounded-4 shadow-sm needs-validation my-3 bg-light-subtle">
+            <div class="row g-2">
+                <div class="col-12 col-md-6 mt-2">
+                    <label asp-for="Fecha" class="form-label fw-bold">Fecha</label>
+                    <input 
+                        id="fecha"
+                        type="date" 
+                        asp-for="Fecha" 
+                        class="form-control" 
+                        disabled="@(Model.Id > 0)"
+                    >
+                    <span asp-validation-for="Fecha" class="text-danger small"></span>
+                </div>
+                <div class="col-12 col-md-6 mt-2">
+                    <label asp-for="Importe" class="form-label fw-bold">Importe</label>
+                    <input id="importe" type="number" asp-for="Importe" asp-format="{0:F2}" class="form-control" disabled="@(Model.Id > 0)">
+                    @if (Model.Id == 0){
+                        <div class="form-text">@(Model.Id == 0 ? "Total a" : "Restan") pagar $@ViewBag?.deuda</div>
+                    }
+                    <span asp-validation-for="Importe" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
+                    <label asp-for="Concepto" class="form-label fw-bold">Concepto</label>
+                    <textarea asp-for="Concepto" class="form-control" rows="3" placeholder="(opcional) agregue un concepto al pago"></textarea>
+                    <span asp-validation-for="Concepto" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <input type="hidden" asp-for="Id"/>
+            <input type="hidden" asp-for="ReservaId"/>
+
+            <div class="row mb-2 justify-content-evenly align-items-end pt-3">
+                <div class="col-2 d-flex justify-content-center">
+                    <input type="submit" value="Guardar" class="btn btn-primary d-block mx-auto">
+                </div>
+                <div class="col-2 d-flex justify-content-center">
+                    <a class="btn btn-secondary px-3" type="button" asp-controller="Reserva" asp-action="Index">Cancelar</a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(ViewBag.MensajeError)) {
+    <partial name="_MensajeError" model="ViewBag.MensajeError"/>
+}
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script type="module" defer>
+        import { mostrarMensaje } from "/js/frontUtils.js";
+        document.addEventListener("DOMContentLoaded", _ => {
+            mostrarMensaje(false, null);
+        });
+        const form = document.getElementById("form");
+        form.addEventListener("submit", e => {
+            e.preventDefault();
+            document.getElementById("fecha").disabled = false;
+            document.getElementById("importe").disabled = false;
+            form.submit();
+        });
+    </script>
+}

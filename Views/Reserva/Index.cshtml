@@ -61,6 +61,17 @@
                                 <a class="icon-enlace" asp-action="Renovar" asp-controller="Reserva" asp-route-id="@item.Id" data-bs-toggle="tooltip" data-bs-title="Renovar Reserva">
                                     <i class="bi bi-file-earmark-plus fs-3 text-success"></i>
                                 </a>
+                                <a class="icon-enlace @(item.FechaTerminado.HasValue ? "invisible" : "")" asp-action="Formulario" asp-controller="Pago" asp-route-reservaId="@item.Id" data-bs-toggle="tooltip" data-bs-title="Registrar Pago">
+                                    <i class="bi bi-currency-dollar fs-3 text-success"></i>
+                                </a>
+                                <a class="icon-enlace" asp-action="Index" asp-controller="Pago" asp-route-reservaId="@item.Id" data-bs-toggle="tooltip" data-bs-title="Ver Pagos">
+                                    <i class="bi bi-wallet2 fs-3 text-warning"></i>
+                                </a>
+                                @if (item.FechaTerminado != null) {
+                                    <i id="mult-@item.Id" class="bi bi-card-list fs-3 text-secondary icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver detalle multa"></i>
+                                } else {
+                                    <i id="end-@item.Id" class="bi bi-file-earmark-x fs-3 text-danger icon-hover" data-bs-toggle="tooltip" data-bs-title="Terminar Reserva"></i>
+                                }
                             </div>
                         </td>
                     </tr>
@@ -110,7 +121,6 @@
 </div>
 
 <partial name="_DetalleReservaModal"/>
-
 <partial name="_ModalEliminar"/>
 
 @if(!string.IsNullOrEmpty(ViewBag.MensajeError)) {
