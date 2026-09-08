@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using inmobiliaria2026.Interfaces;
 using inmobiliaria2026.Models;
+using inmobiliaria2026.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -159,6 +160,20 @@ public class ReservaController : ControladorBase
         */
         ModelState.Clear();
         return View(nameof(Formulario), reservaNueva);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Multa([FromRoute] long id, [FromServices] IInmobiliariaService inmobiliariaService)
+    {
+        if (id <= 0)
+            return BadRequest();
+
+        Reserva? reserva = await _repo.ObtenerPorIdAsync(id);
+
+        if (reserva == null)
+            return NotFound();
+
+        return Json(await inmobiliariaService.GetMulta(reserva));
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

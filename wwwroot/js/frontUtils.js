@@ -204,6 +204,19 @@ function obtenerIdDelCampoHidden() {
 
 
 
+/**
+ * Formatea una fecha string yyyy-MM-dd a dd/MM/yyyy
+ * @param {string} cadena en formato yyyy-MM-dd o yyyy-MM-ddThh:mm:ss.mmmZ
+ * @returns {string} La fecha formateada a dd/MM/yyyy
+ */
+function aFechaLocal(cadena) {
+  if (!cadena || typeof cadena != "string") return " - ";
+  const fecha = cadena?.split("T")[0];
+  return fecha?.split("-")?.reverse()?.join("/");
+}
+
+
+
 export {
   ocultarElemento,
   mostrarElemento,
@@ -217,5 +230,6 @@ export {
   mostrarPregunta,
   recargar,
   obtenerIdDelCampoHidden,
-  createElement
+  createElement,
+  aFechaLocal
 }

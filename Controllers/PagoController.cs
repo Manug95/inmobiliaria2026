@@ -36,7 +36,12 @@ public class PagoController : ControladorBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Guardar([FromForm] Pago pago, [FromServices] IReservaRepository repoReserva)
+    public async Task<IActionResult> Guardar(
+        [FromForm] Pago pago, 
+        [FromForm] bool esMulta, 
+        [FromServices] IReservaRepository repoReserva,
+        [FromServices] IInmobiliariaService inmobiliariaService
+    )
     {
         if (ModelState.IsValid)
         {
@@ -46,7 +51,6 @@ public class PagoController : ControladorBase
             }
             else
             {
-                // ¿deberia comprobar que el importe ingresado no sea mayor que lo que se debe pagar?
                 if (pago.ReservaId <= 0)
                 {
                     TempData["MensajeError"] = "No se especificó la reserva del pago";
@@ -54,35 +58,62 @@ public class PagoController : ControladorBase
                 }
                 
                 Reserva? reserva = await repoReserva.ObtenerPorIdAsync(pago.ReservaId);
-                decimal sumaImportes = await _repo.SumarImportes(pago.ReservaId);
 
                 if (reserva != null)
                 {
-                    decimal importeTotalReserva = 
-                        reserva.Monto!.Value * (reserva.FechaFin!.Value - reserva.FechaInicio!.Value).Days;
-
-                    if (pago.Importe > (importeTotalReserva - sumaImportes))
+                    if (esMulta)
                     {
-                        TempData["MensajeError"] = "El importe ingresado es mayor que el precio total de la reserva";
-                        return RedirectToAction(nameof(Formulario), new { reservaId = pago.ReservaId });
+                        var multa = await inmobiliariaService.GetMulta(reserva);
+
+                        if (pago.Importe != multa.Importe)
+                        {
+                            TempData["MensajeError"] = $"El pago de la multa debe ser de $ {multa.Importe:F2}.";
+                            return RedirectToAction(nameof(Formulario), new { reservaId = pago.ReservaId, multa = multa.Importe });
+                        }
+
+                        reserva.FechaTerminado = DateTime.Today;
+                        await repoReserva.ActualizarAsync(reserva);
                     }
                     else
-                        await _repo.CrearAsync(pago);
+                    {
+                        decimal sumaImportes = await _repo.SumarImportes(pago.ReservaId);
+                        decimal importeTotalReserva = 
+                            reserva.Monto!.Value * (reserva.FechaFin!.Value - reserva.FechaInicio!.Value).Days;
+                        var pagoInicial = importeTotalReserva * (reserva.Inmueble!.Senia / 100);
+                        
+                        if (sumaImportes == 0 && pago.Importe != pagoInicial)
+                        {
+                            TempData["MensajeError"] = $"El importe del primer pago debe ser $ ${pagoInicial} correspondiente al porcentaje de la seña del inmueble";
+                            return RedirectToAction(nameof(Formulario), new { reservaId = pago.ReservaId });
+                        }
+
+                        if (pago.Importe > (importeTotalReserva - sumaImportes))
+                        {
+                            TempData["MensajeError"] = "El importe ingresado es mayor que el precio total de la reserva";
+                            return RedirectToAction(nameof(Formulario), new { reservaId = pago.ReservaId });
+                        }
+                    }
+                    
+                    await _repo.CrearAsync(pago);
                 }
-                // 👆aca termina la logica para comprobar lo de la pregunta anterior👆
-
-                // necesito alguna forma de saber si el pago nuevo es de una multa
-                // si es asi, calculo el valor de esta
-                // luego la comparo con el valor del importe del formulario
-                // si son iguales creo el pago
-                // y tambien tengo que darle la fecha actual a la FechaTerminado de la reserva
-
-                // await _repo.CrearAsync(pago);
+                else
+                {
+                    TempData["MensajeError"] = "No se puede realizar el pago a una reserva que no existe";
+                    return RedirectToAction("Reserva");
+                }
             }
         }
         else
         {
             TempData["MensajeError"] = ModelStateError(ModelState);
+            var parametros = new RouteValueDictionary();
+            if (pago.ReservaId > 0)
+                parametros["reservaId"] = pago.ReservaId;
+            if (pago.Id > 0)
+                parametros["id"] = pago.Id;
+            if (esMulta)
+                parametros["multa"] = pago.Importe;
+            return RedirectToAction(nameof(Formulario), parametros);
         }
 
         return RedirectToAction(nameof(Index));
@@ -101,42 +132,50 @@ public class PagoController : ControladorBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Formulario([FromQuery] bool multa, [FromQuery] long reservaId, [FromServices] IReservaRepository repoReserva, [FromRoute] long id)
+    public async Task<IActionResult> Formulario([FromQuery] long reservaId, [FromRoute] long id, [FromServices] IReservaRepository repoReserva, [FromQuery] decimal? multa)
     {
         if (reservaId < 0 || id < 0)
             return BadRequest();
 
-        Pago? pago = null;
+        Pago? pago;
+        bool esPagoDeMulta = false;
 
         if (reservaId > 0 && id == 0) // es un CREATE
         {
             Reserva? reserva = await repoReserva.ObtenerPorIdAsync(reservaId);
-            decimal sumaImportes = await _repo.SumarImportes(reservaId);
 
             if (reserva != null)
             {
-                decimal importeTotalReserva = 
-                    reserva.Monto!.Value * (reserva.FechaFin!.Value - reserva.FechaInicio!.Value).Days;
-
                 decimal importe;
 
-                ViewBag.deuda = sumaImportes > 0 
-                    ? importeTotalReserva - sumaImportes 
-                    : importeTotalReserva;
+                if (multa.HasValue)
+                {
+                    ViewBag.deuda = multa.Value;
+                    importe = multa.Value;
+                    esPagoDeMulta = true;
+                }
+                else
+                {
+                    decimal sumaImportes = await _repo.SumarImportes(reservaId);
+                    decimal importeTotalReserva = 
+                        reserva.Monto!.Value * (reserva.FechaFin!.Value - reserva.FechaInicio!.Value).Days;
+                    
+                    ViewBag.deuda = sumaImportes > 0 
+                    ? (importeTotalReserva - sumaImportes).ToString("F2") 
+                    : importeTotalReserva.ToString("F2");
 
-                importe = sumaImportes > 0 
+                    importe = sumaImportes > 0 
                     ? importeTotalReserva - sumaImportes 
                     : importeTotalReserva * (reserva.Inmueble!.Senia / 100);
+                }
 
                 pago = new(){ Id = id, ReservaId = reservaId, Importe = importe, Fecha = DateTime.Now };
             }
-
-            // falta calcular el valor de la multa cuando 'multa' es true
-            // calculo el valor de la multa y paso ese valor a ViewBag en lugar del monto
-
-            /*
-                
-            */
+            else
+            {
+                TempData["MensajeError"] = "No se puede realizar el pago a una reserva que no existe";
+                return RedirectToAction("Reserva");
+            }
         }
         else if (id > 0 && reservaId == 0) // es un UPDATE
         {
@@ -148,6 +187,7 @@ public class PagoController : ControladorBase
         }
 
         ViewBag.linkActivo = "pagos";
+        ViewBag.esPagoDeMulta = esPagoDeMulta;
         ViewBag.MensajeError = TempData["MensajeError"] as string;
 
         return View(pago);

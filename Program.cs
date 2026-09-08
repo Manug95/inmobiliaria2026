@@ -15,6 +15,7 @@ builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
 builder.Services.AddScoped<IImagenRepository, ImagenRepository>();
 builder.Services.AddScoped<IPagoRepository, PagoRepository>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IInmobiliariaService, InmobiliariaService>();
 
 var app = builder.Build();
 

@@ -1,7 +1,8 @@
-import { agregarClases, getElementById, mostrarMensaje , mostrarPregunta, removerClases} from "./frontUtils.js";
+import { agregarClases, getElementById, mostrarMensaje , mostrarPregunta, removerClases, aFechaLocal } from "./frontUtils.js";
 
 document.addEventListener("DOMContentLoaded", _ => {
   mostrarMensaje(false, null);
+  let modalMulta;
 
   document.querySelectorAll("td .bi-trash")?.forEach(i => {
     i.addEventListener("click", e => {
@@ -16,15 +17,48 @@ document.addEventListener("DOMContentLoaded", _ => {
       const idFila = e.target.id.split("-")[1];
       try {
         const respuesta = await fetch(`/Reserva/Buscar/${idFila}`);
-        const reserva = await respuesta.json();
-        mostrarModalDetalle(reserva);
+        if (respuesta.ok) {
+          const reserva = await respuesta.json();
+          mostrarModalDetalle(reserva);
+        }
       } catch (error) {
         mostrarMensaje(false, "No se pudieron cargar los datos");
       }
     });
   });
+
+  document.querySelectorAll("td .bi-file-earmark-x")?.forEach(i => {
+    i.addEventListener("click", async e => {
+      const idFila = e.target.id.split("-")[1];
+      try {
+        const respuesta = await fetch(`/Reserva/Multa/${idFila}`);
+        if (respuesta.ok) {
+          const datos = await respuesta.json();
+          agregarDatosModalMulta(datos);
+          if (modalMulta == undefined) {//console.log(getElementById('modal-multa'));
+            modalMulta = new bootstrap.Modal(getElementById('modal-multa'), {});
+          }
+
+          modalMulta.show();
+        }
+      } catch (error) {
+        mostrarMensaje(false, "No se pudieron cargar los datos de la multa");
+      }
+    });
+  });
   
 });
+
+function agregarDatosModalMulta(datos) {
+  getElementById("mensaje_total_dias").textContent = `${datos.totalDiasReserva} días`;
+  getElementById("mensaje_cant_dias_reservados").textContent = `${datos.cantidadDiasReservados} días`;
+  getElementById("mensaje_importe_total").textContent = `$ ${datos.importeTotalReserva}`;
+  getElementById("mensaje_pagado").textContent = `$ ${datos.pagado}`;
+  getElementById("mensaje_deuda").textContent = `$ ${datos.deuda}`;
+  getElementById("mensaje_multa").textContent = `$ ${datos.importe}`;
+
+  getElementById("enlacePagarMulta").href = `/Pago/Formulario?reservaId=${datos.reservaId}&&multa=${datos.importe}`;
+}
 
 function mostrarModalDetalle(reserva) {
   const bodyDetalle = getElementById("body-detalle");
@@ -38,10 +72,10 @@ function mostrarModalDetalle(reserva) {
     getElementById("direccion").textContent = `${reserva.inmueble.calle} ${reserva.inmueble.nroCalle}`;
     getElementById("detalle_tipo").textContent = reserva.inmueble.tipo.tipo;
     getElementById("inquilino").textContent = `${reserva.inquilino.apellido}, ${reserva.inquilino.nombre}`;
-    getElementById("fIni").textContent = aFechaLocal(reserva.fechaInicio.split("T")[0]);
-    getElementById("fFin").textContent = aFechaLocal(reserva.fechaFin.split("T")[0]);
+    getElementById("fIni").textContent = aFechaLocal(reserva.fechaInicio);
+    getElementById("fFin").textContent = aFechaLocal(reserva.fechaFin);
     getElementById("monto").textContent = `$ ${reserva.monto}`;
-    getElementById("fTerm").textContent = reserva.fechaTerminado ? aFechaLocal(reserva.fechaTerminado?.split("T")[0]) : " - ";
+    getElementById("fTerm").textContent = reserva.fechaTerminado ? aFechaLocal(reserva.fechaTerminado) : " - ";
   } else {
     removerClases(bodyMensaje, "d-none");
     agregarClases(bodyMensaje, "d-block");
@@ -49,9 +83,4 @@ function mostrarModalDetalle(reserva) {
   }
   const myModal = new bootstrap.Modal(getElementById('modal_detalle_reserva'), {});
   myModal.show();
-}
-
-function aFechaLocal(fecha) {
-  if (!fecha) return " - ";
-  return fecha.split("-").reverse().join("/");
 }

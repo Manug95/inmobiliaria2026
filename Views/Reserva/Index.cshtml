@@ -59,7 +59,7 @@
                                 <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
                                 <i id="det-@item.Id" class="bi bi-file-earmark-text fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
                                 <a class="icon-enlace" asp-action="Renovar" asp-controller="Reserva" asp-route-id="@item.Id" data-bs-toggle="tooltip" data-bs-title="Renovar Reserva">
-                                    <i class="bi bi-file-earmark-plus fs-3 text-success"></i>
+                                    <i class="bi bi-file-earmark-plus fs-3 text-success-emphasis"></i>
                                 </a>
                                 <a class="icon-enlace @(item.FechaTerminado.HasValue ? "invisible" : "")" asp-action="Formulario" asp-controller="Pago" asp-route-reservaId="@item.Id" data-bs-toggle="tooltip" data-bs-title="Registrar Pago">
                                     <i class="bi bi-currency-dollar fs-3 text-success"></i>
@@ -67,10 +67,14 @@
                                 <a class="icon-enlace" asp-action="Index" asp-controller="Pago" asp-route-reservaId="@item.Id" data-bs-toggle="tooltip" data-bs-title="Ver Pagos">
                                     <i class="bi bi-wallet2 fs-3 text-warning"></i>
                                 </a>
-                                @if (item.FechaTerminado != null) {
-                                    <i id="mult-@item.Id" class="bi bi-card-list fs-3 text-secondary icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver detalle multa"></i>
+                                @if (item.FechaFin < DateTime.Today) {
+                                    <i id="mult-@item.Id" class="bi bi-file-check fs-3 text-success" data-bs-toggle="tooltip" data-bs-title="Reserva Concluida"></i>
                                 } else {
-                                    <i id="end-@item.Id" class="bi bi-file-earmark-x fs-3 text-danger icon-hover" data-bs-toggle="tooltip" data-bs-title="Terminar Reserva"></i>
+                                    @if (item.FechaTerminado != null){
+                                        <i id="end-@item.Id" class="bi bi-file-earmark-x-fill fs-3 text-danger" data-bs-toggle="tooltip" data-bs-title="Reserva Terminada"></i>
+                                    } else {
+                                        <i id="end-@item.Id" class="bi bi-file-earmark-x fs-3 text-danger icon-hover" data-bs-toggle="tooltip" data-bs-title="Terminar Reserva"></i>
+                                    }
                                 }
                             </div>
                         </td>
@@ -97,7 +101,7 @@
                     }
                 </li>
             }
-            <li id="flecha-pag-der" class="page-item @(ViewBag.offsetSiguiente > ViewBag.cantPag ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Siguiente">
+            <li id="flecha-pag-der" class="page-item @(ViewBag.paginaSiguiente > ViewBag.cantPag ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Siguiente">
                 @if(ViewBag.idInm != null) {
                     <a asp-action="Index" asp-route-idInm="@ViewBag.idInm" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaSiguiente" class="page-link"><span>&raquo;</span></a>
                 } else {
@@ -121,6 +125,7 @@
 </div>
 
 <partial name="_DetalleReservaModal"/>
+<partial name="_MultaModal"/>
 <partial name="_ModalEliminar"/>
 
 @if(!string.IsNullOrEmpty(ViewBag.MensajeError)) {
