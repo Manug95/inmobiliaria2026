@@ -143,8 +143,12 @@
             getElementById("concepto_detalle").textContent = pago.concepto;
             getElementById("estadoPago_detalle").textContent = pago.anulado ? "ANULADO ❌" : "VÁLIDO ✔";
 
-            getElementById("cobrador_detalle")?.textContent = `Cod: ${pago.idUsuarioCobrador} - ${pago.usuarioCobrador.apellido}, ${pago.usuarioCobrador.nombre}`;
-            getElementById("anulador_detalle")?.textContent = pago.idUsuarioAnulador ? `Cod: ${pago.idUsuarioAnulador} - ${pago.usuarioAnulador.apellido}, ${pago.usuarioAnulador.nombre}` : " - ";
+            const spanCobrador = getElementById("cobrador_detalle");
+            if (spanCobrador != undefined)
+                spanCobrador.textContent = `Cod: ${pago.idUsuarioCobrador} - ${pago.usuarioCobrador.apellido}, ${pago.usuarioCobrador.nombre}`;
+            const spanAnulador = getElementById("anulador_detalle");
+            if (spanAnulador != undefined)
+                spanAnulador.textContent = pago.idUsuarioAnulador ? `Cod: ${pago.idUsuarioAnulador} - ${pago.usuarioAnulador.apellido}, ${pago.usuarioAnulador.nombre}` : " - ";
 
             getElementById("propietario_detalle").textContent = `${pago.reserva.inmueble.duenio.apellido}, ${pago.reserva.inmueble.duenio.nombre}`;
             getElementById("inquilino_detalle").textContent = `${pago.reserva.inquilino.apellido}, ${pago.reserva.inquilino.nombre}`;

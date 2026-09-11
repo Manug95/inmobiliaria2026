@@ -185,7 +185,8 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                 AND ({nameof(Reserva.FechaInicio)} BETWEEN @desde AND @hasta 
                     OR {nameof(Reserva.FechaFin)} BETWEEN @desde AND @hasta
                     OR (@desde >= {nameof(Reserva.FechaInicio)} AND @desde <= {nameof(Reserva.FechaFin)})
-                    OR (@hasta >= {nameof(Reserva.FechaInicio)} AND @hasta <= {nameof(Reserva.FechaFin)}));"
+                    OR (@hasta >= {nameof(Reserva.FechaInicio)} AND @hasta <= {nameof(Reserva.FechaFin)})) 
+                AND {nameof(Reserva.FechaTerminado)} IS NULL;"
         ;
 
         using (var connection = new MySqlConnection(_connectionString))
@@ -254,11 +255,13 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                 sql += $" AND c.{nameof(Reserva.IdInmueble)} = @idInm";
 
             if (!string.IsNullOrWhiteSpace(desde) && !string.IsNullOrWhiteSpace(hasta))
-                sql += @$" AND ((c.{nameof(Reserva.FechaInicio)} BETWEEN @desde AND @hasta) 
-                            OR (c.{nameof(Reserva.FechaFin)} BETWEEN @desde AND @hasta)) 
-                            OR @desde BETWEEN c.{nameof(Reserva.FechaInicio)} AND c.{nameof(Reserva.FechaFin)} 
-                            OR @hasta BETWEEN c.{nameof(Reserva.FechaInicio)} AND c.{nameof(Reserva.FechaFin)} 
-                            AND c.{nameof(Reserva.FechaTerminado)} IS NULL";
+                sql += @$" 
+                    AND (r.{nameof(Reserva.FechaInicio)} BETWEEN @desde AND @hasta 
+                        OR r.{nameof(Reserva.FechaFin)} BETWEEN @desde AND @hasta
+                        OR (@desde >= r.{nameof(Reserva.FechaInicio)} AND @desde <= r.{nameof(Reserva.FechaFin)})
+                        OR (@hasta >= r.{nameof(Reserva.FechaInicio)} AND @hasta <= r.{nameof(Reserva.FechaFin)})) 
+                    AND r.{nameof(Reserva.FechaTerminado)} IS NULL 
+                    AND r.{nameof(Reserva.FechaFin)} >= @hoy";
 
             if (offset.HasValue && limit.HasValue)
                     sql += $" LIMIT @limit OFFSET @offset";
@@ -271,6 +274,7 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                 {
                     command.Parameters.AddWithValue("desde", desde);
                     command.Parameters.AddWithValue("hasta", hasta);
+                    command.Parameters.AddWithValue("hoy", DateTime.Today);
                 }
 
                 if (offset.HasValue && limit.HasValue)

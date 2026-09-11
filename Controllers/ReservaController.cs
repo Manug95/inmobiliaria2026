@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using inmobiliaria2026.Interfaces;
 using inmobiliaria2026.Models;
+using inmobiliaria2026.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,8 +58,8 @@ public class ReservaController : ControladorBase
         
         if (ModelState.IsValid)
         {
-            DateTime desde = (DateTime)reserva.FechaInicio!;
-            DateTime hasta = (DateTime)reserva.FechaFin!;
+            DateTime desde = reserva.FechaInicio!.Value;
+            DateTime hasta = reserva.FechaFin!.Value;
             if (await _repo.EstaOcupado(desde.ToString("yyyy-MM-dd"), hasta.ToString("yyyy-MM-dd"), (int)reserva.IdInmueble!, reserva.Id))
             {
                 TempData["MensajeError"] = $"El Inmueble ya está reservado entre {desde:dd-MM-yyyy} y {hasta:dd-MM-yyyy}";
@@ -70,6 +71,14 @@ public class ReservaController : ControladorBase
 
             if (reserva.Id > 0)
             {
+                /*
+                    al actualizar hay confilcto con las fechas nuevas y las fechas de la misma reserva.
+                    es decir, cuand reviso si estan ocupadas las nuevas fechas, me puede salir que el mismo inmueble es el que ocupa alguna las nuevas fechas.
+                    se me ocurre joinear la reserva con el inquilino y ver que las ids sean diferentes.
+                    pero ¿que pasa si hay otra reserva del mismo inquilino en las nuevas fechas?
+                    tremendo quilombo
+                    no se deberian poder cambiar las fechas de una reserva y punto
+                */
                 await _repo.ActualizarAsync(reserva);
             }
             else
@@ -180,6 +189,28 @@ public class ReservaController : ControladorBase
             return NotFound();
 
         return Json(await inmobiliariaService.GetMulta(reserva));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> PorFechas(ReservasPorFechasViewModel vm, int pagina = 1, int cantidadPaginado = 10)
+    {
+        int cantidadReservas = 0;
+
+        if (vm.Desde.HasValue && vm.Hasta.HasValue)
+        {
+            vm.Reservas =  (await _repo.ListarReservas(pagina, cantidadPaginado, null, vm.Desde.Value.ToString("yyyy-MM-dd"), vm.Hasta.Value.ToString("yyyy-MM-dd"))).ToList();
+            cantidadReservas =  await _repo.ContarReservas(null, vm.Desde.Value.ToString("yyyy-MM-dd"), vm.Hasta.Value.ToString("yyyy-MM-dd"));
+        }
+
+        ViewBag.cantPag = Math.Ceiling((decimal)cantidadReservas / cantidadPaginado);
+        ViewBag.cantidadPaginado = cantidadPaginado;
+        ViewBag.paginaSiguiente = pagina + 1;
+        ViewBag.paginaAnterior = pagina - 1;
+        ViewBag.linkActivo = "informes";
+
+        ViewBag.MensajeError = vm.Reservas.Count == 0 && vm.Desde.HasValue && vm.Hasta.HasValue ? "No se encontraron resultados" : "";
+
+        return View(vm);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

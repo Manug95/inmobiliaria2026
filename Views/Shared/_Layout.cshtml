@@ -51,6 +51,14 @@
                         <li class="nav-item @(ViewBag?.linkActivo == "pagos" ? "active-link" : "")">
                             <a class="nav-link text-dark nav-font" asp-area="" asp-controller="Pago" asp-action="Index">Pagos</a>
                         </li>
+                        <li class="nav-item dropdown @(ViewBag?.linkActivo == "informes" ? "active-link" : "")">
+                            <a class="nav-link dropdown-toggle text-dark nav-font" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Informes
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Reserva" asp-action="PorFechas">Lista Reservas Vigentes por Fechas</a></li>
+                            </ul>
+                        </li>
                         @if (User.IsInRole(Rol.ADMIN.ToString())) {
                             <li class="nav-item @(ViewBag?.linkActivo == "usuarios" ? "active-link" : "")">
                                 <a class="nav-link text-dark nav-font" asp-area="" asp-controller="Usuario" asp-action="Index">Usuarios</a>

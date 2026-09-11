@@ -134,6 +134,6 @@
     </div>
 </div>
 
-<partial name="_TipoInmuebleFormModal" model="Model.InmuebleFormData?.Tipo"></partial>
+<partial name="_TipoInmuebleFormModal" model="Model.InmuebleFormData?.Tipo ?? new TipoInmueble()"></partial>
 
 <script type="module" src="~/js/inmuebleForm.js"></script>

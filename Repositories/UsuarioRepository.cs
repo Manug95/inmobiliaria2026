@@ -163,7 +163,8 @@ public class UsuarioRepository(IConfiguration config) : BaseRepository(config), 
         {
             string sql = @$"
                 UPDATE usuarios 
-                SET {nameof(Usuario.Activo)} = 0 
+                SET {nameof(Usuario.Activo)} = 0, 
+                    {nameof(Usuario.Avatar)} = NULL 
                 WHERE {nameof(Usuario.Id)} = @{nameof(Usuario.Id)};"
             ;
 

@@ -1,0 +1,138 @@
+@using inmobiliaria2026.Models.ViewModels
+@model ReservasPorFechasViewModel
+
+@{
+    ViewData["Title"] = "Reservas por fecha";
+}
+
+<div class="container-fluid shadow border rounded-4 mt-4 bg-light-subtle position-relative">
+    <div class="row my-2">
+        <div class="col-12">
+            <form asp-action="PorFechas" method="GET" id="form-contratos-fechas">
+                <div class="row mb-md-4">
+                    <div class="col-5 mt-5 mt-md-3 mb-md-0">
+                        <label asp-for="Desde" class="form-label fw-bold">Desde</label>
+                        <input type="date" asp-for="Desde" class="form-control" id="desde">
+                        <span asp-validation-for="Desde" class="text-danger small"></span>
+                    </div>
+                    <div class="col-5 mt-5 mt-md-3 mb-md-0">
+                        <label asp-for="Hasta" class="form-label fw-bold">Hasta</label>
+                        <input type="date" asp-for="Hasta" class="form-control" id="hasta">
+                        <span asp-validation-for="Hasta" class="text-danger small"></span>
+                    </div>
+                    <div class="col-2 d-flex justify-content-center align-items-end">
+                        <div>
+                            <input type="submit" value="Buscar" class="btn btn-primary d-block mx-auto">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    @if(Model.Reservas.Count() > 0) {
+        <div class="table-responsive my-4 rounded-3 fixed-height-table-container">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 100px;">
+                            @Html.DisplayNameFor(model => model.Reserva.Id)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Reserva.FechaInicio).ToUpper()
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Reserva.FechaFin).ToUpper()
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Reserva.Monto).ToUpper()
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Reserva.FechaTerminado).ToUpper()
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo">
+                    @foreach (var item in Model.Reservas)
+                    {
+                        <tr id="@item.Id">
+                            <td class="align-middle py-0 ps-2" style="width: 100px;">
+                                @Html.DisplayFor(modelItem => item.Id)
+                            </td>
+                            <td class="align-middle py-0 ps-2">
+                                @Html.DisplayFor(modelItem => item.FechaInicio)
+                            </td>
+                            <td class="align-middle py-0 ps-2">
+                                @Html.DisplayFor(modelItem => item.FechaFin)
+                            </td>
+                            <td class="align-middle py-0 ps-2">
+                                @Html.DisplayFor(modelItem => item.Monto)
+                            </td>
+                            <td class="align-middle py-0 ps-2">
+                                @Html.DisplayFor(modelItem => item.FechaTerminado)
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-evenly align-items-center">
+                                    <a class="icon-enlace" asp-action="Formulario" asp-controller="Reserva" asp-route-id="@item.Id" data-bs-toggle="tooltip" data-bs-title="Editar">
+                                        <i class="bi bi-pencil-square fs-3 text-primary"></i>
+                                    </a>
+                                    @if (User.IsInRole(Rol.ADMIN.ToString())) {
+                                        <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
+                                    }
+                                    <i id="det-@item.Id" class="bi bi-file-earmark-text fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
+                                    <a class="icon-enlace" asp-action="Renovar" asp-controller="Reserva" asp-route-id="@item.Id" data-bs-toggle="tooltip" data-bs-title="Renovar Reserva">
+                                        <i class="bi bi-file-earmark-plus fs-3 text-success-emphasis"></i>
+                                    </a>
+                                    <a class="icon-enlace @(item.FechaTerminado.HasValue ? "invisible" : "")" asp-action="Formulario" asp-controller="Pago" asp-route-reservaId="@item.Id" data-bs-toggle="tooltip" data-bs-title="Registrar Pago">
+                                        <i class="bi bi-currency-dollar fs-3 text-success"></i>
+                                    </a>
+                                    <a class="icon-enlace" asp-action="Index" asp-controller="Pago" asp-route-reservaId="@item.Id" data-bs-toggle="tooltip" data-bs-title="Ver Pagos">
+                                        <i class="bi bi-wallet2 fs-3 text-warning"></i>
+                                    </a>
+                                    @if (item.FechaFin < DateTime.Today) {
+                                        <i id="mult-@item.Id" class="bi bi-file-check fs-3 text-success" data-bs-toggle="tooltip" data-bs-title="Reserva Concluida"></i>
+                                    } else {
+                                        @if (item.FechaTerminado != null){
+                                            <i id="end-@item.Id" class="bi bi-file-earmark-x-fill fs-3 text-danger" data-bs-toggle="tooltip" data-bs-title="Reserva Terminada"></i>
+                                        } else {
+                                            <i id="end-@item.Id" class="bi bi-file-earmark-x fs-3 text-danger icon-hover" data-bs-toggle="tooltip" data-bs-title="Terminar Reserva"></i>
+                                        }
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <nav>
+            <ul id="paginador" class="pagination justify-content-center">
+                <li id="flecha-pag-izq" class="page-item @(ViewBag.paginaAnterior == 0 ? "disabled" : "")">
+                    <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaAnterior" class="page-link"><span>&laquo;</span></a>
+                </li>
+                @for (int i = 1; i <= ViewBag.cantPag; i++) {
+                    <li class="page-item">
+                        <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@i" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a>
+                    </li>
+                }
+                <li id="flecha-pag-der" class="page-item @(ViewBag.paginaSiguiente > ViewBag.cantPag ? "disabled" : "")">
+                    <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaSiguiente" class="page-link"><span>&raquo;</span></a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+@if (Model.Reservas.Count > 0) {
+    <partial name="_DetalleReservaModal"/>
+    <partial name="_ModalEliminar"/>
+    <partial name="_MultaModal"/>
+}
+
+@if(!string.IsNullOrEmpty(ViewBag.MensajeError)) {
+    <partial name="_MensajeError" model="ViewBag.MensajeError"/>
+}
+
+@section Scripts {
+    <script type="module" src="~/js/reservas.js"></script>
+}

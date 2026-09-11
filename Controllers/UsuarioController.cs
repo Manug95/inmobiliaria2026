@@ -212,19 +212,22 @@ public class UsuarioController(
             await _repo.ActualizarAsync(usuario);
 
             //actualizo la claim que tiene el nombre y el apelldio del usuario
-            var identity = User.Identity as ClaimsIdentity;
-            if (identity != null)
+            if (userId.Value == vm.Id)
             {
-                var claimNombreApellido = identity.FindFirst(ClaimTypes.Name);
-                if (claimNombreApellido != null)
+                var identity = User.Identity as ClaimsIdentity;
+                if (identity != null)
                 {
-                    identity.RemoveClaim(claimNombreApellido);
-                    var newClaim = new Claim(ClaimTypes.Name, usuario.Nombre + " " + usuario.Apellido);
-                    identity.AddClaim(newClaim);
+                    var claimNombreApellido = identity.FindFirst(ClaimTypes.Name);
+                    if (claimNombreApellido != null)
+                    {
+                        identity.RemoveClaim(claimNombreApellido);
+                        var newClaim = new Claim(ClaimTypes.Name, usuario.Nombre + " " + usuario.Apellido);
+                        identity.AddClaim(newClaim);
+                    }
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(identity));
                 }
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(identity));
             }
         }
         else
@@ -232,11 +235,8 @@ public class UsuarioController(
             TempData["MensajeError"] = "No se pueden editar los datos de otro usuario";
             return RedirectToAction(nameof(Index), "Home");
         }
-
-        if (User.IsInRole(Rol.ADMIN.ToString())) 
-            return RedirectToAction(nameof(Index));
         
-        return RedirectToAction(nameof(Index), "Home");
+        return RedirectToAction(nameof(Edit), new { id = vm.Id });
     }
 
     [HttpPost]
@@ -284,9 +284,6 @@ public class UsuarioController(
 
         await _repo.ActualizarAsync(usuario);
 
-        if (User.IsInRole(Rol.ADMIN.ToString()))
-            return RedirectToAction(nameof(Index));
-
         return RedirectToAction(nameof(Edit), new { id = vm.Id });
     }
 
@@ -328,7 +325,7 @@ public class UsuarioController(
         await _repo.ActualizarAsync(usuario);
 
         //actualizo la claim del avatar del usuario si el usuario actualiza el propio
-        if (User.Claims.FirstOrDefault(c => c.Type == "id")?.Value == vm.Id.ToString())
+        if (userId.Value == vm.Id)
         {
             var identity = User.Identity as ClaimsIdentity;
             if (identity != null)
@@ -376,7 +373,7 @@ public class UsuarioController(
 
     [HttpPost]
     [Authorize(Policy = "ADMIN")]
-    public async Task<IActionResult> Eliminar([FromRoute] int id)
+    public async Task<IActionResult> Eliminar([FromRoute] int id, [FromServices] IFileService fileService)
     {
         if (id <= 0)
             return BadRequest();
@@ -384,7 +381,8 @@ public class UsuarioController(
         if (!await _repo.EliminarAsync(id))
             TempData["MensajeError"] = "No se pudo eliminar el usuario";
 
-        // BorrarAvatar(id, );
+        string? avatar = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Uri)?.Value;
+        fileService.BorrarAvatar(id, avatar ?? "");
 
         return RedirectToAction(nameof(Index));
     }
