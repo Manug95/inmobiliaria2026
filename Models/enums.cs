@@ -6,3 +6,9 @@ public enum Disponiblilidad
     HABILITADOS,
     TODOS
 }
+
+public enum Rol
+{
+    ADMIN,
+    EMPLEADO
+}

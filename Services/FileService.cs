@@ -8,6 +8,8 @@ public class FileService : IFileService
     private readonly string PATH_UPLOADS;
     private readonly string PATH_ABSOLUTO_INMUEBLES;
     private readonly string PATH_RELATIVO_INMUEBLES;
+    private readonly string PATH_ABSOLUTO_AVATARES;
+    private readonly string PATH_RELATIVO_AVATARES;
 
     public FileService(IWebHostEnvironment env)
     {
@@ -15,6 +17,8 @@ public class FileService : IFileService
         PATH_UPLOADS = Path.Combine(_env.WebRootPath, "Uploads");;
         PATH_ABSOLUTO_INMUEBLES = Path.Combine(PATH_UPLOADS, "Inmuebles");
         PATH_RELATIVO_INMUEBLES = Path.Combine("/Uploads", "Inmuebles");
+        PATH_ABSOLUTO_AVATARES = Path.Combine(PATH_UPLOADS, "Avatares");
+        PATH_RELATIVO_AVATARES = Path.Combine("/Uploads", "Avatares");
     }
     
     public async Task<string> GuardarImagenPortada(IFormFile imagen, string nombreImagen)
@@ -102,7 +106,51 @@ public class FileService : IFileService
         }
     }
 
-    private async void EscribirArchivo(IFormFile file, string path)
+    public async Task<string> GuardarAvatarDelUsuario(IFormFile imagen, string nombreImagen)
+    {
+        string wwwPath = _env.WebRootPath;
+        string path = Path.Combine(wwwPath, "Uploads");
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
+        path = Path.Combine(path, "Avatares");
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
+        string fileName = nombreImagen + Path.GetExtension(imagen.FileName);
+        string pathCompleto = Path.Combine(path, fileName);
+
+        using (FileStream stream = new FileStream(pathCompleto, FileMode.Create))
+        {
+            await imagen.CopyToAsync(stream);
+        }
+
+        return Path.Combine("/Uploads", "Avatares", fileName);
+    }
+
+    public void BorrarAvatar(int id, string avatar)
+    {
+        try
+        {
+            var ruta = Path.Combine(PATH_ABSOLUTO_AVATARES, $"avatar_{id}" + Path.GetExtension(avatar));
+            if (File.Exists(ruta))
+                File.Delete(ruta);
+        }
+        catch (ArgumentNullException)
+        {
+            throw new Exception("Falta la ruta de la imagen");
+        }
+        catch (ArgumentException)
+        {
+            throw new Exception("");
+        }
+    }
+
+    private static async void EscribirArchivo(IFormFile file, string path)
     {
         using (FileStream stream = new FileStream(path, FileMode.Create))
             await file.CopyToAsync(stream);

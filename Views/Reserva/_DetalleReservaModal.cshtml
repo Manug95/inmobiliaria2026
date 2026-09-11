@@ -49,6 +49,18 @@
                                     <span id="fTerm" class="fs-4"></span>
                                 </div>
                             </div>
+                            @if (User.IsInRole(Rol.ADMIN.ToString())) {
+                                <div class="row">
+                                    <div class="col">
+                                        <span class="fw-bold fs-3 text-info-emphasis">Reservado Por: &nbsp;</span>
+                                        <span id="reservador" class="fs-4"></span>
+                                    </div>
+                                    <div class="col">
+                                        <span class="fw-bold fs-3 text-info-emphasis">Terminado Por: &nbsp;</span>
+                                        <span id="terminador" class="fs-4"></span>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>

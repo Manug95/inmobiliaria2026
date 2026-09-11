@@ -92,14 +92,16 @@ public class PagoRepository(IConfiguration config) : BaseRepository(config), IPa
                     {nameof(Pago.ReservaId)}, 
                     {nameof(Pago.Fecha)}, 
                     {nameof(Pago.Importe)}, 
-                    {nameof(Pago.Concepto)}
+                    {nameof(Pago.Concepto)}, 
+                    {nameof(Pago.IdUsuarioCobrador)} 
                 )
                 VALUES 
                 (
                     @{nameof(Pago.ReservaId)}, 
                     @{nameof(Pago.Fecha)}, 
                     @{nameof(Pago.Importe)}, 
-                    @{nameof(Pago.Concepto)} 
+                    @{nameof(Pago.Concepto)}, 
+                    {nameof(Pago.IdUsuarioCobrador)}  
                 ); 
                 
                 SELECT LAST_INSERT_ID();"
@@ -111,6 +113,7 @@ public class PagoRepository(IConfiguration config) : BaseRepository(config), IPa
                 command.Parameters.AddWithValue($"{nameof(Pago.Fecha)}", pago.Fecha);
                 command.Parameters.AddWithValue($"{nameof(Pago.Importe)}", pago.Importe);
                 command.Parameters.AddWithValue($"{nameof(Pago.Concepto)}", pago.Concepto);
+                command.Parameters.AddWithValue($"{nameof(Pago.IdUsuarioCobrador)}", pago.IdUsuarioCobrador);
 
                 try
                 {
@@ -160,6 +163,33 @@ public class PagoRepository(IConfiguration config) : BaseRepository(config), IPa
         return borrado;
     }
 
+    public async Task<bool> EliminarAsync(long id, int usuarioId)
+    {
+        bool borrado = false;
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = @$"
+                UPDATE pagos 
+                SET {nameof(Pago.Anulado)} = 1, 
+                    {nameof(Pago.IdUsuarioAnulador)} = @{nameof(Pago.IdUsuarioAnulador)}  
+                WHERE {nameof(Pago.Id)} = @{nameof(Pago.Id)};"
+            ;
+
+            using (var command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue($"{nameof(Pago.IdUsuarioAnulador)}", usuarioId);
+                command.Parameters.AddWithValue($"{nameof(Pago.Id)}", id);
+
+                connection.Open();
+                borrado = command.ExecuteNonQuery() > 0;
+                connection.Close();
+            }
+        }
+
+        return borrado;
+    }
+
     public Task<List<Pago>> ListarAsync(int limit, int offset)
     {
         throw new NotImplementedException();
@@ -184,7 +214,9 @@ public class PagoRepository(IConfiguration config) : BaseRepository(config), IPa
                     r.{nameof(Reserva.FechaTerminado)}, 
                     r.{nameof(Reserva.IdInquilino)}, 
                     r.{nameof(Reserva.IdInmueble)}, 
-                    r.{nameof(Reserva.Monto)} 
+                    r.{nameof(Reserva.Monto)}, 
+                    IFNULL(r.{nameof(Reserva.IdUsuarioReservador)}, 0) AS idUContratador, 
+                    IFNULL(r.{nameof(Reserva.IdUsuarioTerminador)}, 0) AS idUTerminador 
                 FROM pagos AS p 
                 INNER JOIN reservas AS r 
                     ON p.{nameof(Pago.ReservaId)} = r.{nameof(Reserva.Id)}"
@@ -227,7 +259,9 @@ public class PagoRepository(IConfiguration config) : BaseRepository(config), IPa
                                 FechaFin = reader.GetDateTime(nameof(Reserva.FechaFin)),
                                 FechaTerminado = reader[nameof(Reserva.FechaTerminado)] == DBNull.Value ? null : reader.GetDateTime(nameof(Reserva.FechaTerminado)),
                                 IdInquilino = reader.GetInt32(nameof(Reserva.IdInquilino)),
-                                IdInmueble = reader.GetInt32(nameof(Reserva.IdInmueble))
+                                IdInmueble = reader.GetInt32(nameof(Reserva.IdInmueble)),
+                                IdUsuarioReservador = reader.GetInt32("idUContratador"),
+                                IdUsuarioTerminador = reader.GetInt32("idUTerminador")
                             }
                         });
                     }
@@ -251,6 +285,8 @@ public class PagoRepository(IConfiguration config) : BaseRepository(config), IPa
                     p.{nameof(Pago.Fecha)}, 
                     p.{nameof(Pago.Importe)}, 
                     p.{nameof(Pago.Anulado)}, 
+                    p.{nameof(Pago.IdUsuarioCobrador)}, 
+                    p.{nameof(Pago.IdUsuarioAnulador)}, 
                     IFNULL({nameof(Pago.Concepto)}, 'Sin Concepto') AS con, 
                     r.{nameof(Reserva.FechaInicio)}, 
                     r.{nameof(Reserva.FechaFin)}, 
@@ -258,6 +294,8 @@ public class PagoRepository(IConfiguration config) : BaseRepository(config), IPa
                     r.{nameof(Reserva.IdInquilino)}, 
                     r.{nameof(Reserva.IdInmueble)}, 
                     r.{nameof(Reserva.Monto)}, 
+                    IFNULL(r.{nameof(Reserva.IdUsuarioReservador)}, 0) AS idUContratador, 
+                    IFNULL(r.{nameof(Reserva.IdUsuarioTerminador)}, 0) AS idUTerminador, 
                     i.{nameof(Inmueble.IdPropietario)}, 
                     i.{nameof(Inmueble.IdTipoInmueble)},  
                     i.{nameof(Inmueble.Cupo)}, 
@@ -274,8 +312,18 @@ public class PagoRepository(IConfiguration config) : BaseRepository(config), IPa
                     pr.{nameof(Propietario.Dni)} AS dniProp, 
                     inq.{nameof(Inquilino.Nombre)} AS nombreInq, 
                     inq.{nameof(Inquilino.Apellido)} AS apellidoInq, 
-                    inq.{nameof(Inquilino.Dni)} AS dniInq 
+                    inq.{nameof(Inquilino.Dni)} AS dniInq, 
+                    uc.{nameof(Usuario.Nombre)} AS nombreCobrador, 
+                    uc.{nameof(Usuario.Apellido)} AS apellidoCobrador, 
+                    uc.{nameof(Usuario.Rol)} AS RolCobrador, 
+                    ua.{nameof(Usuario.Nombre)} AS nombreAnulador, 
+                    ua.{nameof(Usuario.Apellido)} AS apellidoAnulador, 
+                    ua.{nameof(Usuario.Rol)} AS RolAnulador 
                 FROM pagos AS p 
+                INNER JOIN usuarios AS uc 
+                    ON p.{nameof(Pago.IdUsuarioCobrador)} = uc.id 
+                LEFT JOIN usuarios AS ua 
+                    ON p.{nameof(Pago.IdUsuarioAnulador)} = ua.id 
                 INNER JOIN reservas AS r 
                     ON p.{nameof(Pago.ReservaId)} = r.{nameof(Reserva.Id)} 
                 INNER JOIN inmuebles AS i 
@@ -307,6 +355,8 @@ public class PagoRepository(IConfiguration config) : BaseRepository(config), IPa
                             Importe = reader.GetDecimal(nameof(Pago.Importe)),
                             Concepto = reader.GetString("con"),
                             Anulado = reader.GetBoolean(nameof(Pago.Anulado)),
+                            IdUsuarioCobrador = reader.GetInt32(nameof(Pago.IdUsuarioCobrador)),
+                            IdUsuarioAnulador = reader[nameof(Pago.IdUsuarioAnulador)] == DBNull.Value ? 0 : reader.GetInt32(nameof(Pago.IdUsuarioAnulador)),
                             Reserva = new Reserva
                             {
                                 Id = reader.GetInt32(nameof(Pago.ReservaId)),
@@ -316,6 +366,8 @@ public class PagoRepository(IConfiguration config) : BaseRepository(config), IPa
                                 Monto = reader.GetDecimal(nameof(Reserva.Monto)),
                                 IdInquilino = reader.GetInt32(nameof(Reserva.IdInquilino)),
                                 IdInmueble = reader.GetInt32(nameof(Reserva.IdInmueble)),
+                                IdUsuarioReservador = reader.GetInt32("idUContratador"),
+                                IdUsuarioTerminador = reader.GetInt32("idUTerminador"),
                                 Inmueble = new Inmueble
                                 {
                                     Id = reader.GetInt32(nameof(Reserva.IdInmueble)),
@@ -349,8 +401,25 @@ public class PagoRepository(IConfiguration config) : BaseRepository(config), IPa
                                     Apellido = reader.GetString("apellidoInq"),
                                     Dni = reader.GetString("dniInq")
                                 }
+                            },
+                            UsuarioCobrador = new Usuario
+                            {
+                                Id = reader.GetInt32(nameof(Pago.IdUsuarioCobrador)),
+                                Nombre = reader["nombreCobrador"] == DBNull.Value ? null : reader.GetString("nombreCobrador"),
+                                Apellido = reader["apellidoCobrador"] == DBNull.Value ? null : reader.GetString("apellidoCobrador"),
+                                Rol = reader.GetString("rolCobrador")
                             }
                         };
+                        if (reader[nameof(Pago.IdUsuarioAnulador)] != DBNull.Value)
+                        {
+                            pago.UsuarioAnulador = new Usuario
+                            {
+                                Id = reader.GetInt32(nameof(Pago.IdUsuarioAnulador)),
+                                Nombre = reader["nombreAnulador"] == DBNull.Value ? null : reader.GetString("nombreAnulador"),
+                                Apellido = reader["apellidoAnulador"] == DBNull.Value ? null : reader.GetString("apellidoAnulador"),
+                                Rol = reader.GetString("rolAnulador")
+                            };
+                        }
                     }
                 }
             }

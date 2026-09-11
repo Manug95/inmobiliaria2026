@@ -20,6 +20,7 @@ public class Propietario
 
     [StringLength(25, ErrorMessage = "El máximo de caracteres es 25")]
     [Required(ErrorMessage = "El teléfono es requerido")]
+    [RegularExpression(@"^\+?[0-9\s\-]{6,20}$", ErrorMessage = "El teléfono tiene caractares inválidos")]
     [Display(Name = "Teléfono")]
     public string? Telefono { get; set; }
 

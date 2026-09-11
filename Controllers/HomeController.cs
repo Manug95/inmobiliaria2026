@@ -8,6 +8,7 @@ public class HomeController : Controller
 {
     public IActionResult Index()
     {
+        ViewBag.MensajeError = TempData["MensajeError"] as string;
         return View();
     }
 

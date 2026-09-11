@@ -1,0 +1,101 @@
+@using inmobiliaria2026.Models.ViewModels
+@model IEnumerable<UsuarioViewModel>
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<h1 class="text-center display-4">Usuarios</h1>
+
+<div class="container-fluid shadow border rounded-4 mt-4 bg-light-subtle position-relative">
+    <div class="table-responsive my-4 rounded-3 fixed-height-table-container">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center">@Html.DisplayNameFor(model => model.Id).ToUpper()</th>
+                    <th class="text-center">USUARIO</th>
+                    <th class="text-center">E-MAIL</th>
+                    <th class="text-center">ROL</th>
+                    <th class="text-center">AVATAR</th>
+                    <th class="text-center"></th>
+                </tr>
+            </thead>
+            <tbody id="cuerpo">
+                @foreach (var item in Model)
+                {
+                    <tr id="@item.Id">
+                        <td class="align-middle py-0 ps-2 text-center">
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td class="align-middle py-0 ps-2 text-center">
+                            @item.ToString()
+                        </td>
+                        <td class="align-middle py-0 ps-2 text-center">
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <td class="align-middle py-0 ps-2 text-center">
+                            @Html.DisplayFor(modelItem => item.Rol)
+                        </td>
+                        <td class="align-middle py-0 ps-2 text-center">
+                            <img src="@(!String.IsNullOrEmpty(item.Avatar) 
+                                    ? item.Avatar 
+                                    : "https://ui-avatars.com/api/?name="+item.Nombre+"+"+item.Apellido+"&background=random&rounded=true")" 
+                                width="32" 
+                                class="rounded-circle"/>
+                        </td>
+                        <td class="align-middle text-center">
+                            <div class="d-flex justify-content-evenly align-items-center">
+                                <a class="icon-enlace" asp-action="Edit" asp-route-id="@item.Id">
+                                    <i class="bi bi-pencil-square fs-3 icon-hover text-primary" data-bs-toggle="tooltip" data-bs-title="Editar"></i>
+                                </a>
+                                <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <nav>
+        <ul id="paginador" class="pagination justify-content-center">
+            <li id="flecha-pag-izq" class="page-item @(ViewBag.paginaAnterior == 0 ? "disabled" : "")">
+                <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaAnterior" class="page-link"><span>&laquo;</span></a>
+            </li>
+            @for (int i = 1; i <= ViewBag.cantPag; i++) {
+                <li class="page-item">
+                    <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@i" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a>
+                </li>
+            }
+            <li id="flecha-pag-der" class="page-item @(ViewBag.paginaSiguiente > ViewBag.cantPag ? "disabled" : "")">
+                <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaSiguiente" class="page-link"><span>&raquo;</span></a>
+            </li>
+        </ul>
+    </nav>
+    <div id="btn_add" class="position-absolute bottom-0 end-0 me-4 mb-2 contenedor-iconos">
+        <a asp-action="Create" class="icon-enlace d-inline-block">
+            <i class="bi bi-plus-square fs-1 text-primary" data-bs-toggle="tooltip" data-bs-title="Registrar Nuevo"></i>
+        </a>
+    </div>
+</div>
+
+<partial name="_ModalEliminar"></partial>
+@if(!string.IsNullOrEmpty(ViewBag.MensajeError)) {
+    <partial name="_MensajeError" model="ViewBag.MensajeError"/>
+}
+
+@section Scripts {
+    <script type="module">
+        import { getElementById, mostrarMensaje, mostrarPregunta } from "/js/frontUtils.js";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            mostrarMensaje(false, null);
+            
+            document.querySelectorAll("td .bi-trash").forEach(i => {
+                i.addEventListener("click", e => {
+                const idFila = e.target.id.split("-")[1];
+                getElementById("form_eliminar").action = `/Usuario/Eliminar/${idFila}`;
+                mostrarPregunta(null);
+                });
+            });
+        });
+    </script>
+}

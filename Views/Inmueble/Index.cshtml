@@ -5,8 +5,6 @@
     string dir = "";
 }
 
-<link rel="stylesheet" href="~/css/tablas.css">
-
 <h1 class="text-center display-4">Inmuebles</h1>
 
 <div class="container-fluid shadow border rounded-4 mt-3 bg-light-subtle position-relative">
@@ -84,7 +82,9 @@
                                 <a class="icon-enlace" asp-action="FormulariosImagenes" asp-route-id="@item.Id">
                                     <i class="bi bi-images fs-3 icon-hover text-secondary" data-bs-toggle="tooltip" data-bs-title="Gestionar Imágenes"></i>
                                 </a>
-                                <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
+                                @if (User.IsInRole(Rol.ADMIN.ToString())){
+                                    <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
+                                }
                                 <a  class="icon-enlace" asp-controller="Inmueble" asp-action="Detalle" asp-route-id="@item.Id">
                                     <i id="det-@item.Id" class="bi bi-building fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
                                 </a>

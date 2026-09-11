@@ -2,7 +2,103 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mt-5">
+    <header class="relative py-20 mt-5">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="display-4">Inmobiliaria</h1>
+            <h2 class="font-extrabold text-dark leading-tight mb-4">
+                Encuentra tu próxima estadía
+            </h2>
+            <p class="text-light-emphasis mx-auto mb-5">
+                El lugar perfecto para vivir está a solo un clic de distancia. Explora una amplia selección de inmuebles.
+            </p>
+            <div class="d-flex flex-column justify-content-center align-items-evenly mt-5">
+                @if (User.Identity!.IsAuthenticated) {
+                    <div class="d-flex justify-content-evenly align-items-center my-5">
+                        <a 
+                            asp-controller="Inmueble" 
+                            asp-action="Alquilar" 
+                            class="btn btn-outline-success shadow py-3 rounded-pill w-100 mx-3 link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover fw-bold text-dark text-uppercase"
+                        >
+                            Alquilar un Inmueble
+                        </a>
+                        <a 
+                            asp-controller="Contrato" 
+                            asp-action="Index" 
+                            class="btn btn-outline-warning shadow py-3 rounded-pill w-100 mx-3 link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover fw-bold text-dark text-uppercase"
+                        >
+                            Gestionar Contratos
+                        </a>
+                        <a 
+                            asp-controller="Pago" 
+                            asp-action="Index" 
+                            class="btn btn-outline-primary shadow py-3 rounded-pill w-100 mx-3 link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover fw-bold text-dark text-uppercase"
+                        >
+                            Gestionar Pagos
+                        </a>
+                    </div>
+                    <div class="d-flex justify-content-evenly align-items-center my-5">
+                        <a 
+                            asp-controller="Propietario" 
+                            asp-action="Index" 
+                            class="btn btn-outline-warning shadow py-3 rounded-pill w-100 mx-3 link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover fw-bold text-dark text-uppercase"
+                        >
+                            Gestionar Propietarios
+                        </a>
+                        <a 
+                            asp-controller="Inquilino" 
+                            asp-action="Index" 
+                            class="btn btn-outline-primary shadow py-3 rounded-pill w-100 mx-3 link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover fw-bold text-dark text-uppercase"
+                        >
+                            Gestionar Inquilinos
+                        </a>
+                        <a 
+                            asp-controller="Inmueble" 
+                            asp-action="Index" 
+                            class="btn btn-outline-success shadow py-3 rounded-pill w-100 mx-3 link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover fw-bold text-dark text-uppercase"
+                        >
+                            Gestionar Inmuebles
+                        </a>
+                    </div>
+                    @if(User.IsInRole(Rol.ADMIN.ToString())) {
+                        <div class="row my-5">
+                            <div class="col-4 offset-4 px-3">
+                                <a 
+                                    asp-controller="Usuario" 
+                                    asp-action="Index" 
+                                    class="btn btn-outline-primary shadow w-100 py-3 rounded-pill link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover fw-bold text-dark text-uppercase"
+                                >
+                                    Gestionar Usuarios
+                                </a>
+                            </div>
+                        </div>
+                    }
+                } else {
+                    <div class="d-flex justify-content-center align-items-center my-5">
+                        <a 
+                            asp-controller="Usuario" 
+                            asp-action="Login" 
+                            class=" btn btn-outline-primary py-3 rounded-pill shadow link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-0-hover fw-bold text-dark"
+                        >
+                            Inicia Sesión para Comenzar
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </header>
 </div>
+
+@if(!string.IsNullOrEmpty(ViewBag.MensajeError)) {
+    <partial name="_MensajeError" model="ViewBag.MensajeError"/>
+}
+
+@section Scripts {
+    <script type="module">
+        import { mostrarMensaje } from "/js/frontUtils.js";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            mostrarMensaje(false, null);
+        });
+    </script>
+}

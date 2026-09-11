@@ -76,6 +76,8 @@ function mostrarModalDetalle(reserva) {
     getElementById("fFin").textContent = aFechaLocal(reserva.fechaFin);
     getElementById("monto").textContent = `$ ${reserva.monto}`;
     getElementById("fTerm").textContent = reserva.fechaTerminado ? aFechaLocal(reserva.fechaTerminado) : " - ";
+    getElementById("reservador")?.textContent = `Cod: ${reserva.usuarioReservador.id} - ${reserva.usuarioReservador.apellido}, ${reserva.usuarioReservador.nombre}`;
+    getElementById("terminador")?.textContent = reserva.idUsuarioTerminador ? `Cod: ${reserva.usuarioTerminador.id} - ${reserva.usuarioTerminador.apellido}, ${reserva.usuarioTerminador.nombre}` : " - ";
   } else {
     removerClases(bodyMensaje, "d-none");
     agregarClases(bodyMensaje, "d-block");

@@ -1,12 +1,12 @@
 using System.Diagnostics;
 using inmobiliaria2026.Interfaces;
 using inmobiliaria2026.Models;
-using inmobiliaria2026.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace inmobiliaria2026.Controllers;
 
+[Authorize]
 public class ReservaController : ControladorBase
 {
     private readonly IReservaRepository _repo;
@@ -49,8 +49,12 @@ public class ReservaController : ControladorBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Guardar([FromForm] Reserva reserva)
+    public async Task<IActionResult> Guardar([FromForm] Reserva reserva, [FromServices] IInmobiliariaService inmobiliariaService)
     {
+        var userId = inmobiliariaService.GetUserId(User);
+        if (!userId.HasValue)
+            return Unauthorized();
+        
         if (ModelState.IsValid)
         {
             DateTime desde = (DateTime)reserva.FechaInicio!;
@@ -70,6 +74,7 @@ public class ReservaController : ControladorBase
             }
             else
             {
+                reserva.IdUsuarioReservador = userId.Value;
                 await _repo.CrearAsync(reserva);
             }
         }
@@ -123,6 +128,7 @@ public class ReservaController : ControladorBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ADMIN")]
     public async Task<IActionResult> Eliminar([FromRoute] int id)
     {
         if (id <= 0)

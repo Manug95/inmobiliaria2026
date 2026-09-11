@@ -3,8 +3,6 @@
     ViewData["Title"] = "Pagos";
 }
 
-<link rel="stylesheet" href="~/css/tablas.css">
-
 <h1 class="text-center display-4">Pagos</h1>
 
 <div class="container-fluid shadow border rounded-4 mt-4 bg-light-subtle position-relative">
@@ -27,9 +25,6 @@
                     <th>
                         @Html.DisplayNameFor(model => model.Anulado).ToUpper()
                     </th>
-                    @* <th colspan="2">
-                        @Html.DisplayNameFor(model => model.Detalle).ToUpper()
-                    </th> *@
                     <th></th>
                 </tr>
             </thead>
@@ -52,16 +47,14 @@
                         <td class="align-middle py-0 ps-2">
                             @(item.Anulado ? " ANULADO " : " - ")
                         </td>
-                        @* <td class="align-middle py-0 ps-2" colspan="2">
-                            @Html.DisplayFor(modelItem => item.Detalle)
-                        </td> *@
                         <td>
                             <div class="d-flex justify-content-evenly align-items-center">
-                                @* <i id="edit-@item.Id" class="bi bi-pencil-square fs-3 text-primary icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Editar"></i> *@
                                 <a class="icon-enlace" asp-controller="Pago" asp-action="Formulario" asp-route-id="@item.Id" data-bs-toggle="tooltip" data-bs-title="Editar">
                                     <i class="bi bi-pencil-square fs-3 text-primary icon-hover"></i>
                                 </a>
-                                <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover @(!item.Anulado ? "invisible" : "")" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Anular"></i>
+                                @if (User.IsInRole(Rol.ADMIN.ToString())) {
+                                    <i id="del-@item.Id" class="bi bi-trash fs-3 text-danger icon-hover @(!item.Anulado ? "invisible" : "")" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Anular"></i>
+                                }
                                 <i id="det-@item.Id" class="bi bi-file-earmark-text fs-3 text-info icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
                             </div>
                         </td>
@@ -149,6 +142,10 @@
             getElementById("importePago_detalle").textContent = `$ ${pago.importe}`;
             getElementById("concepto_detalle").textContent = pago.concepto;
             getElementById("estadoPago_detalle").textContent = pago.anulado ? "ANULADO ❌" : "VÁLIDO ✔";
+
+            getElementById("cobrador_detalle")?.textContent = `Cod: ${pago.idUsuarioCobrador} - ${pago.usuarioCobrador.apellido}, ${pago.usuarioCobrador.nombre}`;
+            getElementById("anulador_detalle")?.textContent = pago.idUsuarioAnulador ? `Cod: ${pago.idUsuarioAnulador} - ${pago.usuarioAnulador.apellido}, ${pago.usuarioAnulador.nombre}` : " - ";
+
             getElementById("propietario_detalle").textContent = `${pago.reserva.inmueble.duenio.apellido}, ${pago.reserva.inmueble.duenio.nombre}`;
             getElementById("inquilino_detalle").textContent = `${pago.reserva.inquilino.apellido}, ${pago.reserva.inquilino.nombre}`;
             getElementById("tipo_inmueble_detalle").textContent = pago.reserva.inmueble.tipo.tipo;

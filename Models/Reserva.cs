@@ -40,6 +40,14 @@ public class Reserva
 
     public bool Borrado { get; set; }
 
+    public int IdUsuarioReservador { get; set; }
+
+    public Usuario? UsuarioReservador { get; set; }
+
+    public int IdUsuarioTerminador { get; set; }
+
+    public Usuario? UsuarioTerminador { get; set; }
+
     public Reserva() { }
 
     public override string ToString()

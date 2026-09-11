@@ -1,11 +1,13 @@
 using System.Diagnostics;
 using inmobiliaria2026.Interfaces;
 using inmobiliaria2026.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace inmobiliaria2026.Controllers;
 
+
+[Authorize]
 public class InquilinoController : ControladorBase
 {
     private readonly IInquilinoRepository _repo;
@@ -57,6 +59,7 @@ public class InquilinoController : ControladorBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ADMIN")]
     public async Task<IActionResult> Eliminar([FromRoute] int id)
     {
         if (id <= 0)

@@ -27,4 +27,12 @@ public class Pago
     public string? Concepto { get; set; }
 
     public bool Anulado { get; set; }
+
+    public int IdUsuarioCobrador { get; set; }
+
+    public Usuario? UsuarioCobrador { get; set; }
+
+    public int IdUsuarioAnulador { get; set; }
+    
+    public Usuario? UsuarioAnulador { get; set; }
 }

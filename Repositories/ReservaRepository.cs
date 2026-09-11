@@ -101,7 +101,8 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                     {nameof(Reserva.IdInquilino)}, 
                     {nameof(Reserva.Monto)}, 
                     {nameof(Reserva.FechaInicio)}, 
-                    {nameof(Reserva.FechaFin)} 
+                    {nameof(Reserva.FechaFin)}, 
+                    {nameof(Reserva.IdUsuarioReservador)} 
                 )
                 VALUES 
                 (
@@ -109,7 +110,8 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                     @{nameof(Reserva.IdInquilino)}, 
                     @{nameof(Reserva.Monto)}, 
                     @{nameof(Reserva.FechaInicio)}, 
-                    @{nameof(Reserva.FechaFin)} 
+                    @{nameof(Reserva.FechaFin)}, 
+                    @{nameof(Reserva.IdUsuarioReservador)} 
                 ); 
                 
                 SELECT LAST_INSERT_ID();"
@@ -122,6 +124,7 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                 command.Parameters.AddWithValue($"{nameof(Reserva.Monto)}", reserva.Monto);
                 command.Parameters.AddWithValue($"{nameof(Reserva.FechaInicio)}", reserva.FechaInicio);
                 command.Parameters.AddWithValue($"{nameof(Reserva.FechaFin)}", reserva.FechaFin);
+                command.Parameters.AddWithValue($"{nameof(Reserva.IdUsuarioReservador)}", reserva.IdUsuarioReservador);
 
                 try
                 {
@@ -222,6 +225,8 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                     r.{nameof(Reserva.FechaInicio)}, 
                     r.{nameof(Reserva.FechaFin)}, 
                     r.{nameof(Reserva.FechaTerminado)}, 
+                    r.{nameof(Reserva.IdUsuarioReservador)}, 
+                    r.{nameof(Reserva.IdUsuarioTerminador)}, 
                     inm.{nameof(Inmueble.IdPropietario)}, 
                     inm.{nameof(Inmueble.Calle)}, 
                     inm.{nameof(Inmueble.NroCalle)}, 
@@ -289,6 +294,8 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                             FechaInicio = reader.GetDateTime(nameof(Reserva.FechaInicio)),
                             FechaFin = reader.GetDateTime(nameof(Reserva.FechaFin)),
                             FechaTerminado = reader[nameof(Reserva.FechaTerminado)] == DBNull.Value ? null : reader.GetDateTime(nameof(Reserva.FechaTerminado)),
+                            IdUsuarioReservador = reader[nameof(Reserva.IdUsuarioReservador)] == DBNull.Value ? 0 : reader.GetInt32(nameof(Reserva.IdUsuarioReservador)),
+                            IdUsuarioTerminador = reader[nameof(Reserva.IdUsuarioTerminador)] == DBNull.Value ? 0 : reader.GetInt32(nameof(Reserva.IdUsuarioTerminador)),
                             Inmueble = new Inmueble
                             {
                                 Id = reader.GetInt32(nameof(Reserva.IdInmueble)),
@@ -340,6 +347,8 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                     r.{nameof(Reserva.FechaInicio)}, 
                     r.{nameof(Reserva.FechaFin)}, 
                     r.{nameof(Reserva.FechaTerminado)}, 
+                    r.{nameof(Reserva.IdUsuarioReservador)}, 
+                    r.{nameof(Reserva.IdUsuarioTerminador)}, 
                     inm.{nameof(Inmueble.IdPropietario)}, 
                     inm.{nameof(Inmueble.Calle)}, 
                     inm.{nameof(Inmueble.NroCalle)}, 
@@ -352,8 +361,18 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                     p.{nameof(Propietario.Dni)} AS dniProp, 
                     inq.{nameof(Inquilino.Nombre)} AS nombreInq, 
                     inq.{nameof(Inquilino.Apellido)} AS apellidoInq, 
-                    inq.{nameof(Inquilino.Dni)} AS dniInq 
+                    inq.{nameof(Inquilino.Dni)} AS dniInq, 
+                    uc.{nameof(Usuario.Nombre)} AS nombreContratador, 
+                    uc.{nameof(Usuario.Apellido)} AS apellidoContratador, 
+                    uc.{nameof(Usuario.Rol)} AS RolContratador, 
+                    ut.{nameof(Usuario.Nombre)} AS nombreTerminador, 
+                    ut.{nameof(Usuario.Apellido)} AS apellidoTerminador, 
+                    ut.{nameof(Usuario.Rol)} AS RolTerminador  
                 FROM reservas AS r 
+                INNER JOIN usuarios AS uc 
+                    ON r.{nameof(Reserva.IdUsuarioReservador)} = uc.id 
+                LEFT JOIN usuarios AS ut 
+                    ON r.{nameof(Reserva.IdUsuarioTerminador)} = ut.id 
                 INNER JOIN inmuebles AS inm 
                     ON r.{nameof(Reserva.IdInmueble)} = inm.id 
                 INNER JOIN tipos_inmueble AS ti 
@@ -384,6 +403,8 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                             FechaInicio = reader.GetDateTime(nameof(Reserva.FechaInicio)),
                             FechaFin = reader.GetDateTime(nameof(Reserva.FechaFin)),
                             FechaTerminado = reader[nameof(Reserva.FechaTerminado)] == DBNull.Value ? null : reader.GetDateTime(nameof(Reserva.FechaTerminado)),
+                            IdUsuarioReservador = reader[nameof(Reserva.IdUsuarioReservador)] == DBNull.Value ? 0 : reader.GetInt32(nameof(Reserva.IdUsuarioReservador)),
+                            IdUsuarioTerminador = reader[nameof(Reserva.IdUsuarioTerminador)] == DBNull.Value ? 0 : reader.GetInt32(nameof(Reserva.IdUsuarioTerminador)),
                             Inmueble = new Inmueble
                             {
                                 Id = reader.GetInt32(nameof(Reserva.IdInmueble)),
@@ -412,8 +433,25 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                                 Nombre = reader.GetString("nombreInq"),
                                 Apellido = reader.GetString("apellidoInq"),
                                 Dni = reader.GetString("dniInq")
+                            },
+                            UsuarioReservador = new Usuario
+                            {
+                                Id = reader.GetInt32(nameof(Reserva.IdUsuarioReservador)),
+                                Nombre = reader["nombreContratador"] == DBNull.Value ? null : reader.GetString("nombreContratador"),
+                                Apellido = reader["apellidoContratador"] == DBNull.Value ? null : reader.GetString("apellidoContratador"),
+                                Rol = reader.GetString("RolContratador")
                             }
                         };
+                        if (reader[nameof(Reserva.IdUsuarioTerminador)] != DBNull.Value)
+                        {
+                            reserva.UsuarioTerminador = new Usuario
+                            {
+                                Id = reader.GetInt32(nameof(Reserva.IdUsuarioTerminador)),
+                                Nombre = reader["nombreTerminador"] == DBNull.Value ? null : reader.GetString("nombreTerminador"),
+                                Apellido = reader["apellidoTerminador"] == DBNull.Value ? null : reader.GetString("apellidoTerminador"),
+                                Rol = reader.GetString("RolTerminador")
+                            };
+                        }
                     }
                 }
             }

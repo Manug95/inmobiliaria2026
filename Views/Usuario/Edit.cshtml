@@ -1,0 +1,158 @@
+@using inmobiliaria2026.Models.ViewModels
+@* @model UsuarioViewModel; *@
+@model EditUsuarioViewModel;
+
+@{
+    ViewData["Title"] = "Formulario Usuario";
+}
+
+<link rel="stylesheet" href="~/css/styles.css">
+
+<div class="container-md mt-2">
+    <h1 class="text-center display-4">Modificar Datos</h1>
+    <div class="row mt-2 mb-3">
+        <form asp-action="Actualizar" id="form-datos-personales" class="p-3 w-75 mx-auto border rounded-4 shadow-sm bg-light">
+            <legend>Editar Datos Personales</legend>
+            <div class="row mt-3 mb-md-4 border rounded-4 shadow-sm pb-3 bg-light-subtle">
+                @{
+                    string clases = "col-12 mt-5 mt-md-1 mb-md-0";
+                    if (User.IsInRole(Rol.ADMIN.ToString())) 
+                        clases += " col-md-4";
+                    else 
+                        clases += " col-md-6";
+                }
+                <div class="@clases">
+                    <label asp-for="UsuarioViewModel.Nombre" class="form-label fw-bold">Nombre</label>
+                    <input type="text" asp-for="UsuarioViewModel.Nombre" class="form-control" id="Nombre">
+                    <span asp-validation-for="UsuarioViewModel.Nombre" class="text-danger small"></span>
+                </div>
+                <div class="@clases">
+                    <label asp-for="UsuarioViewModel.Apellido" class="form-label fw-bold">Apellido</label>
+                    <input type="text" asp-for="UsuarioViewModel.Apellido" class="form-control" id="Apellido">
+                    <span asp-validation-for="UsuarioViewModel.Apellido" class="text-danger small"></span>
+                </div>
+                @if (User.IsInRole(Rol.ADMIN.ToString())) {
+                    <div class="@clases">
+                        <label asp-for="UsuarioViewModel.Rol" class="form-label fw-bold">Rol</label>
+                        <select class="form-select" asp-for="UsuarioViewModel.Rol" id="Rol">
+                            <option value="@Rol.ADMIN" selected="@(Model.UsuarioViewModel!.Rol==Rol.ADMIN.ToString())">@Rol.ADMIN</option>
+                            <option value="@Rol.EMPLEADO" selected="@(Model.UsuarioViewModel.Rol==Rol.EMPLEADO.ToString())">@Rol.EMPLEADO</option>
+                        </select>
+                        <span asp-validation-for="UsuarioViewModel.Rol" class="text-danger small"></span>
+                    </div>
+                }
+            </div>
+
+            <input type="hidden" asp-for="UsuarioViewModel.Id"/>
+
+            <div class="row mb-2 mt-5 mt-md-4 justify-content-center">
+                <div class="col-2 d-flex justify-content-center">
+                    <input type="submit" value="Guardar" class="btn btn-primary d-block mx-auto">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="row mt-2 mb-3">
+        <form asp-action="CambiarContrasenia" id="form-datos-usuario" class="p-3 w-75 mx-auto border rounded-4 shadow-sm bg-light">
+            <legend>Cambiar Contraseña</legend>
+            <div class="row mb-md-4 border rounded-4 shadow-sm bg-light-subtle pb-3">
+                <div class="col-12 col-md-6 mt-5 mt-md-1 mb-md-0">
+                    <label or="nueva" class="form-label fw-bold">Contraseña Nueva</label>
+                    <input type="password" name="PasswordNuevo" class="form-control" id="nueva">
+                    <span asp-validation-for="CambiarContrasenia.PasswordNuevo" class="text-danger small"></span>
+                </div>
+                @if (!User.IsInRole(Rol.ADMIN.ToString()) || (User.IsInRole(Rol.ADMIN.ToString()) && User.Claims.FirstOrDefault(c => c.Type == "id")?.Value == Model.CambiarContrasenia!.Id.ToString())) {
+                    <div class="col-12 col-md-6 mt-5 mt-md-1 mb-md-0">
+                        <label for="vieja" class="form-label fw-bold">Contraseña Vieja</label>
+                        <input type="password" name="PasswordViejo" class="form-control" id="vieja">
+                        <span asp-validation-for="CambiarContrasenia.PasswordViejo" class="text-danger small"></span>
+                    </div>
+                }
+            </div>
+            <input type="hidden" asp-for="CambiarContrasenia.Id"/>
+            <div class="row mb-2 mt-5 mt-md-4 justify-content-center">
+                <div class="col-2 d-flex justify-content-center">
+                    <input type="submit" value="Guardar" class="btn btn-primary d-block mx-auto">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @* <div class="row">
+        <form asp-action="ActualizarAvatar" enctype="multipart/form-data" id="form-avatar-usuario" class="p-3 w-75 mx-auto border rounded-4 shadow-sm needs-validation mt-2 mb-3 bg-light-subtle">
+            <legend>Cambiar o Eliminar el Avatar</legend>
+            <div class="row mb-md-4 border rounded-4 pb-3">
+                <div class="col-12 col-md-8 mt-5 mt-md-1 mb-md-0">
+                    <label asp-for="UsuarioViewModel.AvatarFile" class="form-label fw-bold">Avatar</label>
+                    <input type="file" asp-for="UsuarioViewModel.AvatarFile" class="form-control" id="Avatar" accept="image/*">
+                    <span asp-validation-for="UsuarioViewModel.AvatarFile" class="text-danger small"></span>
+                </div>
+                @if(!string.IsNullOrWhiteSpace(Model.UsuarioViewModel!.Avatar)){
+                    <div class="col-4 col-md-4 mt-5 py-2 mt-md-4 mb-md-0 d-flex justify-content-evenly align-items-center">
+                        <img src="@Model.UsuarioViewModel.Avatar" alt="" width="48" class="rounded-circle" data-bs-toggle="tooltip" data-bs-title="Mi Avatar"/>
+                        <form asp-action="EliminarAvatar" asp-route-id="@Model.UsuarioViewModel.Id" method="post" class="">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </form>
+                    </div>
+                }
+            </div>
+            <input type="hidden" asp-for="UsuarioViewModel.Id"/>
+            <div class="row mb-2 mt-5 mt-md-4 justify-content-center">
+                <div class="col-2 d-flex justify-content-center">
+                    <input type="submit" value="Guardar" class="btn btn-primary d-block mx-auto">
+                </div>
+            </div>
+        </form>
+    </div> *@
+    <div class="row mt-2 mb-3">
+        <div class="row bg-light w-75 mx-auto border rounded-4 shadow-sm px-0">
+            <div class="col-12 @(!string.IsNullOrWhiteSpace(Model.UsuarioViewModel!.Avatar)?"col-md-8":"") mt-5 mt-md-1 mb-md-0 px-1">
+                <form asp-action="ActualizarAvatar" enctype="multipart/form-data" id="form-avatar-usuario" class="mt-2 mb-3 bg-light-subtle">
+                    <legend class="ps-3">Cambiar el Avatar</legend>
+                    <div class="border rounded-4 shadow-sm p-3">
+                        <label asp-for="UsuarioViewModel.AvatarFile" class="form-label fw-bold">Avatar</label>
+                        <input type="file" asp-for="UsuarioViewModel.AvatarFile" class="form-control" id="Avatar" accept="image/*">
+                        <span asp-validation-for="UsuarioViewModel.AvatarFile" class="text-danger small"></span>
+                    </div>
+                    <input type="hidden" asp-for="UsuarioViewModel.Id"/>
+                    @* <div class="row mb-2 mt-5 mt-md-4 justify-content-center"> *@
+                        @* <div class="col-2 d-flex justify-content-center"> *@
+                            <input type="submit" value="Guardar" class="btn btn-primary d-block mx-auto mt-3">
+                        @* </div> *@
+                    @* </div> *@
+                </form>
+            </div>
+            @if(!string.IsNullOrWhiteSpace(Model.UsuarioViewModel!.Avatar)){
+                <div class="col-12 col-md-4 mt-2 mb-3 bg-light-subtle d-flex justify-content-evenly align-items-center">
+                    <img src="@Model.UsuarioViewModel.Avatar" alt="" width="48" class="rounded-circle" data-bs-toggle="tooltip" data-bs-title="Mi Avatar"/>
+                    <form asp-action="EliminarAvatar" asp-route-id="@Model.UsuarioViewModel.Id" method="post" class="">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </form>
+                    @* <a class="icon-enlace align-top ms-3" asp-action="EliminarAvatar" asp-route-id="@Model.UsuarioViewModel.Id" asp-route-avatar="@Model.UsuarioViewModel.Avatar">
+                        <i class="bi bi-trash fs-2 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar Avatar"></i>
+                    </a> *@
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if(!string.IsNullOrWhiteSpace(ViewBag.MensajeError)) {
+    <partial name="_MensajeError" model="ViewBag.MensajeError" />
+}
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script type="module" defer>
+        import { mostrarMensaje } from "/js/frontUtils.js";
+        document.addEventListener("DOMContentLoaded", _ => {
+            mostrarMensaje(false, null);
+        });
+    </script>
+}

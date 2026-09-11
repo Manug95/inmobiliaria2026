@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using inmobiliaria2026.Interfaces;
 using inmobiliaria2026.Models;
 using inmobiliaria2026.Models.ViewModels;
@@ -34,5 +35,19 @@ public class InmobiliariaService(IPagoRepository pagoRepository) : IInmobiliaria
             Importe = multa,
             ReservaId = reserva.Id
         };
+    }
+
+    public int? GetUserId(ClaimsPrincipal claimsPrincipal)
+    {
+        Claim? claim = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == "id");
+        string? idStr = claim?.Value;
+        if (int.TryParse(idStr, out int id))
+        {
+            return id;
+        }
+        else
+        {
+            return null;
+        }
     }
 }

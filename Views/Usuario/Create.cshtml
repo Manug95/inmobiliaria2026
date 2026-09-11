@@ -1,0 +1,83 @@
+@using inmobiliaria2026.Models.ViewModels
+@model UsuarioViewModel
+
+@{
+    ViewData["Title"] = "Crear Usuario";
+}
+
+<h1 class="text-center display-4">Crear Usuario</h1>
+
+<div class="container mt-3">
+    <div class="d-flex justify-content-center align-items-center vh-50 w-100 mt-5">
+        <form asp-action="Guardar" id="form-usuario" enctype="multipart/form-data" class="p-3 w-75 mx-auto border rounded-4 shadow-sm mt-3 mb-3 bg-light-subtle">
+            <div class="row mt-3 mb-md-4">
+                <div class="col-12 col-md-6 mt-2">
+                    <label asp-for="Nombre" class="form-label fw-bold">Nombre</label>
+                    <input type="text" asp-for="Nombre" class="form-control" id="Nombre">
+                    <span asp-validation-for="Nombre" class="text-danger small"></span>
+                </div>
+                <div class="col-12 col-md-6 mt-2">
+                    <label asp-for="Apellido" class="form-label fw-bold">Apellido</label>
+                    <input type="text" asp-for="Apellido" class="form-control" id="Apellido">
+                    <span asp-validation-for="Apellido" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="row mb-md-4">
+                <div class="col-12 col-md-6 mt-2">
+                    <label asp-for="Email" class="form-label fw-bold">Email</label>
+                    <input type="email" asp-for="Email" class="form-control" id="Email">
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+                <div class="col-12 col-md-6 mt-2">
+                    <label asp-for="Password" class="form-label fw-bold">Contraseña</label>
+                    <input type="password" asp-for="Password" class="form-control" id="Password">
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="row mb-md-4">
+                <div class="col-12 col-md-6 mt-2">
+                    <label asp-for="AvatarFile" class="form-label fw-bold">Avatar</label>
+                    <input type="file" name="AvatarFile" class="form-control" id="Avatar" accept="image/*">
+                    <span asp-validation-for="AvatarFile" class="text-danger small"></span>
+                </div>
+                <div class="col-12 col-md-6 mt-2">
+                    <label asp-for="Rol" class="form-label fw-bold">Rol</label>
+                    <select class="form-select" asp-for="Rol" id="Rol">
+                        <option value="" selected disabled>Seleccionar Rol</option>
+                        <option value="@Rol.ADMIN">@Rol.ADMIN</option>
+                        <option value="@Rol.EMPLEADO">@Rol.EMPLEADO</option>
+                    </select>
+                    <span asp-validation-for="Rol" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <input type="hidden" asp-for="Id"/>
+
+            <div class="row mb-2 mt-5 mt-md-4 justify-content-center">
+                <div class="col-2 d-flex justify-content-center">
+                    <input type="submit" value="Guardar" class="btn btn-primary d-block mx-auto">
+                </div>
+                <div class="col-2 d-flex justify-content-center">
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if(!string.IsNullOrWhiteSpace(ViewBag.MensajeError)) {
+    <partial name="_MensajeError" model="ViewBag.MensajeError" />
+}
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script type="module" defer>
+        import { mostrarMensaje } from "/js/frontUtils.js";
+        document.addEventListener("DOMContentLoaded", _ => {
+            mostrarMensaje(false, null);
+        });
+    </script>
+}

@@ -82,7 +82,8 @@ export function validarTelefono(cadena) {
   if (cadena.length > 25) return { errorMessage: "El máximo de caracteres de de 25." };
 
   // const regExp = /^(\+54\s)?0?(\d{2,4})\s(15\s)?(\d{4}-?\d{4})|(\d{3}-?\d{4})|(\d{2}-?\d{4})$/;
-  // if (!regExp.test(cadena)) return { errorMessage: "El teléfono ingresado NO es valido" };
+  const regExp = /^\+?[0-9\s\-]{6,20}$/;
+  if (!regExp.test(cadena)) return { errorMessage: "El teléfono tiene caractares inválidos" };
   return;
 }
 

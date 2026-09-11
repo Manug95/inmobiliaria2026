@@ -1,9 +1,11 @@
 using inmobiliaria2026.Interfaces;
 using inmobiliaria2026.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace inmobiliaria2026.Controllers;
 
+[Authorize]
 public class PagoController : ControladorBase
 {
     private readonly IPagoRepository _repo;
@@ -56,6 +58,10 @@ public class PagoController : ControladorBase
                     TempData["MensajeError"] = "No se especificó la reserva del pago";
                     return RedirectToAction(nameof(Index), "Reserva");
                 }
+
+                var userId = inmobiliariaService.GetUserId(User);
+                if (!userId.HasValue)
+                    return Unauthorized();
                 
                 Reserva? reserva = await repoReserva.ObtenerPorIdAsync(pago.ReservaId);
 
@@ -72,6 +78,7 @@ public class PagoController : ControladorBase
                         }
 
                         reserva.FechaTerminado = DateTime.Today;
+                        reserva.IdUsuarioTerminador = userId.Value;
                         await repoReserva.ActualizarAsync(reserva);
                     }
                     else
@@ -93,6 +100,8 @@ public class PagoController : ControladorBase
                             return RedirectToAction(nameof(Formulario), new { reservaId = pago.ReservaId });
                         }
                     }
+
+                    pago.IdUsuarioCobrador = userId.Value;
                     
                     await _repo.CrearAsync(pago);
                 }
@@ -120,12 +129,17 @@ public class PagoController : ControladorBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Eliminar([FromRoute] int id)
+    [Authorize(Policy = "ADMIN")]
+    public async Task<IActionResult> Eliminar([FromRoute] int id, [FromServices] IInmobiliariaService inmobiliariaService)
     {
         if (id <= 0)
             return BadRequest();
+        
+        var userId = inmobiliariaService.GetUserId(User);
+        if (!userId.HasValue)
+            return Unauthorized();
 
-        if (!await _repo.EliminarAsync(id))
+        if (!await _repo.EliminarAsync(id, userId.Value))
             TempData["MensajeError"] = "No se pudo eliminar el pago";
 
         return RedirectToAction(nameof(Index));

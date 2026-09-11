@@ -2,11 +2,12 @@ using System.Diagnostics;
 using inmobiliaria2026.Interfaces;
 using inmobiliaria2026.Models;
 using inmobiliaria2026.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace inmobiliaria2026.Controllers;
 
+[Authorize]
 public class InmuebleController : ControladorBase
 {
     private readonly IInmuebleRepository _repo;
@@ -263,6 +264,7 @@ public class InmuebleController : ControladorBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ADMIN")]
     public async Task<IActionResult> Eliminar([FromRoute] int id)
     {
         if (id <= 0)
@@ -275,6 +277,7 @@ public class InmuebleController : ControladorBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ADMIN")]
     public async Task<IActionResult> EliminarPortada([FromRoute] int id, [FromServices] IFileService fileService)
     {
         if (id <= 0)
@@ -304,6 +307,7 @@ public class InmuebleController : ControladorBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ADMIN")]
     public async Task<IActionResult> EliminarImagenInterior([FromRoute] int id, [FromForm] Imagen imagen, [FromServices] IFileService fileService)
     {
         if (id <= 0)

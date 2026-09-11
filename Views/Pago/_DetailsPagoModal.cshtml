@@ -27,6 +27,18 @@
                             <span id="concepto_detalle" class="fs-4"></span>
                         </div>
                     </div>
+                    @if (User.IsInRole(Rol.ADMIN.ToString())) {
+                        <div class="row">
+                            <div class="col">
+                                <span class="fw-bold fs-3 text-info-emphasis">Usuario Cobrador: &nbsp;</span>
+                                <span id="cobrador_detalle" class="fs-4"></span>
+                            </div>
+                            <div class="col">
+                                <span class="fw-bold fs-3 text-info-emphasis">Usuario Anulador: &nbsp;</span>
+                                <span id="anulador_detalle" class="fs-4"></span>
+                            </div>
+                        </div>
+                    }
 
                     <br>
                     <h5 class="display-6 text-primary-emphasis">Reserva</h5>

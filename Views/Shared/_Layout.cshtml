@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -8,7 +9,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/styles.css">
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" >
+    <link rel="stylesheet" href="~/css/tablas.css" asp-append-version="true" >
     <link rel="stylesheet" href="~/inmobiliaria2026.styles.css" asp-append-version="true" />
 </head>
 <body>
@@ -49,7 +51,36 @@
                         <li class="nav-item @(ViewBag?.linkActivo == "pagos" ? "active-link" : "")">
                             <a class="nav-link text-dark nav-font" asp-area="" asp-controller="Pago" asp-action="Index">Pagos</a>
                         </li>
+                        @if (User.IsInRole(Rol.ADMIN.ToString())) {
+                            <li class="nav-item @(ViewBag?.linkActivo == "usuarios" ? "active-link" : "")">
+                                <a class="nav-link text-dark nav-font" asp-area="" asp-controller="Usuario" asp-action="Index">Usuarios</a>
+                            </li>
+                        }
                     </ul>
+                    @if (User.Identity!.IsAuthenticated) {
+                        <div class="dropdown">
+                            <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="pe-3 ps-1">@User.Identity.Name</span>
+                                @{string? avatarURL = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Uri)?.Value;}
+                                @if (avatarURL?.Length > 0) {
+                                    <img width="32" src="@avatarURL" alt="" class="rounded-circle" asp-append-version="true" >
+                                } else {
+                                    string nombre = User!.Identity!.Name!.Split(" ")[0];
+                                    string apellido = User.Identity.Name.Split(" ")[1];
+                                    <img width="32" src="https://ui-avatars.com/api/?name=@(nombre + "+" + apellido)&background=random&rounded=true" alt="" asp-append-version="true" >
+                                }
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li><span class="dropdown-item text-white">@User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value</span></li>
+                                <li><hr class="dropdown-divider"></li>
+                                @{string? id = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;}
+                                <li><a class="dropdown-item text-white" asp-area="" asp-controller="Usuario" asp-action="Edit" asp-route-id="@id">Actualizar Perfil</a></li>
+                                <li><a class="dropdown-item text-white" asp-area="" asp-controller="Usuario" asp-action="Logout">Salir</a></li>
+                            </ul>
+                        </div>
+                    } else {
+                        <a asp-controller="Usuario" asp-action="Login" type="button" class="btn btn-primary">Login</a>
+                    }
                 </div>
             </div>
         </nav>
