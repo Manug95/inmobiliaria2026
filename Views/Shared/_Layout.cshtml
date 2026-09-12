@@ -56,7 +56,8 @@
                                 Informes
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Reserva" asp-action="PorFechas">Lista Reservas Vigentes por Fechas</a></li>
+                                <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Reserva" asp-action="PorFechas">Reservas Vigentes por Fechas</a></li>
+                                <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Inmueble" asp-action="MasReservados">Inmuebles Más Reservados</a></li>
                             </ul>
                         </li>
                         @if (User.IsInRole(Rol.ADMIN.ToString())) {

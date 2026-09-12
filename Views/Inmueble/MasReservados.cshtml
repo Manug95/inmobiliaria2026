@@ -1,0 +1,142 @@
+@using inmobiliaria2026.Models.ViewModels
+@model MasReservadosViewModel
+@{
+    ViewData["Title"] = "Más Reservados";
+    string dir = "";
+}
+
+<h1 class="text-center display-4">Inmuebles Más Reservados</h1>
+
+<div class="container-fluid shadow border rounded-4 mt-4 bg-light position-relative">
+    <div class="row my-2 ms-2 pt-2">
+        <div class="col">
+            <form asp-action="MasReservados" method="GET" class="row row-cols-lg-auto g-3 align-items-center">
+                <div class="col-12">
+                    @* <label asp-for="Cantidad" class="form-label">Los</label> *@
+                    <div class="input-group align-items-start">
+                        <span class="mt-1 fs-4">Los</span>
+                        <div>
+                            <input type="number" size="5" maxlength="5" asp-for="Cantidad" class="form-control mx-1" id="Cantidad">
+                            <span asp-validation-for="Cantidad" class="text-danger small ms-2"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    @* <label asp-for="Dias" class="form-label">inmuebles más reservados en los últimos</label> *@
+                    <div class="input-group align-items-start">
+                        <span class="mt-1 fs-4">inmuebles más reservados en los últimos</span>
+                        <div>
+                            <input type="number" size="5" maxlength="5" asp-for="Dias" class="form-control mx-1" id="Dias">
+                            <span asp-validation-for="Dias" class="text-danger small ms-2"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 d-flex align-items-start">
+                    <span class="mb-3 fs-4">días.</span>
+                </div>
+                <div class="col-12 d-flex align-items-center ms-3 mt-0">
+                    <button type="submit" class="btn btn-primary mb-2">Consultar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @if(Model.Inmuebles.Count() > 0) {
+        <div class="row">
+            <div class="table-responsive my-4 rounded-3 fixed-height-table-container">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th >
+                                N°
+                            </th>
+                            <th >
+                                ID
+                            </th>
+                            <th >
+                                DIRECCIÓN
+                            </th>
+                            <th>
+                                @Html.DisplayName(nameof(Inmueble.Tipo)).ToUpper()
+                            </th>
+                            <th>
+                                @Html.DisplayName(nameof(Inmueble.Cupo)).ToUpper()
+                            </th>
+                            <th>
+                                @Html.DisplayName(nameof(Inmueble.Duenio)).ToUpper()
+                            </th>
+                            <th>
+                                @Html.DisplayName(nameof(Inmueble.Precio)).ToUpper()
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpo">
+                        @for (int i = 0; i < Model.Inmuebles.Count; i++) {
+                            <tr id="@Model.Inmuebles[i].Id">
+                                <td class="align-middle py-0 ps-2">
+                                    @(i+1)
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => Model.Inmuebles[i].Id)
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @{dir = Model.Inmuebles[i].Calle + " " + Model.Inmuebles[i].NroCalle;}
+                                    @dir
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => Model.Inmuebles[i].Tipo!.Tipo)
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => Model.Inmuebles[i].Cupo)
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @(Model.Inmuebles[i].Duenio != null ? Model.Inmuebles[i].Duenio?.ToString().Split('-').ElementAt(0) : "Sin Dueño")
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => Model.Inmuebles[i].Precio)
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-evenly align-items-center contenedor-iconos">
+                                        <a class="icon-enlace" asp-action="Formulario" asp-route-id="@Model.Inmuebles[i].Id">
+                                            <i class="bi bi-pencil-square fs-3 icon-hover text-primary" data-bs-toggle="tooltip" data-bs-title="Editar"></i>
+                                        </a>
+                                        <a class="icon-enlace" asp-action="FormulariosImagenes" asp-route-id="@Model.Inmuebles[i].Id">
+                                            <i class="bi bi-images fs-3 icon-hover text-secondary" data-bs-toggle="tooltip" data-bs-title="Gestionar Imágenes"></i>
+                                        </a>
+                                        @if (User.IsInRole(Rol.ADMIN.ToString())){
+                                            <i id="del-@Model.Inmuebles[i].Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
+                                        }
+                                        <a  class="icon-enlace" asp-controller="Inmueble" asp-action="Detalle" asp-route-id="@Model.Inmuebles[i].Id">
+                                            <i id="det-@Model.Inmuebles[i].Id" class="bi bi-building fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <partial name="_ModalEliminar"/>
+    }
+</div>
+
+@if(!string.IsNullOrEmpty(ViewBag.MensajeError)) {
+    <partial name="_MensajeError" model="ViewBag.MensajeError"/>
+}
+
+@section Scripts {
+    <script type="module">
+        import { getElementById, mostrarMensaje, mostrarPregunta } from "/js/frontUtils.js";
+        document.addEventListener("DOMContentLoaded", () => {
+            mostrarMensaje(false, null);
+            document.querySelectorAll(".bi-trash")?.forEach(i => {
+                i.addEventListener("click", e => {
+                const idFila = e.target.id.split("-")[1];
+                getElementById("form_eliminar").action = `/Inmueble/Eliminar/${idFila}`;
+                mostrarPregunta(null);
+                });
+            });
+        });
+    </script>
+}

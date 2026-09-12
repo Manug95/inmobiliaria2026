@@ -11,4 +11,5 @@ public interface IInmuebleRepository : IRepository<Inmueble, int>
     public Task<List<Inmueble>> ListarInmueblesParaAlquilar(string desde, string hasta, int? tipo, int? cupo, decimal? precio, int offset, int limit);
     public Task<bool> GuardarImagen(int inmuebleId, string ruta);
     public Task<bool> EliminarImagen(string ruta);
+    public Task<List<Inmueble>> ListarMasReservadosUltimosXDias(int dias, int limit);
 }

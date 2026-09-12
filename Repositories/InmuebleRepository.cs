@@ -661,6 +661,93 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
         return inmuebles;
     }
 
+    public async Task<List<Inmueble>> ListarMasReservadosUltimosXDias(int dias = 365, int limit = 10)
+    {
+        var inmuebles = new List<Inmueble>();
+        DateTime hoy = DateTime.Today;
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = @$"
+                SELECT 
+                    i.{nameof(Inmueble.Id)}, 
+                    i.{nameof(Inmueble.IdPropietario)}, 
+                    i.{nameof(Inmueble.IdTipoInmueble)}, 
+                    i.{nameof(Inmueble.Cupo)}, 
+                    i.{nameof(Inmueble.Calle)}, 
+                    i.{nameof(Inmueble.NroCalle)}, 
+                    IFNULL(i.{nameof(Inmueble.Latitud)}, 0) AS latitud, 
+                    IFNULL(i.{nameof(Inmueble.Longitud)}, 0) AS longitud, 
+                    i.{nameof(Inmueble.Precio)}, 
+                    i.{nameof(Inmueble.Senia)}, 
+                    i.{nameof(Inmueble.Disponible)}, 
+                    i.{nameof(Inmueble.Foto)}, 
+                    ti.{nameof(TipoInmueble.Tipo)}, 
+                    p.{nameof(Propietario.Nombre)}, 
+                    p.{nameof(Propietario.Apellido)}, 
+                    p.{nameof(Propietario.Dni)}, 
+                    COUNT(r.id) AS total_reservas 
+                FROM inmuebles AS i 
+                INNER JOIN tipos_inmueble AS ti 
+                    ON i.{nameof(Inmueble.IdTipoInmueble)} = ti.{nameof(TipoInmueble.Id)} 
+                INNER JOIN propietarios AS p 
+                    ON i.{nameof(Inmueble.IdPropietario)} = p.{nameof(Propietario.Id)} 
+                INNER JOIN reservas as r
+                    ON r.{nameof(Reserva.IdInmueble)} = i.{nameof(Inmueble.Id)} 
+                WHERE i.{nameof(Inmueble.Borrado)} = 0 
+                    AND (r.{nameof(Reserva.FechaInicio)} BETWEEN @fechaAtras AND @hoy) 
+                GROUP BY i.{nameof(Inmueble.Id)}
+                ORDER BY total_reservas DESC
+                LIMIT @limit;"
+            ;
+
+            using (var command = new MySqlCommand(sql + ";", connection))
+            {
+                command.Parameters.AddWithValue("fechaAtras", hoy.AddDays(dias*(-1)).ToString("yyyy-MM-dd"));
+                command.Parameters.AddWithValue("hoy", hoy.ToString("yyyy-MM-dd"));
+                command.Parameters.AddWithValue("limit", limit);
+
+                connection.Open();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        inmuebles.Add(new Inmueble
+                        {
+                            Id = reader.GetInt32(nameof(Inmueble.Id)),
+                            IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                            IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                            Cupo = reader.GetInt32(nameof(Inmueble.Cupo)),
+                            Calle = reader.GetString(nameof(Inmueble.Calle)),
+                            NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
+                            Latitud = reader.GetDecimal("latitud"),
+                            Longitud = reader.GetDecimal("longitud"),
+                            Disponible = reader.GetBoolean(nameof(Inmueble.Disponible)),
+                            Foto = reader[nameof(Inmueble.Foto)] == DBNull.Value ? null : reader.GetString(nameof(Inmueble.Foto)),
+                            Precio = reader.GetDecimal(nameof(Inmueble.Precio)),
+                            Senia = reader.GetInt32(nameof(Inmueble.Senia)),
+                            Duenio = new Propietario
+                            {
+                                Id = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                                Nombre = reader.GetString(nameof(Propietario.Nombre)),
+                                Apellido = reader.GetString(nameof(Propietario.Apellido)),
+                                Dni = reader.GetString(nameof(Propietario.Dni))
+                            },
+                            Tipo = new TipoInmueble
+                            {
+                                Id = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                                Tipo = reader.GetString(nameof(TipoInmueble.Tipo))
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        return inmuebles;
+    }
+
     public async Task<Inmueble?> ObtenerPorIdAsync(int id)
     {
         Inmueble? inmueble = null;

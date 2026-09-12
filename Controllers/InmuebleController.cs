@@ -393,6 +393,27 @@ public class InmuebleController : ControladorBase
         return View(filtros);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> MasReservados([FromQuery] MasReservadosViewModel vm)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(vm);
+        }
+
+        var inmuebles = await _repo.ListarMasReservadosUltimosXDias(vm.Dias, vm.Cantidad);
+        if (inmuebles.Count > 0)
+        {
+            vm.Inmuebles = inmuebles;
+        }
+        else
+        {
+            ViewBag.MensajeError = "No se encontraro resultados";
+        }
+
+        return View(vm);
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
