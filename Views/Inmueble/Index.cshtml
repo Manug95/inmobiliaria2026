@@ -98,18 +98,18 @@
     <nav>
         <ul id="paginador" class="pagination justify-content-center">
             <li id="flecha-pag-izq" class="page-item @(ViewBag.paginaAnterior == 0 ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Anterior">
-                @if (ViewBag.idProp == 0) { <a asp-action="Index" asp-route-cantidadPaginado="10" asp-route-pagina="@ViewBag.paginaAnterior" asp-route-disp="@ViewBag.disponible" class="page-link"><span>&laquo;</span></a> }
-                else { <a asp-action="Index" asp-route-cantidadPaginado="10" asp-route-pagina="@ViewBag.paginaAnterior" asp-route-disp="@ViewBag.disponible" asp-route-idProp="@ViewBag.idProp" class="page-link"><span>&laquo;</span></a> }
+                @if (ViewBag.idProp == 0) { <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaAnterior" asp-route-disp="@ViewBag.disponible" class="page-link"><span>&laquo;</span></a> }
+                else { <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaAnterior" asp-route-disp="@ViewBag.disponible" asp-route-idProp="@ViewBag.idProp" class="page-link"><span>&laquo;</span></a> }
             </li>
             @for (int i = 1; i <= ViewBag.cantPag; i++) {
                 <li class="page-item">
-                    @if (ViewBag.idProp == 0) { <a asp-action="Index" asp-route-cantidadPaginado="10" asp-route-pagina="@i" asp-route-disp="@ViewBag.disponible" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a> }
-                    else { <a asp-action="Index" asp-route-cantidadPaginado="10" asp-route-pagina="@i" asp-route-disp="@ViewBag.disponible" asp-route-idProp="@ViewBag.idProp" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a> }
+                    @if (ViewBag.idProp == 0) { <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@i" asp-route-disp="@ViewBag.disponible" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a> }
+                    else { <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@i" asp-route-disp="@ViewBag.disponible" asp-route-idProp="@ViewBag.idProp" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a> }
                 </li>
             }
             <li id="flecha-pag-der" class="page-item @(ViewBag.paginaSiguiente > ViewBag.cantPag ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Siguiente">
-                @if (ViewBag.idProp == 0) { <a asp-action="Index" asp-route-cantidadPaginado="10" asp-route-pagina="@ViewBag.paginaSiguiente" asp-route-disp="@ViewBag.disponible" class="page-link"><span>&raquo;</span></a> }
-                else { <a asp-action="Index" asp-route-cantidadPaginado="10" asp-route-pagina="@ViewBag.paginaSiguiente" asp-route-disp="@ViewBag.disponible" asp-route-idProp="@ViewBag.idProp" class="page-link"><span>&raquo;</span></a> }
+                @if (ViewBag.idProp == 0) { <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaSiguiente" asp-route-disp="@ViewBag.disponible" class="page-link"><span>&raquo;</span></a> }
+                else { <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaSiguiente" asp-route-disp="@ViewBag.disponible" asp-route-idProp="@ViewBag.idProp" class="page-link"><span>&raquo;</span></a> }
             </li>
         </ul>
     </nav>

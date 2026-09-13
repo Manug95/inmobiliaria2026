@@ -5,10 +5,11 @@
     string dir = "";
 }
 
-<h1 class="text-center display-4">Inmuebles Más Reservados</h1>
 
-<div class="container-fluid shadow border rounded-4 mt-4 bg-light position-relative">
-    <div class="row my-2 ms-2 pt-2">
+<div class="container-fluid shadow border rounded-4 mt-1 bg-light position-relative">
+    <h1 class="text-center display-4">Inmuebles Más Reservados</h1>
+
+    <div class="row mt-3 ms-2 pt-2">
         <div class="col">
             <form asp-action="MasReservados" method="GET" class="row row-cols-lg-auto g-3 align-items-center">
                 <div class="col-12">
@@ -50,9 +51,6 @@
                                 N°
                             </th>
                             <th >
-                                ID
-                            </th>
-                            <th >
                                 DIRECCIÓN
                             </th>
                             <th>
@@ -77,9 +75,6 @@
                                     @(i+1)
                                 </td>
                                 <td class="align-middle py-0 ps-2">
-                                    @Html.DisplayFor(modelItem => Model.Inmuebles[i].Id)
-                                </td>
-                                <td class="align-middle py-0 ps-2">
                                     @{dir = Model.Inmuebles[i].Calle + " " + Model.Inmuebles[i].NroCalle;}
                                     @dir
                                 </td>
@@ -97,15 +92,6 @@
                                 </td>
                                 <td>
                                     <div class="d-flex justify-content-evenly align-items-center contenedor-iconos">
-                                        <a class="icon-enlace" asp-action="Formulario" asp-route-id="@Model.Inmuebles[i].Id">
-                                            <i class="bi bi-pencil-square fs-3 icon-hover text-primary" data-bs-toggle="tooltip" data-bs-title="Editar"></i>
-                                        </a>
-                                        <a class="icon-enlace" asp-action="FormulariosImagenes" asp-route-id="@Model.Inmuebles[i].Id">
-                                            <i class="bi bi-images fs-3 icon-hover text-secondary" data-bs-toggle="tooltip" data-bs-title="Gestionar Imágenes"></i>
-                                        </a>
-                                        @if (User.IsInRole(Rol.ADMIN.ToString())){
-                                            <i id="del-@Model.Inmuebles[i].Id" class="bi bi-trash fs-3 text-danger icon-hover" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Eliminar"></i>
-                                        }
                                         <a  class="icon-enlace" asp-controller="Inmueble" asp-action="Detalle" asp-route-id="@Model.Inmuebles[i].Id">
                                             <i id="det-@Model.Inmuebles[i].Id" class="bi bi-building fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
                                         </a>
@@ -127,16 +113,9 @@
 
 @section Scripts {
     <script type="module">
-        import { getElementById, mostrarMensaje, mostrarPregunta } from "/js/frontUtils.js";
+        import { mostrarMensaje } from "/js/frontUtils.js";
         document.addEventListener("DOMContentLoaded", () => {
             mostrarMensaje(false, null);
-            document.querySelectorAll(".bi-trash")?.forEach(i => {
-                i.addEventListener("click", e => {
-                const idFila = e.target.id.split("-")[1];
-                getElementById("form_eliminar").action = `/Inmueble/Eliminar/${idFila}`;
-                mostrarPregunta(null);
-                });
-            });
         });
     </script>
 }

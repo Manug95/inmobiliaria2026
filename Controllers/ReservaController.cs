@@ -74,9 +74,7 @@ public class ReservaController : ControladorBase
                 /*
                     al actualizar hay confilcto con las fechas nuevas y las fechas de la misma reserva.
                     es decir, cuand reviso si estan ocupadas las nuevas fechas, me puede salir que el mismo inmueble es el que ocupa alguna las nuevas fechas.
-                    se me ocurre joinear la reserva con el inquilino y ver que las ids sean diferentes.
-                    pero ¿que pasa si hay otra reserva del mismo inquilino en las nuevas fechas?
-                    tremendo quilombo
+                    deberia usar la id de la reserva para ver que no matchee con misma
                     no se deberian poder cambiar las fechas de una reserva y punto
                 */
                 await _repo.ActualizarAsync(reserva);

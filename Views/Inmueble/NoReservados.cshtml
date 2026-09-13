@@ -1,0 +1,115 @@
+@model IEnumerable<Inmueble>
+@{
+    ViewData["Title"] = "No Reservados";
+    string dir = "";
+}
+
+
+<div class="container-fluid shadow border rounded-4 mt-1 bg-light position-relative">
+    <h1 class="text-center display-4">Inmuebles No Reservados</h1>
+
+    <div class="row mt-3 ms-2 pt-2">
+        <div class="col-6">
+            <form asp-action="NoReservados" method="get" class="row row-cols-lg-auto g-3 align-items-center">
+                <div class="input-group">
+                    <label for="dias" class="form-label fs-4 mt-1 me-3">Cantidad de días</label>
+                    <select name="dias" id="dias" class="form-select">
+                        <option value="0" selected="@(ViewBag.dias==0)" disabled>Seleccionar</option>
+                        <option value="30" selected="@(ViewBag.dias==30)">30</option>
+                        <option value="60" selected="@(ViewBag.dias==60)">60</option>
+                        <option value="90" selected="@(ViewBag.dias==90)">90</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i>
+                        Consultar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @if(Model.Count() > 0) {
+        <div class="row">
+            <div class="table-responsive my-4 rounded-3 fixed-height-table-container">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th >
+                                DIRECCIÓN
+                            </th>
+                            <th>
+                                @Html.DisplayName(nameof(Inmueble.Tipo)).ToUpper()
+                            </th>
+                            <th>
+                                @Html.DisplayName(nameof(Inmueble.Cupo)).ToUpper()
+                            </th>
+                            <th>
+                                @Html.DisplayName(nameof(Inmueble.Duenio)).ToUpper()
+                            </th>
+                            <th>
+                                @Html.DisplayName(nameof(Inmueble.Precio)).ToUpper()
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpo">
+                         @foreach (var item in Model) {
+                            <tr id="@item.Id">
+                                <td class="align-middle py-0 ps-2">
+                                    @{dir = item.Calle + " " + item.NroCalle;}
+                                    @dir
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => item.Tipo!.Tipo)
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => item.Cupo)
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @(item.Duenio != null ? item.Duenio.ToString().Split('-').ElementAt(0) : "Sin Dueño")
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => item.Precio)
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-evenly align-items-center contenedor-iconos">
+                                        <a  class="icon-enlace" asp-controller="Inmueble" asp-action="Detalle" asp-route-id="@item.Id">
+                                            <i id="det-@item.Id" class="bi bi-building fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <nav>
+                <ul id="paginador" class="pagination justify-content-center">
+                    <li id="flecha-pag-izq" class="page-item @(ViewBag.paginaAnterior == 0 ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Anterior">
+                        <a asp-action="NoReservados" asp-route-dias="@ViewBag.dias" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaAnterior" class="page-link"><span>&laquo;</span></a>
+                    </li>
+                    @for (int i = 1; i <= ViewBag.cantPag; i++) {
+                        <li class="page-item">
+                            <a asp-action="NoReservados" asp-route-dias="@ViewBag.dias" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@i" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a>
+                        </li>
+                    }
+                    <li id="flecha-pag-der" class="page-item @(ViewBag.paginaSiguiente > ViewBag.cantPag ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Siguiente">
+                        <a asp-action="NoReservados" asp-route-dias="@ViewBag.dias" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaSiguiente" class="page-link"><span>&raquo;</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>
+
+@if(!string.IsNullOrEmpty(ViewBag.MensajeError)) {
+    <partial name="_MensajeError" model="ViewBag.MensajeError"/>
+}
+
+@section Scripts {
+    <script type="module">
+        import { mostrarMensaje } from "/js/frontUtils.js";
+        document.addEventListener("DOMContentLoaded", () => {
+            mostrarMensaje(false, null);
+        });
+    </script>
+}

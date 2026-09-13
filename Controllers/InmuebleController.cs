@@ -411,7 +411,25 @@ public class InmuebleController : ControladorBase
             ViewBag.MensajeError = "No se encontraro resultados";
         }
 
+        ViewBag.linkActivo = "informes";
+
         return View(vm);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> NoReservados([FromQuery] int dias = 30, [FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10)
+    {
+        var inmuebles = await _repo.ListarNoReservados(dias, pagina, cantidadPaginado);
+        int cantidadInmuebles = await _repo.ContarNoReservados(dias);
+
+        ViewBag.linkActivo = "informes";
+        ViewBag.cantPag = Math.Ceiling((decimal)cantidadInmuebles / cantidadPaginado);
+        ViewBag.cantidadPaginado = cantidadPaginado;
+        ViewBag.paginaSiguiente = pagina + 1;
+        ViewBag.paginaAnterior = pagina - 1;
+        ViewBag.dias = dias;
+
+        return View(inmuebles);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

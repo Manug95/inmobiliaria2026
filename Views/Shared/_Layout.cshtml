@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="~/inmobiliaria2026.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header style="height: 5vh">
+    <header style="height: 5vh" class="position-sticky top-0 z-3">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-1 p-0 fs-5" style="background-color: #e3f2fd;">
             <div class="container-fluid">
                 <a class="navbar-brand nav-font" asp-area="" asp-controller="Home" asp-action="Index">Inmobiliaria</a>
@@ -37,7 +37,6 @@
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Inmueble" asp-action="Index">Lista Inmuebles</a></li>
                                 <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="TipoInmueble" asp-action="Index">Tipos de Inmuebles</a></li>
-                                <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Inmueble" asp-action="Reservar">Reservar Inmueble</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown @(ViewBag?.linkActivo == "reservas" ? "active-link" : "")">
@@ -46,6 +45,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Reserva" asp-action="Index">Lista Reservas</a></li>
+                                <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Inmueble" asp-action="Reservar">Reservar Inmueble</a></li>
                             </ul>
                         </li>
                         <li class="nav-item @(ViewBag?.linkActivo == "pagos" ? "active-link" : "")">
@@ -58,6 +58,7 @@
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Reserva" asp-action="PorFechas">Reservas Vigentes por Fechas</a></li>
                                 <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Inmueble" asp-action="MasReservados">Inmuebles Más Reservados</a></li>
+                                <li><a class="dropdown-item text-dark nav-font" asp-area="" asp-controller="Inmueble" asp-action="NoReservados">Inmuebles No Reservados</a></li>
                             </ul>
                         </li>
                         @if (User.IsInRole(Rol.ADMIN.ToString())) {
@@ -94,8 +95,8 @@
             </div>
         </nav>
     </header>
-    <div class="container-fluid">
-        <main role="main" class="pb-3 overflow-y-auto" style="height: 90vh">
+    <div class="container-fluid" style="height: 90vh">
+        <main role="main" class="pb-3 overflow-y-auto">
             @RenderBody()
         </main>
     </div>
