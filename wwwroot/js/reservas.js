@@ -77,10 +77,10 @@ function mostrarModalDetalle(reserva) {
     getElementById("monto").textContent = `$ ${reserva.monto}`;
     getElementById("fTerm").textContent = reserva.fechaTerminado ? aFechaLocal(reserva.fechaTerminado) : " - ";
     const spanReservador = getElementById("reservador");
-    if (spanReservador != undefined)
+    if (spanReservador != null)
       spanReservador.textContent = `Cod: ${reserva.usuarioReservador.id} - ${reserva.usuarioReservador.apellido}, ${reserva.usuarioReservador.nombre}`;
     const spanTerminador = getElementById("terminador");
-    if (spanTerminador != undefined)
+    if (spanTerminador != null)
       spanTerminador.textContent = reserva.idUsuarioTerminador ? `Cod: ${reserva.usuarioTerminador.id} - ${reserva.usuarioTerminador.apellido}, ${reserva.usuarioTerminador.nombre}` : " - ";
   } else {
     removerClases(bodyMensaje, "d-none");

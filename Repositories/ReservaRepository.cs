@@ -88,6 +88,48 @@ public class ReservaRepository : BaseRepository, IReservaRepository
         return cantidadReservas;
     }
 
+    public async Task<long> ContarReservasPorVencer(int? dias, DateTime? desde, DateTime? hasta)
+    {
+        long cantidadReservas = 0;
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = @$"
+                SELECT COUNT({nameof(Reserva.Id)}) AS cantidad 
+                FROM reservas 
+                WHERE {nameof(Reserva.Borrado)} = 0 
+                    AND {nameof(Reserva.FechaTerminado)} IS NULL"
+            ;
+
+            if (dias.HasValue)
+                sql += $" AND {nameof(Reserva.FechaFin)} BETWEEN @hoy AND @dias";
+            
+            if (desde.HasValue && hasta.HasValue)
+                sql += @$" AND {nameof(Reserva.FechaFin)} BETWEEN @desde AND @hasta";
+
+            using (var command = new MySqlCommand(sql + ";", connection))
+            {
+                if (dias.HasValue)
+                {
+                    command.Parameters.AddWithValue("hoy", DateTime.Today);
+                    command.Parameters.AddWithValue("dias", DateTime.Today.AddDays(dias.Value));
+                }
+
+                if (desde.HasValue && hasta.HasValue)
+                {
+                    command.Parameters.AddWithValue("desde", desde.Value);
+                    command.Parameters.AddWithValue("hasta", hasta.Value);
+                }
+
+                connection.Open();
+                cantidadReservas = Convert.ToInt64(command.ExecuteScalar());
+                connection.Close();
+            }
+        }
+
+        return cantidadReservas;
+    }
+
     public async Task<long> CrearAsync(Reserva reserva)
     {
         int id = 0;
@@ -275,6 +317,129 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                     command.Parameters.AddWithValue("desde", desde);
                     command.Parameters.AddWithValue("hasta", hasta);
                     command.Parameters.AddWithValue("hoy", DateTime.Today);
+                }
+
+                if (offset.HasValue && limit.HasValue)
+                {
+                    command.Parameters.AddWithValue($"limit", limit.Value);
+                    command.Parameters.AddWithValue($"offset", (offset.Value - 1) * limit.Value);
+                }
+
+                connection.Open();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        reservas.Add(new Reserva
+                        {
+                            Id = reader.GetInt64(nameof(Reserva.Id)),
+                            IdInmueble = reader.GetInt32(nameof(Reserva.IdInmueble)),
+                            IdInquilino = reader.GetInt32(nameof(Reserva.IdInquilino)),
+                            Monto = reader.GetDecimal(nameof(Reserva.Monto)),
+                            FechaInicio = reader.GetDateTime(nameof(Reserva.FechaInicio)),
+                            FechaFin = reader.GetDateTime(nameof(Reserva.FechaFin)),
+                            FechaTerminado = reader[nameof(Reserva.FechaTerminado)] == DBNull.Value ? null : reader.GetDateTime(nameof(Reserva.FechaTerminado)),
+                            IdUsuarioReservador = reader[nameof(Reserva.IdUsuarioReservador)] == DBNull.Value ? 0 : reader.GetInt32(nameof(Reserva.IdUsuarioReservador)),
+                            IdUsuarioTerminador = reader[nameof(Reserva.IdUsuarioTerminador)] == DBNull.Value ? 0 : reader.GetInt32(nameof(Reserva.IdUsuarioTerminador)),
+                            Inmueble = new Inmueble
+                            {
+                                Id = reader.GetInt32(nameof(Reserva.IdInmueble)),
+                                IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                                IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                                Calle = reader.GetString(nameof(Inmueble.Calle)),
+                                NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
+                                Tipo = new TipoInmueble
+                                {
+                                    Id = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                                    Tipo = reader.GetString(nameof(TipoInmueble.Tipo))
+                                },
+                                Duenio = new Propietario
+                                {
+                                    Id = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                                    Nombre = reader.GetString(nameof(Propietario.Nombre)),
+                                    Apellido = reader.GetString(nameof(Propietario.Apellido)),
+                                    Dni = reader.GetString(nameof(Propietario.Dni))
+                                }
+                            },
+                            Inquilino = new Inquilino
+                            {
+                                Id = reader.GetInt32(nameof(Reserva.IdInquilino)),
+                                Nombre = reader.GetString(nameof(Inquilino.Nombre)),
+                                Apellido = reader.GetString(nameof(Inquilino.Apellido)),
+                                Dni = reader.GetString(nameof(Inquilino.Dni))
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        return reservas;
+    }
+
+    public async Task<List<Reserva>> ListarReservasPorVencer(int? dias, DateTime? desde, DateTime? hasta, int? offset, int? limit)
+    {
+        var reservas = new List<Reserva>();
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = @$"
+                SELECT 
+                    r.{nameof(Reserva.Id)}, 
+                    r.{nameof(Reserva.IdInmueble)}, 
+                    r.{nameof(Reserva.IdInquilino)}, 
+                    r.{nameof(Reserva.Monto)}, 
+                    r.{nameof(Reserva.FechaInicio)}, 
+                    r.{nameof(Reserva.FechaFin)}, 
+                    r.{nameof(Reserva.FechaTerminado)}, 
+                    r.{nameof(Reserva.IdUsuarioReservador)}, 
+                    r.{nameof(Reserva.IdUsuarioTerminador)}, 
+                    inm.{nameof(Inmueble.IdPropietario)}, 
+                    inm.{nameof(Inmueble.Calle)}, 
+                    inm.{nameof(Inmueble.NroCalle)}, 
+                    inm.{nameof(Inmueble.IdTipoInmueble)}, 
+                    ti.{nameof(Inmueble.Tipo)}, 
+                    p.{nameof(Propietario.Nombre)}, 
+                    p.{nameof(Propietario.Apellido)}, 
+                    p.{nameof(Propietario.Dni)}, 
+                    inq.{nameof(Inquilino.Nombre)}, 
+                    inq.{nameof(Inquilino.Apellido)}, 
+                    inq.{nameof(Inquilino.Dni)} 
+                FROM reservas AS r 
+                INNER JOIN inmuebles AS inm 
+                    ON r.{nameof(Reserva.IdInmueble)} = inm.id 
+                INNER JOIN tipos_inmueble AS ti 
+                    ON inm.{nameof(Inmueble.IdTipoInmueble)} = ti.id 
+                INNER JOIN propietarios AS p 
+                    ON inm.{nameof(Inmueble.IdPropietario)} = p.id 
+                INNER JOIN inquilinos AS inq 
+                    ON r.{nameof(Reserva.IdInquilino)} = inq.id 
+                WHERE r.{nameof(Reserva.Borrado)} = 0 
+                    AND r.{nameof(Reserva.FechaTerminado)} IS NULL"
+            ;
+
+            if (dias.HasValue)
+                sql += $" AND r.{nameof(Reserva.FechaFin)} BETWEEN @hoy AND @dias";
+
+            if (desde.HasValue && hasta.HasValue)
+                sql += @$" AND r.{nameof(Reserva.FechaFin)} BETWEEN @desde AND @hasta";
+
+            if (offset.HasValue && limit.HasValue)
+                    sql += $" LIMIT @limit OFFSET @offset";
+
+            using (var command = new MySqlCommand(sql + ";", connection))
+            {
+                if (dias.HasValue)
+                {
+                    command.Parameters.AddWithValue("hoy", DateTime.Today);
+                    command.Parameters.AddWithValue("dias", DateTime.Today.AddDays(dias.Value));
+                }
+
+                if (desde.HasValue && hasta.HasValue)
+                {
+                    command.Parameters.AddWithValue("desde", desde.Value);
+                    command.Parameters.AddWithValue("hasta", hasta.Value);
                 }
 
                 if (offset.HasValue && limit.HasValue)

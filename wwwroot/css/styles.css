@@ -68,3 +68,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .nav-font {
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
+
+.nav-item:hover > .nav-link, .dropdown-menu .dropdown-item:hover {
+    background-color: #c9e1f3; /* Tu color deseado */
+}
+
+/* .navbar-brand:hover {
+    background-color: #c0d5e4;
+} */

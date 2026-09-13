@@ -210,6 +210,41 @@ public class ReservaController : ControladorBase
 
         return View(vm);
     }
+    
+    [HttpGet]
+    public async Task<IActionResult> PorVencer(ReservasPorVencerViewModel vm, int pagina = 1, int cantidadPaginado = 10)
+    {
+        ViewBag.linkActivo = "informes";
+
+        if (!vm.B)
+            return View(vm);
+
+        if (vm.Dias.HasValue || (vm.Desde.HasValue && vm.Hasta.HasValue))
+        {
+            if (!ModelState.IsValid)
+                return View(vm);
+            
+            if (vm.Dias.HasValue)
+                vm.Desde = vm.Hasta = null;
+            
+            vm.Reservas = await _repo.ListarReservasPorVencer(vm.Dias, vm.Desde, vm.Hasta, pagina, cantidadPaginado);
+            long cantidadReservas = await _repo.ContarReservasPorVencer(vm.Dias, vm.Desde, vm.Hasta);
+
+            if (vm.Reservas.Count > 0)
+            {
+                ViewBag.cantPag = Math.Ceiling((decimal)cantidadReservas / cantidadPaginado);
+                ViewBag.cantidadPaginado = cantidadPaginado;
+                ViewBag.paginaSiguiente = pagina + 1;
+                ViewBag.paginaAnterior = pagina - 1;
+            }
+            else
+                ViewBag.MensajeError = "No se encontraron resultados";
+        }
+        else
+            ViewBag.MensajeError = "Faltan los días o las fechas desde y hasta";
+        
+        return View(vm);
+    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

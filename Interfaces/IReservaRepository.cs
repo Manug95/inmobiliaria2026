@@ -7,4 +7,6 @@ public interface IReservaRepository : IRepository<Reserva, long>
     public Task<IList<Reserva>> ListarReservas(int? offset, int? limit, int? idInm, string? desde = null, string? hasta = null);
     public Task<int> ContarReservas(int? idInm, string? desde = null, string? hasta = null);
     public Task<bool> EstaOcupado(string desde, string hasta, int inmuebleId, long reservaId);
+    public Task<List<Reserva>> ListarReservasPorVencer(int? dias, DateTime? desde, DateTime? hasta, int? offset, int? limit);
+    public Task<long> ContarReservasPorVencer(int? dias, DateTime? desde, DateTime? hasta);
 }

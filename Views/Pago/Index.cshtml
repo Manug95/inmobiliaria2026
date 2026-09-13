@@ -144,10 +144,10 @@
             getElementById("estadoPago_detalle").textContent = pago.anulado ? "ANULADO ❌" : "VÁLIDO ✔";
 
             const spanCobrador = getElementById("cobrador_detalle");
-            if (spanCobrador != undefined)
+            if (spanCobrador != null)
                 spanCobrador.textContent = `Cod: ${pago.idUsuarioCobrador} - ${pago.usuarioCobrador.apellido}, ${pago.usuarioCobrador.nombre}`;
             const spanAnulador = getElementById("anulador_detalle");
-            if (spanAnulador != undefined)
+            if (spanAnulador != null)
                 spanAnulador.textContent = pago.idUsuarioAnulador ? `Cod: ${pago.idUsuarioAnulador} - ${pago.usuarioAnulador.apellido}, ${pago.usuarioAnulador.nombre}` : " - ";
 
             getElementById("propietario_detalle").textContent = `${pago.reserva.inmueble.duenio.apellido}, ${pago.reserva.inmueble.duenio.nombre}`;
