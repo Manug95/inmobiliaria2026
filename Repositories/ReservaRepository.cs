@@ -218,29 +218,35 @@ public class ReservaRepository : BaseRepository, IReservaRepository
 
     public async Task<bool> EstaOcupado(string desde, string hasta, int inmuebleId, long reservaId)
     {
-        int reservasContadas = 0;
+        long reservasContadas = 0;
 
         string sql = @$"
             SELECT COUNT({nameof(Reserva.Id)}) 
             FROM reservas 
             WHERE {nameof(Reserva.IdInmueble)} = @idInmueble 
-                AND ({nameof(Reserva.FechaInicio)} BETWEEN @desde AND @hasta 
+                    AND ({nameof(Reserva.FechaInicio)} BETWEEN @desde AND @hasta 
                     OR {nameof(Reserva.FechaFin)} BETWEEN @desde AND @hasta
                     OR (@desde >= {nameof(Reserva.FechaInicio)} AND @desde <= {nameof(Reserva.FechaFin)})
                     OR (@hasta >= {nameof(Reserva.FechaInicio)} AND @hasta <= {nameof(Reserva.FechaFin)})) 
-                AND {nameof(Reserva.FechaTerminado)} IS NULL;"
+                AND {nameof(Reserva.FechaTerminado)} IS NULL 
+                AND {nameof(Reserva.Borrado)} = 0"
         ;
+
+        if (reservaId > 0) // si reservaId == 0 no va matchear con ninguna fila asi que esta medio al pedo poner esto aca pero bueno
+            sql += $" AND {nameof(Reserva.Id)} != @reservaId";
 
         using (var connection = new MySqlConnection(_connectionString))
         {
-            using (var command = new MySqlCommand(sql, connection))
+            using (var command = new MySqlCommand(sql + ";", connection))
             {
                 command.Parameters.AddWithValue("idInmueble", inmuebleId);
                 command.Parameters.AddWithValue("desde", desde);
                 command.Parameters.AddWithValue("hasta", hasta);
+                if (reservaId > 0)
+                    command.Parameters.AddWithValue("reservaId", reservaId);
 
                 connection.Open();
-                reservasContadas = Convert.ToInt32(command.ExecuteScalar());
+                reservasContadas = Convert.ToInt64(command.ExecuteScalar());
                 connection.Close();
             }
         }

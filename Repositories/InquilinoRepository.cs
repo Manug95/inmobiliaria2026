@@ -47,7 +47,7 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
         return estaModificado;
     }
 
-    public async Task<int> ContarInquilinos()
+    public async Task<int> ContarInquilinos(string? nomApe = null)
     {
         int cantidadInquilinos = 0;
 
@@ -56,16 +56,19 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
             string sql = @$"
                 SELECT COUNT({nameof(Inquilino.Id)}) AS cantidad 
                 FROM inquilinos 
-                WHERE {nameof(Inquilino.Activo)} = 1;"
+                WHERE {nameof(Inquilino.Activo)} = 1"
             ;
 
-            using (var command = new MySqlCommand(sql, connection))
+            if (!string.IsNullOrWhiteSpace(nomApe))
+                sql += $" AND ({nameof(Inquilino.Nombre)} LIKE @nomApe OR {nameof(Inquilino.Apellido)} LIKE @nomApe)";
+
+            using (var command = new MySqlCommand(sql + ";", connection))
             {
+                if (!string.IsNullOrWhiteSpace(nomApe)) 
+                    command.Parameters.AddWithValue("nomApe", $"{nomApe}%");
 
                 connection.Open();
-
                 cantidadInquilinos = Convert.ToInt32(command.ExecuteScalar());
-
                 connection.Close();
             }
         }
@@ -238,13 +241,13 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
             using (var command = new MySqlCommand(sql + ";", connection))
             {
                 if (!string.IsNullOrWhiteSpace(nomApe)) 
-                    command.Parameters.AddWithValue($"nomApe", $"%{nomApe}%");
+                    command.Parameters.AddWithValue("nomApe", $"{nomApe}%");
                 if (!string.IsNullOrWhiteSpace(orderBy) && _campos.Contains(orderBy, StringComparer.OrdinalIgnoreCase)) 
-                    command.Parameters.AddWithValue($"orderBy", orderBy);
+                    command.Parameters.AddWithValue("orderBy", orderBy);
                 if (offset.HasValue && limit.HasValue)
                 {
-                    command.Parameters.AddWithValue($"limit", limit.Value);
-                    command.Parameters.AddWithValue($"offset", (offset.Value - 1) * limit.Value);
+                    command.Parameters.AddWithValue("limit", limit.Value);
+                    command.Parameters.AddWithValue("offset", (offset.Value - 1) * limit.Value);
                 }
 
                 connection.Open();

@@ -60,29 +60,30 @@ public class ReservaController : ControladorBase
         {
             DateTime desde = reserva.FechaInicio!.Value;
             DateTime hasta = reserva.FechaFin!.Value;
-            if (await _repo.EstaOcupado(desde.ToString("yyyy-MM-dd"), hasta.ToString("yyyy-MM-dd"), (int)reserva.IdInmueble!, reserva.Id))
+            if (await _repo.EstaOcupado(desde.ToString("yyyy-MM-dd"), hasta.ToString("yyyy-MM-dd"), reserva.IdInmueble!.Value, reserva.Id))
             {
-                TempData["MensajeError"] = $"El Inmueble ya está reservado entre {desde:dd-MM-yyyy} y {hasta:dd-MM-yyyy}";
+                TempData["MensajeError"] = $"El Inmueble ya está reservado entre {desde:dd/MM/yyyy} y {hasta:dd/MM/yyyy}";
                 return RedirectToAction(
                     nameof(Formulario), 
-                    new { desde = desde.ToString("yyyy-MM-dd"), hasta = hasta.ToString("yyyy-MM-dd"), idInq = reserva.IdInquilino, idInm = reserva.IdInmueble }
+                    new { 
+                        desde = desde.ToString("yyyy-MM-dd"), 
+                        hasta = hasta.ToString("yyyy-MM-dd"), 
+                        id = reserva.Id, 
+                        idInq = reserva.IdInquilino, 
+                        idInm = reserva.IdInmueble 
+                    }
                 );
             }
 
             if (reserva.Id > 0)
             {
-                /*
-                    al actualizar hay confilcto con las fechas nuevas y las fechas de la misma reserva.
-                    es decir, cuand reviso si estan ocupadas las nuevas fechas, me puede salir que el mismo inmueble es el que ocupa alguna las nuevas fechas.
-                    deberia usar la id de la reserva para ver que no matchee con misma
-                    no se deberian poder cambiar las fechas de una reserva y punto
-                */
                 await _repo.ActualizarAsync(reserva);
             }
             else
             {
                 reserva.IdUsuarioReservador = userId.Value;
                 await _repo.CrearAsync(reserva);
+                return RedirectToAction("Formulario", "Pago", new { reservaId = reserva.Id });
             }
         }
         else

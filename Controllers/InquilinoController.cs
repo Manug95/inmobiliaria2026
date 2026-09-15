@@ -18,15 +18,22 @@ public class InquilinoController : ControladorBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index([FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10)
+    public async Task<IActionResult> Index([FromQuery] string? nomApe, [FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10)
     {
-        IList<Inquilino> inquilinos = await _repo.ListarAsync(cantidadPaginado, pagina);
-        int cantidadInquilinos = await _repo.ContarInquilinos();
+        IList<Inquilino> inquilinos;
+
+        if (!string.IsNullOrWhiteSpace(nomApe))
+            inquilinos = await _repo.ListarInquilinos(nomApe, $"{nameof(Inquilino.Apellido)}, {nameof(Inquilino.Nombre)}", "ASC", cantidadPaginado, pagina);
+        else
+            inquilinos = await _repo.ListarAsync(cantidadPaginado, pagina);
+        
+        int cantidadInquilinos = await _repo.ContarInquilinos(nomApe);
 
         ViewBag.cantPag = Math.Ceiling((decimal)cantidadInquilinos / cantidadPaginado);
         ViewBag.cantidadPaginado = cantidadPaginado;
         ViewBag.paginaSiguiente = pagina + 1;
         ViewBag.paginaAnterior = pagina - 1;
+        ViewBag.busqueda = nomApe;
         ViewBag.linkActivo = "inquilinos";
         ViewBag.MensajeError = TempData["MensajeError"] as string;
 

@@ -11,5 +11,5 @@ public interface IInquilinoRepository : IRepository<Inquilino, int>
         int? limit = null,
         int? offset = null
     );
-    public Task<int> ContarInquilinos();
+    public Task<int> ContarInquilinos(string? nomApe = null);
 }

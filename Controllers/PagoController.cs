@@ -178,6 +178,8 @@ public class PagoController : ControladorBase
                     ? (importeTotalReserva - sumaImportes).ToString("F2") 
                     : importeTotalReserva.ToString("F2");
 
+                    // si es el primer pago, pongo como valor del importe el porcentaje correspondiente al pago inicial del inmueble
+                    // si no, lo que falta para completar la deuda
                     importe = sumaImportes > 0 
                     ? importeTotalReserva - sumaImportes 
                     : importeTotalReserva * (reserva.Inmueble!.Senia / 100);

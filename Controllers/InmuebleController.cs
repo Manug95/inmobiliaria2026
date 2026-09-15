@@ -363,13 +363,21 @@ public class InmuebleController : ControladorBase
         [FromQuery] int cantidadPaginado = 10
     )
     {
+        ViewBag.linkActivo = "inmuebles";
+
+        if (!filtros.B)
+        {
+            ModelState.ClearValidationState(nameof(FiltroInmuebleViewModel.Desde));
+            ModelState.ClearValidationState(nameof(FiltroInmuebleViewModel.Hasta));
+            return View(filtros);
+        }
+
         List<Inmueble> inmuebles = [];
         List<TipoInmueble>? tipoInmuebles = await _repoTipoInmueble.ListarAsync(100, 1);
 
         if (!ModelState.IsValid)
         {
             filtros.TiposInmuebles = tipoInmuebles;
-            filtros.Inmuebles = inmuebles;
             return View(filtros);
         }
 
@@ -385,7 +393,6 @@ public class InmuebleController : ControladorBase
             ViewBag.cantidadPaginado = cantidadPaginado;
             ViewBag.paginaSiguiente = pagina + 1;
             ViewBag.paginaAnterior = pagina - 1;
-            ViewBag.linkActivo = "inmuebles";
         }
 
         filtros.TiposInmuebles = tipoInmuebles;

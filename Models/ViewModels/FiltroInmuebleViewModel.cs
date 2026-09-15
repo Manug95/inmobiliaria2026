@@ -10,27 +10,35 @@ public class FiltroInmuebleViewModel
     public List<TipoInmueble> TiposInmuebles { get; set; } = [];
     public Inmueble? Inmueble { get; set; }
 
-    [Required(ErrorMessage = "La fecha de inicio es requerida")]
+    [Required(ErrorMessage = "La fecha de desde es requerida")]
+    [FechaStringMayorOIgualQueHoy(ErrorMessage = "La fecha Desde no puede ser menor que la fecha actual")]
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
     [DataType(DataType.Date)]
     public string? Desde { get; set; }
-    [Required(ErrorMessage = "La fecha de fin es requerida")]
+
+    [Required(ErrorMessage = "La fecha de hasta es requerida")]
     [FechaStringMayorQue(nameof(Desde), ErrorMessage = "La fecha Hasta no puede ser menor que Desde.")]
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
     [DataType(DataType.Date)]
     public string? Hasta { get; set; }
+
     public int IdInquilino { get; set; }
+
     [DataType(DataType.Currency)]
     [Range(1, double.MaxValue, ErrorMessage = "El monto máximo debe ser positivo")]
     [Display(Name = "Monto por Día")]
     public decimal? MontoMax { get; set; }
+
     [Range(1, int.MaxValue, ErrorMessage = "Tipo de inmueble incorrecto")]
     public int? TipoInmueble { get; set; }
     
     [Display(Name = "Seña")]
     public int? SeniaMaxima { get; set; }
+
     [Range(1, int.MaxValue, ErrorMessage = "El cupo debe ser mayor a 0")]
     public int? Cupo { get; set; }
+
+    public bool B { get; set; } = false;
 }
 
 public class FechaStringMayorQueAttribute : ValidationAttribute
@@ -62,6 +70,25 @@ public class FechaStringMayorQueAttribute : ValidationAttribute
 
         if (valorActual < valorComparar)
             return new ValidationResult(ErrorMessage ?? $"La fecha {validationContext.DisplayName} debe ser mayor o igual que {_otraPropiedad}.");
+
+        return ValidationResult.Success;
+    }
+}
+
+public class FechaStringMayorOIgualQueHoyAttribute : ValidationAttribute
+{
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+    {
+        var valorActualStr = value as string;
+
+        if (string.IsNullOrWhiteSpace(valorActualStr))
+            return ValidationResult.Success;
+
+        if (!DateTime.TryParse(valorActualStr, CultureInfo.InvariantCulture, DateTimeStyles.None, out var valorActual))
+            return new ValidationResult($"La fecha de {validationContext.DisplayName} no es válida.");
+
+        if (valorActual < DateTime.Today)
+            return new ValidationResult(ErrorMessage ?? $"La fecha no puede ser menor que la fecha actual.");
 
         return ValidationResult.Success;
     }
