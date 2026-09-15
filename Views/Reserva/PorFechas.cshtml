@@ -5,24 +5,35 @@
     ViewData["Title"] = "Reservas por fecha";
 }
 
-<div class="container-fluid shadow border rounded-4 mt-4 bg-light-subtle position-relative">
-    <div class="row my-2">
-        <div class="col-12">
+<div class="container-fluid shadow border rounded-4 bg-light position-relative">
+    <h1 class="text-center display-4">Reservas Vigentes</h1>
+    <p class="text-center fs-5">
+        <span class="text-danger fw-bold">***</span>
+        Listar todos las reservas de alquiler que se encuentren vigentes (por fecha desde y hasta)
+        <span class="text-danger fw-bold">***</span>
+    </p>
+
+    <div class="row my-1 ms-2">
+        <div class="col">
             <form asp-action="PorFechas" method="GET">
-                <div class="row mb-md-4">
+                <input type="hidden" name="B" value="true">
+                <div class="row">
                     <div class="col-5 mt-5 mt-md-3 mb-md-0">
                         <label asp-for="Desde" class="form-label fw-bold">Desde</label>
                         <input type="date" asp-for="Desde" class="form-control" id="desde">
-                        <span asp-validation-for="Desde" class="text-danger small"></span>
+                        <span asp-validation-for="Desde" class="text-danger small ms-1"></span>
                     </div>
                     <div class="col-5 mt-5 mt-md-3 mb-md-0">
                         <label asp-for="Hasta" class="form-label fw-bold">Hasta</label>
                         <input type="date" asp-for="Hasta" class="form-control" id="hasta">
-                        <span asp-validation-for="Hasta" class="text-danger small"></span>
+                        <span asp-validation-for="Hasta" class="text-danger small ms-1"></span>
                     </div>
                     <div class="col-2 d-flex justify-content-center align-items-end">
-                        <div>
-                            <input type="submit" value="Buscar" class="btn btn-primary d-block mx-auto">
+                        <div class="mb-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i>
+                                Buscar
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -30,24 +41,24 @@
         </div>
     </div>
     @if(Model.Reservas.Count() > 0) {
-        <div class="table-responsive my-4 rounded-3 fixed-height-table-container">
+        <div class="table-responsive my-4 rounded-3 fixed-height-table-container-informes">
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
                         <th style="width: 100px;">
-                            @Html.DisplayNameFor(model => model.Reserva.Id)
+                            @Html.DisplayNameFor(model => model.Reservas[0].Id)
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.Reserva.FechaInicio).ToUpper()
+                            @Html.DisplayNameFor(model => model.Reservas[0].FechaInicio).ToUpper()
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.Reserva.FechaFin).ToUpper()
+                            @Html.DisplayNameFor(model => model.Reservas[0].FechaFin).ToUpper()
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.Reserva.Monto).ToUpper()
+                            @Html.DisplayNameFor(model => model.Reservas[0].Monto).ToUpper()
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.Reserva.FechaTerminado).ToUpper()
+                            @Html.DisplayNameFor(model => model.Reservas[0].FechaTerminado).ToUpper()
                         </th>
                         <th></th>
                     </tr>
@@ -108,31 +119,54 @@
         <nav>
             <ul id="paginador" class="pagination justify-content-center">
                 <li id="flecha-pag-izq" class="page-item @(ViewBag.paginaAnterior == 0 ? "disabled" : "")">
-                    <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaAnterior" class="page-link"><span>&laquo;</span></a>
+                    <a 
+                        asp-action="PorFechas" 
+                        asp-route-desde="@Model.Desde" 
+                        asp-route-hasta="@Model.Hasta" 
+                        asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" 
+                        asp-route-pagina="@ViewBag.paginaAnterior" 
+                        class="page-link"
+                    >
+                        <span>&laquo;</span>
+                    </a>
                 </li>
                 @for (int i = 1; i <= ViewBag.cantPag; i++) {
                     <li class="page-item">
-                        <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@i" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a>
+                        <a 
+                            asp-action="PorFechas" 
+                            asp-route-desde="@Model.Desde" 
+                            asp-route-hasta="@Model.Hasta" 
+                            asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" 
+                            asp-route-pagina="@i" 
+                            class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")"
+                        >
+                            @i
+                        </a>
                     </li>
                 }
                 <li id="flecha-pag-der" class="page-item @(ViewBag.paginaSiguiente > ViewBag.cantPag ? "disabled" : "")">
-                    <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaSiguiente" class="page-link"><span>&raquo;</span></a>
+                    <a 
+                        asp-action="PorFechas" 
+                        asp-route-desde="@Model.Desde" 
+                        asp-route-hasta="@Model.Hasta" 
+                        asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" 
+                        asp-route-pagina="@ViewBag.paginaSiguiente" 
+                        class="page-link"
+                    >
+                        <span>&raquo;</span>
+                    </a>
                 </li>
             </ul>
         </nav>
+        <partial name="_DetalleReservaModal"/>
     }
 </div>
-
-@if (Model.Reservas.Count > 0) {
-    <partial name="_DetalleReservaModal"/>
-    <partial name="_ModalEliminar"/>
-    <partial name="_MultaModal"/>
-}
 
 @if(!string.IsNullOrEmpty(ViewBag.MensajeError)) {
     <partial name="_MensajeError" model="ViewBag.MensajeError"/>
 }
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script type="module" src="~/js/reservas.js"></script>
 }

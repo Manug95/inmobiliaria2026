@@ -84,7 +84,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
         return cantidadInmuebles;
     }
 
-    public async Task<int> ContarNoReservados(int dias)
+    public async Task<int> ContarSinReservas(int dias)
     {
         int cantidadInmuebles = 0;
 
@@ -97,12 +97,48 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                     ON r.{nameof(Reserva.IdInmueble)} = i.{nameof(Inmueble.Id)} 
                     AND r.{nameof(Reserva.FechaInicio)} >= @fecha 
                 WHERE i.{nameof(Inmueble.Borrado)} = 0 
+                    AND i.{nameof(Inmueble.Disponible)} = 1 
                     AND r.{nameof(Reserva.Id)} IS NULL;"
             ;
 
             using (var command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("fecha", DateTime.Today.AddDays(dias*(-1)).ToString("yyyy-MM-dd"));
+
+                connection.Open();
+                cantidadInmuebles = Convert.ToInt32(command.ExecuteScalar());
+                connection.Close();
+            }
+        }
+
+        return cantidadInmuebles;
+    }
+
+    public async Task<long> ContarNoOcupados(DateTime desde, DateTime hasta)
+    {
+        long cantidadInmuebles = 0;
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = @$"
+                SELECT COUNT(i.{nameof(Inmueble.Id)}) AS cantidad 
+                FROM inmuebles AS i
+                WHERE i.{nameof(Inmueble.Borrado)} = 0 
+                    AND i.{nameof(Inmueble.Disponible)} = 1 
+                    AND i.{nameof(Inmueble.Id)} NOT IN (
+                        SELECT r.{nameof(Reserva.IdInmueble)}
+                        FROM reservas AS r 
+                        WHERE (r.{nameof(Reserva.FechaInicio)} <= @hasta 
+                                AND r.{nameof(Reserva.FechaFin)} >= @desde) 
+                            AND r.{nameof(Reserva.FechaTerminado)} IS NULL 
+                            AND r.{nameof(Reserva.Borrado)} = 0
+                );"
+            ;
+
+            using (var command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("hasta", hasta);
+                command.Parameters.AddWithValue("desde", desde);
 
                 connection.Open();
                 cantidadInmuebles = Convert.ToInt32(command.ExecuteScalar());
@@ -777,7 +813,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
         return inmuebles;
     }
 
-    public async Task<List<Inmueble>> ListarNoReservados(int dias = 30, int offset = 1, int limit = 10)
+    public async Task<List<Inmueble>> ListarInmueblesSinReservas(int dias = 30, int offset = 1, int limit = 10)
     {
         var inmuebles = new List<Inmueble>();
 
@@ -810,6 +846,7 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                     ON r.{nameof(Reserva.IdInmueble)} = i.{nameof(Inmueble.Id)} 
                     AND r.{nameof(Reserva.FechaInicio)} >= @fecha 
                 WHERE i.{nameof(Inmueble.Borrado)} = 0 
+                    AND i.{nameof(Inmueble.Disponible)} = 1 
                     AND r.{nameof(Reserva.Id)} IS NULL 
                 LIMIT @limit OFFSET @offset;"
             ;
@@ -819,6 +856,102 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
                 command.Parameters.AddWithValue("fecha", DateTime.Today.AddDays(dias*(-1)).ToString("yyyy-MM-dd"));
                 command.Parameters.AddWithValue("limit", limit);
                 command.Parameters.AddWithValue("offset", (offset - 1) * limit);
+
+                connection.Open();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        inmuebles.Add(new Inmueble
+                        {
+                            Id = reader.GetInt32(nameof(Inmueble.Id)),
+                            IdPropietario = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                            IdTipoInmueble = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                            Cupo = reader.GetInt32(nameof(Inmueble.Cupo)),
+                            Calle = reader.GetString(nameof(Inmueble.Calle)),
+                            NroCalle = reader.GetUInt32(nameof(Inmueble.NroCalle)),
+                            Latitud = reader.GetDecimal("latitud"),
+                            Longitud = reader.GetDecimal("longitud"),
+                            Disponible = reader.GetBoolean(nameof(Inmueble.Disponible)),
+                            Foto = reader[nameof(Inmueble.Foto)] == DBNull.Value ? null : reader.GetString(nameof(Inmueble.Foto)),
+                            Precio = reader.GetDecimal(nameof(Inmueble.Precio)),
+                            Senia = reader.GetInt32(nameof(Inmueble.Senia)),
+                            Duenio = new Propietario
+                            {
+                                Id = reader.GetInt32(nameof(Inmueble.IdPropietario)),
+                                Nombre = reader.GetString(nameof(Propietario.Nombre)),
+                                Apellido = reader.GetString(nameof(Propietario.Apellido)),
+                                Dni = reader.GetString(nameof(Propietario.Dni))
+                            },
+                            Tipo = new TipoInmueble
+                            {
+                                Id = reader.GetInt32(nameof(Inmueble.IdTipoInmueble)),
+                                Tipo = reader.GetString(nameof(TipoInmueble.Tipo))
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        return inmuebles;
+    }
+
+    public async Task<List<Inmueble>> ListarInmueblesNoOcupados(DateTime desde, DateTime hasta, int? offset, int? limit)
+    {
+        var inmuebles = new List<Inmueble>();
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = @$"
+                SELECT 
+                    i.{nameof(Inmueble.Id)}, 
+                    i.{nameof(Inmueble.IdPropietario)}, 
+                    i.{nameof(Inmueble.IdTipoInmueble)}, 
+                    i.{nameof(Inmueble.Cupo)}, 
+                    i.{nameof(Inmueble.Calle)}, 
+                    i.{nameof(Inmueble.NroCalle)}, 
+                    IFNULL(i.{nameof(Inmueble.Latitud)}, 0) AS latitud, 
+                    IFNULL(i.{nameof(Inmueble.Longitud)}, 0) AS longitud, 
+                    i.{nameof(Inmueble.Precio)}, 
+                    i.{nameof(Inmueble.Senia)}, 
+                    i.{nameof(Inmueble.Disponible)}, 
+                    i.{nameof(Inmueble.Foto)}, 
+                    ti.{nameof(TipoInmueble.Tipo)}, 
+                    p.{nameof(Propietario.Nombre)}, 
+                    p.{nameof(Propietario.Apellido)}, 
+                    p.{nameof(Propietario.Dni)} 
+                FROM inmuebles AS i 
+                INNER JOIN tipos_inmueble AS ti 
+                    ON i.{nameof(Inmueble.IdTipoInmueble)} = ti.{nameof(TipoInmueble.Id)} 
+                INNER JOIN propietarios AS p 
+                    ON i.{nameof(Inmueble.IdPropietario)} = p.{nameof(Propietario.Id)} 
+                WHERE i.{nameof(Inmueble.Borrado)} = 0 
+                    AND i.{nameof(Inmueble.Disponible)} = 1 
+                    AND i.{nameof(Inmueble.Id)} NOT IN (
+                        SELECT {nameof(Reserva.IdInmueble)} 
+                        FROM reservas AS r 
+                        WHERE (r.{nameof(Reserva.FechaInicio)} <= @hasta 
+                                AND r.{nameof(Reserva.FechaFin)} >= @desde) 
+                            AND r.{nameof(Reserva.FechaTerminado)} IS NULL 
+                            AND r.{nameof(Reserva.Borrado)} = 0
+                    )
+            ";
+
+            if (offset.HasValue && limit.HasValue)
+                sql += $" LIMIT @limit OFFSET @offset";
+
+            using (var command = new MySqlCommand(sql+";", connection))
+            {
+                command.Parameters.AddWithValue("hasta", hasta);
+                command.Parameters.AddWithValue("desde", desde);
+
+                if (offset.HasValue && limit.HasValue)
+                {
+                    command.Parameters.AddWithValue("limit", limit);
+                    command.Parameters.AddWithValue("offset", (offset - 1) * limit);
+                }
 
                 connection.Open();
 

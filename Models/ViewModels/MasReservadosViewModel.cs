@@ -9,6 +9,7 @@ public class MasReservadosViewModel
     public int Dias { get; set; } = 365;
 
     [Range(3, 10, ErrorMessage = "La cantidad debe estar entre 3 y 10")]
+    [Required(ErrorMessage = "Debe ingresar la cantidad de resultados")]
     public int Cantidad { get; set; } = 10;
 
     public List<Inmueble> Inmuebles { get; set; } = [];

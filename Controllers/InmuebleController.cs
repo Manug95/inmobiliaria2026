@@ -396,40 +396,86 @@ public class InmuebleController : ControladorBase
     [HttpGet]
     public async Task<IActionResult> MasReservados([FromQuery] MasReservadosViewModel vm)
     {
+        ViewBag.linkActivo = "informes";
+
         if (!ModelState.IsValid)
-        {
             return View(vm);
-        }
 
         var inmuebles = await _repo.ListarMasReservadosUltimosXDias(vm.Dias, vm.Cantidad);
-        if (inmuebles.Count > 0)
-        {
-            vm.Inmuebles = inmuebles;
-        }
-        else
-        {
-            ViewBag.MensajeError = "No se encontraro resultados";
-        }
 
-        ViewBag.linkActivo = "informes";
+        if (inmuebles.Count > 0)
+            vm.Inmuebles = inmuebles;
+        else
+            ViewBag.MensajeError = "No se encontraro resultados";
 
         return View(vm);
     }
 
     [HttpGet]
-    public async Task<IActionResult> NoReservados([FromQuery] int dias = 30, [FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10)
+    public async Task<IActionResult> SinReservas([FromQuery] int dias = 30, [FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10)
     {
-        var inmuebles = await _repo.ListarNoReservados(dias, pagina, cantidadPaginado);
-        int cantidadInmuebles = await _repo.ContarNoReservados(dias);
-
         ViewBag.linkActivo = "informes";
-        ViewBag.cantPag = Math.Ceiling((decimal)cantidadInmuebles / cantidadPaginado);
-        ViewBag.cantidadPaginado = cantidadPaginado;
-        ViewBag.paginaSiguiente = pagina + 1;
-        ViewBag.paginaAnterior = pagina - 1;
-        ViewBag.dias = dias;
+        List<Inmueble> inmuebles = [];
+        
+        if (dias <= 0)
+        {
+            ViewBag.MensajeError = "Cantidad de días incorrecta";
+            ViewBag.dias = 0;
+        }
+        else
+        {
+            inmuebles = await _repo.ListarInmueblesSinReservas(dias, pagina, cantidadPaginado);
+            int cantidadInmuebles = await _repo.ContarSinReservas(dias);
+
+            if (inmuebles.Count > 0)
+            {
+                ViewBag.cantPag = Math.Ceiling((decimal)cantidadInmuebles / cantidadPaginado);
+                ViewBag.cantidadPaginado = cantidadPaginado;
+                ViewBag.paginaSiguiente = pagina + 1;
+                ViewBag.paginaAnterior = pagina - 1;
+            }
+            else
+                ViewBag.MensajeError = "No se encontraron resultados";
+
+            ViewBag.dias = dias;
+        }
 
         return View(inmuebles);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> NoOcupados([FromQuery]InmueblesNoOcupadosViewModel vm, [FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10)
+    {
+        ViewBag.linkActivo = "informes";
+
+        if (!vm.B)
+        {
+            ModelState.ClearValidationState(nameof(InmueblesNoOcupadosViewModel.Desde));
+            ModelState.ClearValidationState(nameof(InmueblesNoOcupadosViewModel.Hasta));
+            return View(vm);
+        }
+        
+        if (ModelState.IsValid)
+        {
+            vm.Inmuebles = await _repo.ListarInmueblesNoOcupados(vm.Desde!.Value, vm.Hasta!.Value, pagina, cantidadPaginado);
+            long cantidadInmuebles = await _repo.ContarNoOcupados(vm.Desde.Value, vm.Hasta.Value);
+
+            if (vm.Inmuebles.Count > 0)
+            {
+                ViewBag.cantPag = Math.Ceiling((decimal)cantidadInmuebles / cantidadPaginado);
+                ViewBag.cantidadPaginado = cantidadPaginado;
+                ViewBag.paginaSiguiente = pagina + 1;
+                ViewBag.paginaAnterior = pagina - 1;
+            }
+            else
+                ViewBag.MensajeError = "No se encontraron resultados";
+        }
+        else
+        {
+            // ViewBag.MensajeError = ModelStateError(ModelState);
+        }
+
+        return View(vm);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -6,8 +6,13 @@
 
 <div class="container-fluid shadow border rounded-4 bg-light-subtle position-relative">
     <h1 class="text-center display-4">Reservas Por Vencer</h1>
+    <p class="text-center fs-5">
+        <span class="text-danger fw-bold">***</span>
+        Listar todos las reservas que terminen en X días (permitir elegir o especificar plazo)
+        <span class="text-danger fw-bold">***</span>
+    </p>
 
-    <div class="row">
+    <div class="row my-1 ms-2">
         <div class="col-12">
             <form asp-action="PorVencer" method="GET">
                 <input type="hidden" name="B" value="true">
@@ -36,7 +41,7 @@
                         <div class="mb-4">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-search"></i>
-                                Consultar
+                                Buscar
                             </button>
                         </div>
                     </div>
@@ -46,7 +51,7 @@
     </div>
 
     @if(Model.Reservas.Count() > 0) {
-        <div class="table-responsive rounded-3 fixed-height-table-container">
+        <div class="table-responsive my-4 rounded-3 fixed-height-table-container-informes">
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
@@ -104,7 +109,7 @@
             <ul id="paginador" class="pagination justify-content-center">
                 <li id="flecha-pag-izq" class="page-item @(ViewBag.paginaAnterior == 0 ? "disabled" : "")">
                     <a 
-                        asp-action="Index" 
+                        asp-action="PorVencer" 
                         asp-route-dias="@Model.Dias" 
                         asp-route-desde="@Model.Desde" 
                         asp-route-hasta="@Model.Hasta" 
@@ -118,7 +123,7 @@
                 @for (int i = 1; i <= ViewBag.cantPag; i++) {
                     <li class="page-item">
                         <a 
-                            asp-action="Index" 
+                            asp-action="PorVencer" 
                             asp-route-dias="@Model.Dias" 
                             asp-route-desde="@Model.Desde" 
                             asp-route-hasta="@Model.Hasta" 
@@ -132,7 +137,7 @@
                 }
                 <li id="flecha-pag-der" class="page-item @(ViewBag.paginaSiguiente > ViewBag.cantPag ? "disabled" : "")">
                     <a 
-                        asp-action="Index" 
+                        asp-action="PorVencer" 
                         asp-route-dias="@Model.Dias" 
                         asp-route-desde="@Model.Desde" 
                         asp-route-hasta="@Model.Hasta" 

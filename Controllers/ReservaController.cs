@@ -190,29 +190,38 @@ public class ReservaController : ControladorBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> PorFechas(ReservasPorFechasViewModel vm, int pagina = 1, int cantidadPaginado = 10)
+    public async Task<IActionResult> PorFechas([FromQuery] ReservasPorFechasViewModel vm, [FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10)
     {
-        int cantidadReservas = 0;
-
-        if (vm.Desde.HasValue && vm.Hasta.HasValue)
-        {
-            vm.Reservas =  (await _repo.ListarReservas(pagina, cantidadPaginado, null, vm.Desde.Value.ToString("yyyy-MM-dd"), vm.Hasta.Value.ToString("yyyy-MM-dd"))).ToList();
-            cantidadReservas =  await _repo.ContarReservas(null, vm.Desde.Value.ToString("yyyy-MM-dd"), vm.Hasta.Value.ToString("yyyy-MM-dd"));
-        }
-
-        ViewBag.cantPag = Math.Ceiling((decimal)cantidadReservas / cantidadPaginado);
-        ViewBag.cantidadPaginado = cantidadPaginado;
-        ViewBag.paginaSiguiente = pagina + 1;
-        ViewBag.paginaAnterior = pagina - 1;
         ViewBag.linkActivo = "informes";
 
-        ViewBag.MensajeError = vm.Reservas.Count == 0 && vm.Desde.HasValue && vm.Hasta.HasValue ? "No se encontraron resultados" : "";
+        if (!vm.B)
+        {
+            ModelState.ClearValidationState(nameof(ReservasPorFechasViewModel.Desde));
+            ModelState.ClearValidationState(nameof(ReservasPorFechasViewModel.Hasta));
+            return View(vm);
+        }
+
+        if (ModelState.IsValid)
+        {
+            vm.Reservas =  (await _repo.ListarReservas(pagina, cantidadPaginado, null, vm.Desde!.Value.ToString("yyyy-MM-dd"), vm.Hasta!.Value.ToString("yyyy-MM-dd"))).ToList();
+            int cantidadReservas =  await _repo.ContarReservas(null, vm.Desde.Value.ToString("yyyy-MM-dd"), vm.Hasta.Value.ToString("yyyy-MM-dd"));
+
+            if (vm.Reservas.Count > 0)
+            {
+                ViewBag.cantPag = Math.Ceiling((decimal)cantidadReservas / cantidadPaginado);
+                ViewBag.cantidadPaginado = cantidadPaginado;
+                ViewBag.paginaSiguiente = pagina + 1;
+                ViewBag.paginaAnterior = pagina - 1;
+            }
+            else
+                ViewBag.MensajeError = "No se encontraron resultados";
+        }
 
         return View(vm);
     }
     
     [HttpGet]
-    public async Task<IActionResult> PorVencer(ReservasPorVencerViewModel vm, int pagina = 1, int cantidadPaginado = 10)
+    public async Task<IActionResult> PorVencer([FromQuery] ReservasPorVencerViewModel vm, [FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10)
     {
         ViewBag.linkActivo = "informes";
 

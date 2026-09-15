@@ -1,0 +1,163 @@
+@using inmobiliaria2026.Models.ViewModels
+@model InmueblesNoOcupadosViewModel
+
+@{
+    ViewData["Title"] = "No Ocupados";
+    string dir = "";
+}
+
+<div class="container-fluid shadow border rounded-4 bg-light position-relative">
+    <h1 class="text-center display-4">Inmuebles No Reservados</h1>
+    <p class="text-center fs-5">
+        <span class="text-danger fw-bold">***</span>
+        Dadas dos fechas posibles de una reserva (inicio y fin), listar todos los inmuebles que no estén ocupados en alguna reserva entre esas fechas
+        <span class="text-danger fw-bold">***</span>
+    </p>
+
+    <div class="row my-1 ms-2 pt-2">
+        <div class="col">
+            <form asp-action="NoOcupados" method="get">
+                <input type="hidden" name="B" value="true">
+                <div class="row">
+                    <div class="col-5 mt-5 mt-md-3 mb-md-0">
+                        <label asp-for="Desde" class="form-label fw-bold">Desde</label>
+                        <input type="date" asp-for="Desde" class="form-control" id="desde">
+                        <span asp-validation-for="Desde" class="text-danger small ms-1"></span>
+                    </div>
+                    <div class="col-5 mt-5 mt-md-3 mb-md-0">
+                        <label asp-for="Hasta" class="form-label fw-bold">Hasta</label>
+                        <input type="date" asp-for="Hasta" class="form-control" id="hasta">
+                        <span asp-validation-for="Hasta" class="text-danger small ms-1"></span>
+                    </div>
+                    <div class="col-2 d-flex justify-content-center align-items-end">
+                        <div class="mb-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i>
+                                Buscar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    @if(Model.Inmuebles.Count() > 0) {
+        <div class="row">
+            <div class="table-responsive my-4 rounded-3 fixed-height-table-container-informes">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th >
+                                ID
+                            </th>
+                            <th >
+                                DIRECCIÓN
+                            </th>
+                            <th>
+                                @Html.DisplayName(nameof(Inmueble.Tipo)).ToUpper()
+                            </th>
+                            <th>
+                                @Html.DisplayName(nameof(Inmueble.Cupo)).ToUpper()
+                            </th>
+                            <th>
+                                @Html.DisplayName(nameof(Inmueble.Duenio)).ToUpper()
+                            </th>
+                            <th>
+                                @Html.DisplayName(nameof(Inmueble.Precio)).ToUpper()
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpo">
+                         @foreach (var item in Model.Inmuebles) {
+                            <tr id="@item.Id">
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => item.Id)
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @{dir = item.Calle + " " + item.NroCalle;}
+                                    @dir
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => item.Tipo!.Tipo)
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => item.Cupo)
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @(item.Duenio != null ? item.Duenio.ToString().Split('-').ElementAt(0) : "Sin Dueño")
+                                </td>
+                                <td class="align-middle py-0 ps-2">
+                                    @Html.DisplayFor(modelItem => item.Precio)
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-evenly align-items-center contenedor-iconos">
+                                        <a  class="icon-enlace" asp-controller="Inmueble" asp-action="Detalle" asp-route-id="@item.Id">
+                                            <i id="det-@item.Id" class="bi bi-building fs-3 text-info icon-hover" data-bs-toggle="tooltip" data-bs-title="Ver Detalle"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <nav>
+                <ul id="paginador" class="pagination justify-content-center">
+                    <li id="flecha-pag-izq" class="page-item @(ViewBag.paginaAnterior == 0 ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Anterior">
+                        <a 
+                            asp-action="NoOcupados" 
+                            asp-route-desde="@Model.Desde" 
+                            asp-route-hasta="@Model.Hasta" 
+                            asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" 
+                            asp-route-pagina="@ViewBag.paginaAnterior" 
+                            class="page-link"
+                        >
+                            <span>&laquo;</span>
+                        </a>
+                    </li>
+                    @for (int i = 1; i <= ViewBag.cantPag; i++) {
+                        <li class="page-item">
+                            <a 
+                                asp-action="NoOcupados" 
+                                asp-route-desde="@Model.Desde" 
+                                asp-route-hasta="@Model.Hasta" 
+                                asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" 
+                                asp-route-pagina="@i" 
+                                class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")"
+                            >
+                                @i
+                            </a>
+                        </li>
+                    }
+                    <li id="flecha-pag-der" class="page-item @(ViewBag.paginaSiguiente > ViewBag.cantPag ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Siguiente">
+                        <a 
+                            asp-action="NoOcupados" 
+                            asp-route-desde="@Model.Desde" 
+                            asp-route-hasta="@Model.Hasta" 
+                            asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" 
+                            asp-route-pagina="@ViewBag.paginaSiguiente" 
+                            class="page-link"
+                        >
+                            <span>&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>
+
+@if(!string.IsNullOrEmpty(ViewBag.MensajeError)) {
+    <partial name="_MensajeError" model="ViewBag.MensajeError"/>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script type="module">
+        import { mostrarMensaje } from "/js/frontUtils.js";
+        document.addEventListener("DOMContentLoaded", () => {
+            mostrarMensaje(false, null);
+        });
+    </script>
+}

@@ -10,6 +10,12 @@
     overflow-y: auto;
 }
 
+.fixed-height-table-container-informes {
+    height: 575px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
