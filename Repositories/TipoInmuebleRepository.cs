@@ -29,9 +29,7 @@ public class TipoInmuebleRepository : BaseRepository, ITipoInmuebleRepository
                 command.Parameters.AddWithValue($"{nameof(TipoInmueble.Id)}", tipoInmueble.Id);
 
                 connection.Open();
-
                 estaModificado = command.ExecuteNonQuery() > 0;
-
                 connection.Close();
             }
         }

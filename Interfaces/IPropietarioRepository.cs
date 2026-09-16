@@ -12,4 +12,5 @@ public interface IPropietarioRepository : IRepository<Propietario, int>
         int? limit = null
     );
     public Task<int> ContarPropietarios();
+    public Task<Propietario?> ObtenerPorDNIAsync(string dni);
 }

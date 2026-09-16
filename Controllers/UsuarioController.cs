@@ -109,7 +109,6 @@ public class UsuarioController(
         {
             TempData["MensajeError"] = ModelStateError(ModelState);
             TempData["Mail"] = login.Email;
-            // TempData["returnUrl"] = returnUrl;
             return RedirectToAction(nameof(Login), new { returnUrl });
         }
     }
@@ -145,11 +144,10 @@ public class UsuarioController(
         {
             string hashed = HashearPassword(vm.Password);
             vm.Password = hashed;
-            //var nbreRnd = Guid.NewGuid();//posible nombre aleatorio
             vm.Id = await _repo.CrearAsync(Usuario.Parse(vm));
+
             if (vm.AvatarFile != null && vm.Id > 0)
             {
-                // GuardarAvatarDelUsuario(vm);
                 vm.Avatar = await fileService.GuardarAvatarDelUsuario(vm.AvatarFile, $"avatar_{vm.Id}");
                 await _repo.ActualizarAsync(Usuario.Parse(vm));
             }
@@ -190,7 +188,6 @@ public class UsuarioController(
     [HttpPost]
     public async Task<IActionResult> Actualizar([Bind(Prefix = nameof(UsuarioViewModel))] [FromForm] UsuarioViewModel vm)
     {
-        // if (User.Claims.FirstOrDefault(c => c.Type == "id")?.Value == vm.Id.ToString())
         int? userId = _inmobiliaria.GetUserId(User);
         if (!userId.HasValue)
             return Unauthorized();
@@ -318,8 +315,6 @@ public class UsuarioController(
         if (usuario == null)
             return BadRequest();
         
-        // BorrarAvatar(usuario.Id, usuario.Avatar ?? "");
-        // GuardarAvatarDelUsuario(vm);
         fileService.BorrarAvatar(usuario.Id, usuario.Avatar ?? "");
         usuario.Avatar = await fileService.GuardarAvatarDelUsuario(vm.AvatarFile, $"avatar_{vm.Id}");
         await _repo.ActualizarAsync(usuario);
@@ -357,7 +352,6 @@ public class UsuarioController(
             Usuario? usuario = await _repo.ObtenerPorIdAsync(id);
             if (usuario != null)
             {
-                // BorrarAvatar(id, usuario.Avatar ?? "");
                 fileService.BorrarAvatar(id, usuario.Avatar ?? "");
                 usuario.Avatar = null;
                 await _repo.ActualizarAsync(usuario);

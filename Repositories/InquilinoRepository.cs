@@ -37,9 +37,7 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
                 command.Parameters.AddWithValue($"{nameof(Inquilino.Id)}", inquilino.Id);
 
                 connection.Open();
-
                 estaModificado = command.ExecuteNonQuery() > 0;
-
                 connection.Close();
             }
         }
@@ -151,9 +149,7 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
                 command.Parameters.AddWithValue($"{nameof(Inquilino.Id)}", id);
 
                 connection.Open();
-
                 estaBorrado = command.ExecuteNonQuery() > 0;
-
                 connection.Close();
             }
         }
@@ -299,6 +295,53 @@ public class InquilinoRepository : BaseRepository, IInquilinoRepository
             using (var command = new MySqlCommand(sql + ";", connection))
             {
                 command.Parameters.AddWithValue($"{nameof(Inquilino.Id)}", id);
+
+                connection.Open();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        inquilino = new Inquilino
+                        {
+                            Id = reader.GetInt32(nameof(Inquilino.Id)),
+                            Nombre = reader.GetString(nameof(Inquilino.Nombre)),
+                            Apellido = reader.GetString(nameof(Inquilino.Apellido)),
+                            Dni = reader.GetString(nameof(Inquilino.Dni)),
+                            Telefono = reader.GetString(nameof(Inquilino.Telefono)),
+                            Email = reader.GetString(nameof(Inquilino.Email)),
+                            Activo = reader.GetBoolean(nameof(Inquilino.Activo))
+                        };
+                    }
+                }
+            }
+        }
+
+        return inquilino;
+    }
+
+    public async Task<Inquilino?> ObtenerPorDNIAsync(string dni)
+    {
+        Inquilino? inquilino = null;
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = @$"
+                SELECT 
+                    {nameof(Inquilino.Id)}, 
+                    {nameof(Inquilino.Nombre)}, 
+                    {nameof(Inquilino.Apellido)}, 
+                    {nameof(Inquilino.Dni)}, 
+                    {nameof(Inquilino.Telefono)}, 
+                    {nameof(Inquilino.Email)}, 
+                    {nameof(Inquilino.Activo)} 
+                FROM inquilinos 
+                WHERE {nameof(Inquilino.Dni)} = @{nameof(Inquilino.Dni)};"
+            ;
+
+            using (var command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue($"{nameof(Inquilino.Dni)}", dni);
 
                 connection.Open();
 

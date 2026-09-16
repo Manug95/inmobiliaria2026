@@ -352,7 +352,6 @@ public class InmuebleController : ControladorBase
         List<Imagen> imagenes = await _repoImagenes.ListarPorInmuebleAsync(id, 100, 1);
         List<string> fotos = [.. imagenes.Select(i => i.Ruta!)];
         
-        // return View(new DetalleInmuebleViewModel(inmueble, fotos));
         return View(new DetalleInmuebleViewModel(inmueble, imagenes));
     }
 
@@ -479,7 +478,7 @@ public class InmuebleController : ControladorBase
         }
         else
         {
-            // ViewBag.MensajeError = ModelStateError(ModelState);
+            ViewBag.MensajeError = ModelStateError(ModelState);
         }
 
         return View(vm);

@@ -12,4 +12,5 @@ public interface IInquilinoRepository : IRepository<Inquilino, int>
         int? offset = null
     );
     public Task<int> ContarInquilinos(string? nomApe = null);
+    public Task<Inquilino?> ObtenerPorDNIAsync(string dni);
 }

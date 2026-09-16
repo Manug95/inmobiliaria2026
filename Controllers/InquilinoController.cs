@@ -52,6 +52,13 @@ public class InquilinoController : ControladorBase
     {
         if (ModelState.IsValid)
         {
+            Inquilino? i = await _repo.ObtenerPorDNIAsync(inquilino.Dni!);
+            if (i != null)
+            {
+                TempData["MensajeError"] = $"El DNI: {inquilino.Dni} ya está registrado";
+                return RedirectToAction(nameof(Index));
+            }
+
             if (inquilino.Id > 0)
                 await _repo.ActualizarAsync(inquilino);
             else

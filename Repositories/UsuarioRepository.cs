@@ -33,9 +33,7 @@ public class UsuarioRepository(IConfiguration config) : BaseRepository(config), 
                 command.Parameters.AddWithValue($"{nameof(Usuario.Id)}", usuario.Id);
 
                 connection.Open();
-
                 modificado = command.ExecuteNonQuery() > 0;
-
                 connection.Close();
             }
         }

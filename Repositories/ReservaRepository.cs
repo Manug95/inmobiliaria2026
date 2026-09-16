@@ -78,9 +78,7 @@ public class ReservaRepository : BaseRepository, IReservaRepository
                 }
 
                 connection.Open();
-
                 cantidadReservas = Convert.ToInt32(command.ExecuteScalar());
-
                 connection.Close();
             }
         }

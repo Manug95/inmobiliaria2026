@@ -45,6 +45,13 @@ public class PropietarioController : ControladorBase
     {
         if (ModelState.IsValid)
         {
+            Propietario? i = await _repo.ObtenerPorDNIAsync(propietario.Dni!);
+            if (i != null)
+            {
+                TempData["MensajeError"] = $"El DNI: {propietario.Dni} ya está registrado";
+                return RedirectToAction(nameof(Index));
+            }
+            
             if (propietario.Id > 0)
                 await _repo.ActualizarAsync(propietario);
             else

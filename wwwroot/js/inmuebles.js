@@ -2,8 +2,6 @@ import { getElementById, mostrarMensaje, mostrarPregunta } from "./frontUtils.js
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  const DETALLES = [];
-
   mostrarMensaje(false, null);
   
   document.querySelectorAll(".bi-trash")?.forEach(i => {

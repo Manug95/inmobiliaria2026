@@ -8,21 +8,27 @@
 
     <div class="row my-1">
        <div class="col-6">
-            <form asp-action="Index" method="get">
+            <form id="buscador" asp-action="Index" method="get" class="position-relative needs-validation">
                 <label for="nomApe" class="form-label fw-bold">Buscar Inquilino</label>
-                <div class="input-group mb-3">
+                <div class="input-group has-validation mb-3">
                     <input type="text" id="nomApe" name="nomApe" class="form-control" placeholder="nombre o apellido del inquilino" value="@ViewBag.busqueda">
+                    <span class="input-group-text" id="limpiar" style="cursor: pointer;">
+                        <i class="bi bi-x-lg" data-bs-toggle="tooltip" data-bs-title="Limpiar"></i>
+                    </span>
+                    <div id="tpe_buscador" class="invalid-tooltip"></div>
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search"></i>
                         Buscar
                     </button>
-                    <a class="btn btn-outline-secondary" asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="1">
-                        <i class="bi bi-arrow-clockwise"></i>
-                        Limpiar
-                    </a>
                 </div>
                 <input type="hidden" name="cantidadPaginado" value="@ViewBag.cantidadPaginado">
             </form>
+        </div>
+        <div class="col d-flex justify-content-end align-items-center mt-3 me-5">
+            <a class="btn btn-outline-dark" asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="1">
+                <i class="bi bi-arrow-clockwise"></i>
+                Recargar Todos
+            </a>
         </div>
     </div>
     <div class="table-responsive my-2 rounded-3 fixed-height-table-container">
@@ -85,15 +91,15 @@
     <nav>
         <ul id="paginador" class="pagination justify-content-center">
             <li id="flecha-pag-izq" class="page-item @(ViewBag.paginaAnterior == 0 ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Anterior">
-                <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaAnterior" class="page-link"><span>&laquo;</span></a>
+                <a asp-action="Index" asp-route-nomApe="@ViewBag.busqueda" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaAnterior" class="page-link"><span>&laquo;</span></a>
             </li>
             @for (int i = 1; i <= ViewBag.cantPag; i++) {
                 <li class="page-item">
-                    <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@i" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a>
+                    <a asp-action="Index" asp-route-nomApe="@ViewBag.busqueda" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@i" class="page-link @(i > ViewBag.paginaAnterior && i < ViewBag.paginaSiguiente ? "active" : "")">@i</a>
                 </li>
             }
             <li id="flecha-pag-der" class="page-item @(ViewBag.paginaSiguiente > ViewBag.cantPag ? "disabled" : "")" data-bs-toggle="tooltip" data-bs-title="Siguiente">
-                <a asp-action="Index" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaSiguiente" class="page-link"><span>&raquo;</span></a>
+                <a asp-action="Index" asp-route-nomApe="@ViewBag.busqueda" asp-route-cantidadPaginado="@ViewBag.cantidadPaginado" asp-route-pagina="@ViewBag.paginaSiguiente" class="page-link"><span>&raquo;</span></a>
             </li>
         </ul>
     </nav>

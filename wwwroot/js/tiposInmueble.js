@@ -1,4 +1,4 @@
-import { agregarClases, getElementById, getFormInputValue, mostrarMensaje, mostrarPregunta, removerClases } from "./frontUtils.js";
+import { getElementById, getFormInputValue, mostrarMensaje, mostrarPregunta } from "./frontUtils.js";
 import { 
   setInvalidInputStyle, 
   setValidInputStyle,

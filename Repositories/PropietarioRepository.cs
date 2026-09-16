@@ -37,9 +37,7 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
                 command.Parameters.AddWithValue($"{nameof(Propietario.Id)}", propietario.Id);
 
                 connection.Open();
-
                 modificado = command.ExecuteNonQuery() > 0;
-
                 connection.Close();
             }
         }
@@ -260,6 +258,53 @@ public class PropietarioRepository : BaseRepository, IPropietarioRepository
         }
 
         return propietarios;
+    }
+
+    public async Task<Propietario?> ObtenerPorDNIAsync(string dni)
+    {
+        Propietario? propietario = null;
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = @$"
+                SELECT 
+                    {nameof(Propietario.Id)}, 
+                    {nameof(Propietario.Nombre)}, 
+                    {nameof(Propietario.Apellido)}, 
+                    {nameof(Propietario.Dni)}, 
+                    {nameof(Propietario.Telefono)}, 
+                    {nameof(Propietario.Email)}, 
+                    {nameof(Propietario.Activo)}
+                FROM propietarios 
+                WHERE {nameof(Propietario.Dni)} = @{nameof(Propietario.Dni)};"
+            ;
+
+            using (var command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue($"{nameof(Propietario.Dni)}", dni);
+
+                connection.Open();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        propietario = new Propietario
+                        {
+                            Id = reader.GetInt32(nameof(Propietario.Id)),
+                            Nombre = reader.GetString(nameof(Propietario.Nombre)),
+                            Apellido = reader.GetString(nameof(Propietario.Apellido)),
+                            Dni = reader.GetString(nameof(Propietario.Dni)),
+                            Telefono = reader.GetString(nameof(Propietario.Telefono)),
+                            Email = reader.GetString(nameof(Propietario.Email)),
+                            Activo = reader.GetBoolean(nameof(Propietario.Activo))
+                        };
+                    }
+                }
+            }
+        }
+
+        return propietario;
     }
 
     public async Task<Propietario?> ObtenerPorIdAsync(int id)

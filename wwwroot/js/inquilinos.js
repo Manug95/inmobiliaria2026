@@ -1,4 +1,4 @@
-import { agregarClases, getElementById, getFormInputValue, mostrarMensaje, mostrarPregunta, removerClases } from "./frontUtils.js";
+import { getElementById, getFormInputValue, mostrarMensaje, mostrarPregunta } from "./frontUtils.js";
 import { 
   setInvalidInputStyle, 
   setValidInputStyle, 
@@ -70,6 +70,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     return;
+  });
+
+  const formBuscador = getElementById("buscador");
+  formBuscador?.addEventListener("submit", e => {
+    e.preventDefault();
+    const valor = getElementById("nomApe").value;
+    if (valor === undefined || valor === null) 
+      return;
+    if (valor.trim() == "") 
+      return;
+    if (valor.length > 20) {
+      setInvalidInputStyle("nomApe"); 
+      setValidationErrorMessage("tpe_buscador", "Valor de búsqueda muy largo");
+      return;
+    }
+
+    formBuscador.submit();
+  });
+
+  getElementById("limpiar").addEventListener("click", _ => {
+    const valor = getElementById("nomApe").value = "";
+    resetValidationInputStyle("nomApe");
   });
 
 });
