@@ -5,10 +5,10 @@
     ViewData["Title"] = "Reservas";
 }
 
-<div class="container-fluid shadow border rounded-4 mt-1 bg-light-subtle position-relative">
+<div class="container-fluid shadow border rounded-4 mt-4 bg-light-subtle position-relative">
     <h1 class="text-center display-4">Reservas</h1>
 
-    <div class="table-responsive my-2 rounded-3 fixed-height-table-container">
+    <div class="table-responsive my-4 rounded-3 fixed-height-table-container">
         <table class="table table-hover mb-0">
             <thead class="table-light">
                 <tr>
@@ -67,11 +67,11 @@
                                 <a class="icon-enlace" asp-action="Index" asp-controller="Pago" asp-route-reservaId="@item.Id" data-bs-toggle="tooltip" data-bs-title="Ver Pagos">
                                     <i class="bi bi-wallet2 fs-3 text-warning"></i>
                                 </a>
-                                @if (item.FechaFin < DateTime.Today) {
-                                    <i id="mult-@item.Id" class="bi bi-file-check fs-3 text-success" data-bs-toggle="tooltip" data-bs-title="Reserva Concluida"></i>
+                                @if (item.FechaTerminado != null) {
+                                    <i id="end-@item.Id" class="bi bi-file-earmark-x-fill fs-3 text-danger" data-bs-toggle="tooltip" data-bs-title="Reserva Terminada"></i>
                                 } else {
-                                    @if (item.FechaTerminado != null){
-                                        <i id="end-@item.Id" class="bi bi-file-earmark-x-fill fs-3 text-danger" data-bs-toggle="tooltip" data-bs-title="Reserva Terminada"></i>
+                                    @if (item.FechaFin < DateTime.Today){
+                                        <i id="mult-@item.Id" class="bi bi-file-earmark-check fs-3 text-success" data-bs-toggle="tooltip" data-bs-title="Reserva Concluida"></i>
                                     } else {
                                         <i id="end-@item.Id" class="bi bi-file-earmark-x fs-3 text-danger icon-hover" data-bs-toggle="tooltip" data-bs-title="Terminar Reserva"></i>
                                     }
@@ -119,6 +119,12 @@
         <div class="position-absolute bottom-0 end-0 me-4 mb-2 contenedor-iconos">
             <a asp-action="Index" class="icon-enlace d-inline-block">
                 <i class="bi bi-arrow-counterclockwise fs-1 text-primary" data-bs-toggle="tooltip" data-bs-title="Recargar Reservas"></i>
+            </a>
+        </div>
+    } else {
+        <div id="btn_add" class="position-absolute bottom-0 end-0 me-4 mb-2 contenedor-iconos">
+            <a asp-controller="Inmueble" asp-action="Reservar" class="icon-enlace d-inline-block">
+                <i class="bi bi-plus-square fs-1 text-primary" data-bs-toggle="tooltip" data-bs-title="Realizar Reserva"></i>
             </a>
         </div>
     }

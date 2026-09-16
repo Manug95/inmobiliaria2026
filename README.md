@@ -32,7 +32,7 @@ El archivo "dbinmobiliaria.sql" contiene la creación de la BD en MySql 8.0.43 y
 7. Presionar el boton **Start Import**.
 8. En el panel izquierdo, ir a la pestaña **Schemas**
 9. Click derecho en cualquier lugar del panel y seleccionar **Refresh All**
-10. Verificar que aparezca la base `dbinmobiliaria` con las tablas `propietarios`, `inquilinos`, `inmuebles`, `tipos_inmueble`, `imagenes` y `reservas`.
+10. Verificar que aparezca la base de datos `dbinmobiliaria` con las tablas `propietarios`, `inquilinos`, `inmuebles`, `tipos_inmueble`, `imagenes`, `reservas`, `pagos` y `usuarios`.
 
 #### Opción 2: importar con phpMyAdmin
 
@@ -42,7 +42,7 @@ El archivo "dbinmobiliaria.sql" contiene la creación de la BD en MySql 8.0.43 y
 4. Seleccionar la pestaña **Importar**.
 5. Elegir el archivo `dbinmobiliaria.sql` del proyecto.
 6. Mantener el formato SQL y presionar **Continuar**.
-7. Verificar que aparezca la base `dbinmobiliaria` con las tablas `propietarios`, `inquilinos`, `inmuebles`, `tipos_inmueble`, `imagenes` y `reservas`.
+7. Verificar que aparezca la base de datos `dbinmobiliaria` con las tablas `propietarios`, `inquilinos`, `inmuebles`, `tipos_inmueble`, `imagenes`, `reservas`, `pagos` y `usuarios`.
 
 # 🚀 Guía para ejecutar el proyecto
 ## 1. Clonar el repositorio
@@ -67,7 +67,7 @@ Ejecutar la app con `dotnet run` porque al ejecutar con `dotnet watch` crashea a
 ### 🏠 Realizar una Reserva
 
 #### Opción 1
-1. En el menú de navegacion Inmuebles -> Reservar Inmueble
+1. En el menú de navegacion Reservas -> Reservar Inmueble
 2. Rellenar el fomulario con los campo requeridos y deseados
 3. Si se encontro el inmueble deseado, clickear el icono de Reservar Inmueble
 4. Rellenar el formulario de la reserva
@@ -75,5 +75,11 @@ Ejecutar la app con `dotnet run` porque al ejecutar con `dotnet watch` crashea a
 #### Opción 2
 1. En el menú de navegacion Inquilinos
 2. Buscar el Inquilino que quiere hacer la reserva
-3. Clickear el icono de Reservar Inmueble que tiene cada inquilino
+3. Click en el icono de Reservar Inmueble que tiene cada inquilino
 4. Rellenar el formulario de la reserva
+
+## 🖥 Usuarios
+### Con rol ADMIN
+* mail: manuel@mail.com - contraseña: 123
+### Con rol EMPLEADO
+* mail: a@mail.com - contraseña: 123

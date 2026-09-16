@@ -3,10 +3,10 @@
     ViewData["Title"] = "Pagos";
 }
 
-<div class="container-fluid shadow border rounded-4 mt-1 bg-light-subtle position-relative">
+<div class="container-fluid shadow border rounded-4 mt-4 bg-light-subtle position-relative">
     <h1 class="text-center display-4">Pagos</h1>
 
-    <div class="table-responsive my-2 rounded-3 fixed-height-table-container">
+    <div class="table-responsive my-4 rounded-3 fixed-height-table-container">
         <table class="table table-hover mb-0">
             <thead class="table-light">
                 <tr>
@@ -116,7 +116,7 @@
 
 @section Scripts{
     <script type="module">
-        import { getElementById, mostrarMensaje, mostrarPregunta } from "/js/frontUtils.js";
+        import { getElementById, mostrarMensaje, mostrarPregunta, aFechaLocal } from "/js/frontUtils.js";
 
         document.addEventListener("DOMContentLoaded", () => {
             mostrarMensaje(false, null);
@@ -141,7 +141,7 @@
 
         function mostrarModalDetalle(pago) {
             getElementById("nro").textContent = pago.id;
-            getElementById("fPago_detalle").textContent = aFechaLocal(pago.fecha?.split("T")[0]);
+            getElementById("fPago_detalle").textContent = aFechaLocal(pago.fecha);
             getElementById("importePago_detalle").textContent = `$ ${pago.importe}`;
             getElementById("concepto_detalle").textContent = pago.concepto;
             getElementById("estadoPago_detalle").textContent = pago.anulado ? "ANULADO ❌" : "VÁLIDO ✔";
@@ -163,18 +163,13 @@
             getElementById("lat_detalle").textContent = pago.reserva.inmueble.latitud;
             getElementById("long_detalle").textContent = pago.reserva.inmueble.longitud;
             getElementById("habilitado_detalle").textContent = pago.reserva.inmueble.disponible ? "✔" : "❌";
-            getElementById("fIni_detalle").textContent = aFechaLocal(pago.reserva.fechaInicio?.split("T")[0]);
-            getElementById("fFin_detalle").textContent = aFechaLocal(pago.reserva.fechaFin?.split("T")[0]);
+            getElementById("fIni_detalle").textContent = aFechaLocal(pago.reserva.fechaInicio);
+            getElementById("fFin_detalle").textContent = aFechaLocal(pago.reserva.fechaFin);
             getElementById("monto_detalle").textContent = `$ ${pago.reserva.monto}`;
-            getElementById("fTerm_detalle").textContent = pago.reserva.fechaTerminado ? aFechaLocal(pago.reserva.fechaTerminado?.split("T")[0]) : " - ";
+            getElementById("fTerm_detalle").textContent = pago.reserva.fechaTerminado ? aFechaLocal(pago.reserva.fechaTerminado) : " - ";
 
             const myModal = new bootstrap.Modal(getElementById('modal_detalle_pago'), {});
             myModal.show();
-        }
-
-        function aFechaLocal(fecha) {
-            if (!fecha) return;
-            return fecha.split("-").reverse().join("/");
         }
     </script>
 }
