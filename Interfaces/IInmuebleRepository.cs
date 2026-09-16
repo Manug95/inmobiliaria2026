@@ -7,6 +7,7 @@ public interface IInmuebleRepository : IRepository<Inmueble, int>
     public Task<IList<Inmueble>> ListarInmuebles(int disponible, int? offset, int? limit, string? nomApeProp);
     public Task<IList<Inmueble>> ListarInmueblesPorPropietario(int idProp, int? offset, int? limit);
     public Task<int> ContarInmuebles(int? disponible, int? idProp);
+    public Task<int> ContarInmuebles(int? disponible, string? prop);
     public Task<int> ContarSinReservas(int dias);
     public Task<long> ContarNoOcupados(DateTime desde, DateTime hasta);
     public Task<long> ContarInmueblesParaAlquilar(string desde, string hasta, int? tipo, int? cupo, decimal? precio);

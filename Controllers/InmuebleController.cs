@@ -29,23 +29,31 @@ public class InmuebleController : ControladorBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index([FromQuery] string? prop, [FromQuery] int idProp = 0, [FromQuery] int pagina = 1, [FromQuery] int cantidadPaginado = 10, [FromQuery] int disp = (int)Disponiblilidad.TODOS)
+    public async Task<IActionResult> Index(
+        [FromQuery] string? prop, 
+        [FromQuery] int idProp = 0, 
+        [FromQuery] int pagina = 1, 
+        [FromQuery] int cantidadPaginado = 10, 
+        [FromQuery] int disp = (int)Disponiblilidad.TODOS
+    )
     {
         if (idProp < 0 || pagina <= 0 || cantidadPaginado <= 0 || !Enum.IsDefined(typeof(Disponiblilidad), disp))
             return BadRequest();
 
         IList<Inmueble>? inmuebles;
-        int cantidadInmuebles = await _repo.ContarInmuebles(disp, idProp);
+        int cantidadInmuebles;
 
         if (idProp != 0)
         {
             inmuebles = await _repo.ListarInmueblesPorPropietario(idProp, pagina, cantidadPaginado);
+            cantidadInmuebles = await _repo.ContarInmuebles(disp, idProp);
             if (inmuebles.Count != 0)
                 ViewBag.propietario = inmuebles.First()?.Duenio?.Apellido + " " + inmuebles.First()?.Duenio?.Nombre;
         }
         else
         {
             inmuebles = await _repo.ListarInmuebles(disp, pagina, cantidadPaginado, prop);
+            cantidadInmuebles = await _repo.ContarInmuebles(disp, prop);
             ViewBag.propietario = prop;
         }
         

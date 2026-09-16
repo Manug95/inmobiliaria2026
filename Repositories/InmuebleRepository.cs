@@ -84,6 +84,40 @@ public class InmuebleRepository : BaseRepository, IInmuebleRepository
         return cantidadInmuebles;
     }
 
+    public async Task<int> ContarInmuebles(int? disponible, string? nomApeProp)
+    {
+        int cantidadInmuebles = 0;
+
+        using (var connection = new MySqlConnection(_connectionString))
+        {
+            string sql = @$"
+                SELECT COUNT(i.{nameof(Inmueble.Id)}) AS cantidad 
+                FROM inmuebles AS i 
+                INNER JOIN propietarios AS p 
+                    ON i.{nameof(Inmueble.IdPropietario)} = p.{nameof(Propietario.Id)} 
+                WHERE i.{nameof(Inmueble.Borrado)} = 0 
+                    AND (p.{nameof(Propietario.Nombre)} LIKE @nomApeProp OR p.{nameof(Propietario.Apellido)} LIKE @nomApeProp)"
+            ;
+
+            if (disponible.HasValue && ((int)Disponiblilidad.HABILITADOS == disponible.Value || (int)Disponiblilidad.NO_HABILITADOS == disponible.Value))
+                sql += $" AND i.{nameof(Inmueble.Disponible)} = @disponible";
+
+            using (var command = new MySqlCommand(sql + ";", connection))
+            {
+                command.Parameters.AddWithValue("nomApeProp", $"{nomApeProp}%");
+
+                if (disponible.HasValue && ((int)Disponiblilidad.HABILITADOS == disponible.Value || (int)Disponiblilidad.NO_HABILITADOS == disponible.Value))
+                    command.Parameters.AddWithValue("disponible", disponible.Value);
+
+                connection.Open();
+                cantidadInmuebles = Convert.ToInt32(command.ExecuteScalar());
+                connection.Close();
+            }
+        }
+
+        return cantidadInmuebles;
+    }
+
     public async Task<int> ContarSinReservas(int dias)
     {
         int cantidadInmuebles = 0;

@@ -105,7 +105,10 @@
 </div>
 
 <partial name="_DetailsPagoModal"/>
-<partial name="_ModalEliminar"/>
+
+@if (User.IsInRole(Rol.ADMIN.ToString())) {
+    <partial name="_ModalEliminar"/>
+}
 
 @if(!string.IsNullOrEmpty(ViewBag.MensajeError)) {
     <partial name="_MensajeError" model="ViewBag.MensajeError"/>
